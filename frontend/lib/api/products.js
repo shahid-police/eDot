@@ -10,6 +10,15 @@ export function getProductBySlug(slug) {
   return apiGet(`/api/v1/products/${encodeURIComponent(slug)}`);
 }
 
+export async function loadApiProductBySlug(slug) {
+  try {
+    return await getProductBySlug(slug);
+  } catch (error) {
+    console.error(`Product API unavailable for "${slug}", trying template data:`, error);
+    return null;
+  }
+}
+
 /**
  * Adapts an API ProductListItemDto to the card shape the Vemus shop grid renders.
  * Fields the API does not model yet (size, multi-colour facets) are left empty.
