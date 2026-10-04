@@ -1,10 +1,12 @@
 using Elegance.Application.Auth;
 using Elegance.Application.Carts;
+using Elegance.Application.Compare;
 using Elegance.Application.Categories;
 using Elegance.Application.Customers;
 using Elegance.Application.Products;
 using Elegance.Infrastructure.Auth;
 using Elegance.Infrastructure.Carts;
+using Elegance.Infrastructure.Compare;
 using Elegance.Infrastructure.Catalog;
 using Elegance.Infrastructure.Customers;
 using Elegance.Infrastructure.Wishlists;
@@ -44,6 +46,7 @@ public static class DependencyInjection
         services.AddScoped<ICustomerService, CustomerService>();
         services.AddScoped<ICartService, CartService>();
         services.AddScoped<IWishlistService, WishlistService>();
+        services.AddScoped<ICompareService, CompareService>();
 
         return services;
     }

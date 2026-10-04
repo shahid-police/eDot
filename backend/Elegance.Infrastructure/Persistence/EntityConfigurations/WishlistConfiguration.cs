@@ -17,5 +17,8 @@ public class WishlistConfiguration : IEntityTypeConfiguration<Wishlist>
             .HasForeignKey(w => w.CustomerId)
             .OnDelete(DeleteBehavior.Cascade);
         builder.HasIndex(w => w.CustomerId).IsUnique();
+
+        builder.Property(w => w.GuestTokenHash).HasMaxLength(128);
+        builder.HasIndex(w => w.GuestTokenHash).IsUnique();
     }
 }

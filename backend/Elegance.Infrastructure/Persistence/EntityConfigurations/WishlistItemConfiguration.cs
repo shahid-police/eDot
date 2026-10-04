@@ -22,6 +22,11 @@ public class WishlistItemConfiguration : IEntityTypeConfiguration<WishlistItem>
             .HasForeignKey(i => i.ProductId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasIndex(i => new { i.WishlistId, i.ProductId }).IsUnique();
+        builder.HasOne(i => i.Variant)
+            .WithMany()
+            .HasForeignKey(i => i.VariantId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasIndex(i => new { i.WishlistId, i.ProductId, i.VariantId }).IsUnique();
     }
 }

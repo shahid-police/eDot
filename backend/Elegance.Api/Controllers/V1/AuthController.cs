@@ -1,6 +1,8 @@
 using Elegance.Api.Contracts;
 using Elegance.Application.Auth;
 using Elegance.Application.Carts;
+using Elegance.Application.Compare;
+using Elegance.Application.Wishlists;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 
@@ -8,7 +10,11 @@ namespace Elegance.Api.Controllers.V1;
 
 [ApiController]
 [Route("api/v1/auth")]
-public class AuthController(IAuthService authService, ICartService cartService) : ControllerBase
+public class AuthController(
+    IAuthService authService,
+    ICartService cartService,
+    IWishlistService wishlistService,
+    ICompareService compareService) : ControllerBase
 {
     public const string RefreshCookieName = "elegance_refresh";
     private const string RefreshCookiePath = "/api/v1/auth";
@@ -18,7 +24,7 @@ public class AuthController(IAuthService authService, ICartService cartService) 
     public async Task<ActionResult<AuthResponse>> Register([FromBody] RegisterRequest request, CancellationToken cancellationToken)
     {
         var session = await authService.RegisterAsync(request, cancellationToken);
-        await AdoptGuestCartAsync(session.Customer.Id, cancellationToken);
+        await AdoptGuestListsAsync(session.Customer.Id, cancellationToken);
         SetRefreshCookie(session.RefreshToken, session.RefreshTokenExpiresAt);
         return StatusCode(StatusCodes.Status201Created, ToResponse(session));
     }
@@ -28,7 +34,7 @@ public class AuthController(IAuthService authService, ICartService cartService) 
     public async Task<ActionResult<AuthResponse>> Login([FromBody] LoginRequest request, CancellationToken cancellationToken)
     {
         var session = await authService.LoginAsync(request, cancellationToken);
-        await AdoptGuestCartAsync(session.Customer.Id, cancellationToken);
+        await AdoptGuestListsAsync(session.Customer.Id, cancellationToken);
         SetRefreshCookie(session.RefreshToken, session.RefreshTokenExpiresAt);
         return Ok(ToResponse(session));
     }
@@ -50,16 +56,23 @@ public class AuthController(IAuthService authService, ICartService cartService) 
         return NoContent();
     }
 
-    private async Task AdoptGuestCartAsync(long customerId, CancellationToken cancellationToken)
+    private async Task AdoptGuestListsAsync(long customerId, CancellationToken cancellationToken)
     {
-        var guestToken = Request.Cookies[CartController.GuestCookieName];
+        await AdoptGuestListAsync(CartController.GuestCookieName, token => cartService.MergeGuestCartAsync(customerId, token, cancellationToken), cancellationToken);
+        await AdoptGuestListAsync(WishlistController.GuestCookieName, token => wishlistService.MergeGuestWishlistAsync(customerId, token, cancellationToken), cancellationToken);
+        await AdoptGuestListAsync(CompareController.GuestCookieName, token => compareService.MergeGuestCompareAsync(customerId, token, cancellationToken), cancellationToken);
+    }
+
+    private async Task AdoptGuestListAsync(string cookieName, Func<string, Task> merge, CancellationToken cancellationToken)
+    {
+        var guestToken = Request.Cookies[cookieName];
         if (string.IsNullOrEmpty(guestToken))
         {
             return;
         }
 
-        await cartService.MergeGuestCartAsync(customerId, guestToken, cancellationToken);
-        Response.Cookies.Delete(CartController.GuestCookieName, new CookieOptions { Path = "/", Secure = true, SameSite = SameSiteMode.Lax });
+        await merge(guestToken);
+        Response.Cookies.Delete(cookieName, new CookieOptions { Path = "/", Secure = true, SameSite = SameSiteMode.Lax });
     }
 
     private void SetRefreshCookie(string refreshToken, DateTime expiresAt)

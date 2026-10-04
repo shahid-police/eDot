@@ -394,6 +394,65 @@ namespace Elegance.Infrastructure.Persistence.Migrations
                     b.ToTable("product_variants", (string)null);
                 });
 
+            modelBuilder.Entity("Elegance.Domain.Compare.CompareItem", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("AddedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<long>("CompareListId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("ProductId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("CompareListId", "ProductId")
+                        .IsUnique();
+
+                    b.ToTable("compare_items", (string)null);
+                });
+
+            modelBuilder.Entity("Elegance.Domain.Compare.CompareList", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<long?>("CustomerId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("GuestTokenHash")
+                        .HasMaxLength(128)
+                        .HasColumnType("varchar(128)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId")
+                        .IsUnique();
+
+                    b.HasIndex("GuestTokenHash")
+                        .IsUnique();
+
+                    b.ToTable("compare_lists", (string)null);
+                });
+
             modelBuilder.Entity("Elegance.Domain.Customers.Customer", b =>
                 {
                     b.Property<long>("Id")
@@ -622,8 +681,12 @@ namespace Elegance.Infrastructure.Persistence.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<long>("CustomerId")
+                    b.Property<long?>("CustomerId")
                         .HasColumnType("bigint");
+
+                    b.Property<string>("GuestTokenHash")
+                        .HasMaxLength(128)
+                        .HasColumnType("varchar(128)");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime(6)");
@@ -631,6 +694,9 @@ namespace Elegance.Infrastructure.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId")
+                        .IsUnique();
+
+                    b.HasIndex("GuestTokenHash")
                         .IsUnique();
 
                     b.ToTable("wishlists", (string)null);
@@ -650,6 +716,9 @@ namespace Elegance.Infrastructure.Persistence.Migrations
                     b.Property<long>("ProductId")
                         .HasColumnType("bigint");
 
+                    b.Property<long?>("VariantId")
+                        .HasColumnType("bigint");
+
                     b.Property<long>("WishlistId")
                         .HasColumnType("bigint");
 
@@ -657,7 +726,9 @@ namespace Elegance.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.HasIndex("WishlistId", "ProductId")
+                    b.HasIndex("VariantId");
+
+                    b.HasIndex("WishlistId", "ProductId", "VariantId")
                         .IsUnique();
 
                     b.ToTable("wishlist_items", (string)null);
@@ -771,6 +842,35 @@ namespace Elegance.Infrastructure.Persistence.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("Elegance.Domain.Compare.CompareItem", b =>
+                {
+                    b.HasOne("Elegance.Domain.Compare.CompareList", "CompareList")
+                        .WithMany("Items")
+                        .HasForeignKey("CompareListId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Elegance.Domain.Catalog.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CompareList");
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("Elegance.Domain.Compare.CompareList", b =>
+                {
+                    b.HasOne("Elegance.Domain.Customers.Customer", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Customer");
+                });
+
             modelBuilder.Entity("Elegance.Domain.Customers.CustomerAddress", b =>
                 {
                     b.HasOne("Elegance.Domain.Customers.Customer", "Customer")
@@ -798,8 +898,7 @@ namespace Elegance.Infrastructure.Persistence.Migrations
                     b.HasOne("Elegance.Domain.Customers.Customer", "Customer")
                         .WithMany()
                         .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Customer");
                 });
@@ -812,6 +911,11 @@ namespace Elegance.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Elegance.Domain.Catalog.ProductVariant", "Variant")
+                        .WithMany()
+                        .HasForeignKey("VariantId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
                     b.HasOne("Elegance.Domain.Wishlists.Wishlist", "Wishlist")
                         .WithMany("Items")
                         .HasForeignKey("WishlistId")
@@ -819,6 +923,8 @@ namespace Elegance.Infrastructure.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("Product");
+
+                    b.Navigation("Variant");
 
                     b.Navigation("Wishlist");
                 });
@@ -840,6 +946,11 @@ namespace Elegance.Infrastructure.Persistence.Migrations
                     b.Navigation("Images");
 
                     b.Navigation("Variants");
+                });
+
+            modelBuilder.Entity("Elegance.Domain.Compare.CompareList", b =>
+                {
+                    b.Navigation("Items");
                 });
 
             modelBuilder.Entity("Elegance.Domain.Customers.Customer", b =>

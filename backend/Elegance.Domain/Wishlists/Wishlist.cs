@@ -6,8 +6,10 @@ public class Wishlist
 {
     public long Id { get; set; }
 
-    public long CustomerId { get; set; }
-    public Customer Customer { get; set; } = null!;
+    public long? CustomerId { get; set; }
+    public Customer? Customer { get; set; }
+
+    public string? GuestTokenHash { get; set; }
 
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }

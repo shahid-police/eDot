@@ -1,5 +1,6 @@
 using Elegance.Domain.Carts;
 using Elegance.Domain.Catalog;
+using Elegance.Domain.Compare;
 using Elegance.Domain.Customers;
 using Elegance.Domain.Media;
 using Elegance.Domain.Wishlists;
@@ -26,6 +27,8 @@ public class EleganceDbContext : DbContext
     public DbSet<CartItem> CartItems => Set<CartItem>();
     public DbSet<Wishlist> Wishlists => Set<Wishlist>();
     public DbSet<WishlistItem> WishlistItems => Set<WishlistItem>();
+    public DbSet<CompareList> CompareLists => Set<CompareList>();
+    public DbSet<CompareItem> CompareItems => Set<CompareItem>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
