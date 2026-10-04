@@ -1,9 +1,12 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Slider1 from "./sliders/Slider1";
 import QuantitySelect from "../common/QuantitySelect";
 import { addCartItem } from "@/lib/api/cart";
+import { addWishlistItem, getWishlist, removeWishlistItem } from "@/lib/api/wishlist";
+import { useSession } from "@/lib/auth/session";
+import { openModal } from "@/lib/ui/modal";
 
 const GALLERY_KEY = "api";
 
@@ -15,6 +18,45 @@ export default function ApiProductDetail({ product }) {
   const [quantity, setQuantity] = useState(1);
   const [adding, setAdding] = useState(false);
   const [cartError, setCartError] = useState("");
+  const session = useSession();
+  const [wishlistItemId, setWishlistItemId] = useState(null);
+  const [wishlistBusy, setWishlistBusy] = useState(false);
+  const [wishlistError, setWishlistError] = useState("");
+
+  useEffect(() => {
+    if (!session) {
+      setWishlistItemId(null);
+      return;
+    }
+    getWishlist()
+      .then((wishlist) => {
+        const saved = wishlist.items.find((item) => item.productId === product.id);
+        setWishlistItemId(saved?.id ?? null);
+      })
+      .catch(() => setWishlistItemId(null));
+  }, [session, product.id]);
+
+  const toggleWishlist = async () => {
+    if (!session) {
+      openModal("log");
+      return;
+    }
+    setWishlistError("");
+    setWishlistBusy(true);
+    try {
+      if (wishlistItemId) {
+        await removeWishlistItem(wishlistItemId);
+        setWishlistItemId(null);
+      } else {
+        const wishlist = await addWishlistItem(product.id);
+        setWishlistItemId(wishlist.items.find((item) => item.productId === product.id)?.id ?? null);
+      }
+    } catch (err) {
+      setWishlistError(err.message || "We could not update your wishlist.");
+    } finally {
+      setWishlistBusy(false);
+    }
+  };
 
   const selectedVariant =
     product.variants.find((variant) => variant.id === selectedVariantId) ?? null;
@@ -138,6 +180,15 @@ export default function ApiProductDetail({ product }) {
                       {adding ? "adding..." : inStock ? "add to bag" : "currently unavailable"}
                     </button>
                     {cartError && <p className="text-danger mt-2 mb-0">{cartError}</p>}
+                    <button
+                      type="button"
+                      className="tf-btn style-2 w-100 mt-2 fw-medium"
+                      disabled={wishlistBusy}
+                      onClick={toggleWishlist}
+                    >
+                      {wishlistItemId ? "remove from wishlist" : "add to wishlist"}
+                    </button>
+                    {wishlistError && <p className="text-danger mt-2 mb-0">{wishlistError}</p>}
                   </div>
                 </div>
               </div>

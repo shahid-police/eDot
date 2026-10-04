@@ -2,6 +2,7 @@ using Elegance.Domain.Carts;
 using Elegance.Domain.Catalog;
 using Elegance.Domain.Customers;
 using Elegance.Domain.Media;
+using Elegance.Domain.Wishlists;
 using Microsoft.EntityFrameworkCore;
 
 namespace Elegance.Infrastructure.Persistence;
@@ -23,6 +24,8 @@ public class EleganceDbContext : DbContext
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
     public DbSet<Cart> Carts => Set<Cart>();
     public DbSet<CartItem> CartItems => Set<CartItem>();
+    public DbSet<Wishlist> Wishlists => Set<Wishlist>();
+    public DbSet<WishlistItem> WishlistItems => Set<WishlistItem>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

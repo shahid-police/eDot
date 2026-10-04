@@ -1,4 +1,4 @@
-using Elegance.Application.Common;
+using Elegance.Api.Auth;
 using Elegance.Application.Customers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,46 +13,35 @@ public class CustomersController(ICustomerService customerService) : ControllerB
     [HttpGet]
     public async Task<ActionResult<CustomerDto>> GetProfile(CancellationToken cancellationToken)
     {
-        var profile = await customerService.GetProfileAsync(CurrentCustomerId, cancellationToken);
+        var profile = await customerService.GetProfileAsync(User.GetCustomerId(), cancellationToken);
         return Ok(profile);
     }
 
     [HttpGet("addresses")]
     public async Task<ActionResult<IReadOnlyList<AddressDto>>> GetAddresses(CancellationToken cancellationToken)
     {
-        var addresses = await customerService.GetAddressesAsync(CurrentCustomerId, cancellationToken);
+        var addresses = await customerService.GetAddressesAsync(User.GetCustomerId(), cancellationToken);
         return Ok(addresses);
     }
 
     [HttpPost("addresses")]
     public async Task<ActionResult<AddressDto>> AddAddress([FromBody] AddressRequest request, CancellationToken cancellationToken)
     {
-        var address = await customerService.AddAddressAsync(CurrentCustomerId, request, cancellationToken);
+        var address = await customerService.AddAddressAsync(User.GetCustomerId(), request, cancellationToken);
         return StatusCode(StatusCodes.Status201Created, address);
     }
 
     [HttpPut("addresses/{addressId:long}")]
     public async Task<ActionResult<AddressDto>> UpdateAddress(long addressId, [FromBody] AddressRequest request, CancellationToken cancellationToken)
     {
-        var address = await customerService.UpdateAddressAsync(CurrentCustomerId, addressId, request, cancellationToken);
+        var address = await customerService.UpdateAddressAsync(User.GetCustomerId(), addressId, request, cancellationToken);
         return Ok(address);
     }
 
     [HttpDelete("addresses/{addressId:long}")]
     public async Task<IActionResult> DeleteAddress(long addressId, CancellationToken cancellationToken)
     {
-        await customerService.DeleteAddressAsync(CurrentCustomerId, addressId, cancellationToken);
+        await customerService.DeleteAddressAsync(User.GetCustomerId(), addressId, cancellationToken);
         return NoContent();
-    }
-
-    private long CurrentCustomerId
-    {
-        get
-        {
-            var subject = User.FindFirst("sub")?.Value;
-            return long.TryParse(subject, out var id)
-                ? id
-                : throw new ApplicationFailure(FailureKind.Unauthorized, "Your session has expired. Please sign in again.");
-        }
     }
 }

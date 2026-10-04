@@ -7,6 +7,8 @@ using Elegance.Infrastructure.Auth;
 using Elegance.Infrastructure.Carts;
 using Elegance.Infrastructure.Catalog;
 using Elegance.Infrastructure.Customers;
+using Elegance.Infrastructure.Wishlists;
+using Elegance.Application.Wishlists;
 using Elegance.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -41,6 +43,7 @@ public static class DependencyInjection
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<ICustomerService, CustomerService>();
         services.AddScoped<ICartService, CartService>();
+        services.AddScoped<IWishlistService, WishlistService>();
 
         return services;
     }
