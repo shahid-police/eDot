@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import Image from "next/image";
 import QuickView from "@/components/common/QuickView";
-import AddtoCompare from "@/components/common/AddtoCompare";
 import DiscountMarquee from "@/components/common/DiscountMarquee";
 import { Navigation, Pagination } from "swiper/modules";
 import CountdownTimer from "@/components/common/Countdown";
@@ -112,10 +111,7 @@ export default function Products1() {
                                                                                     <li>
                               <QuickView product={product} />
                             </li>
-                            <li className="compare">
-                              <AddtoCompare product={product} />
-                            </li>
-                          </ul>
+                                                      </ul>
                         )}
 
                         {product.badge && (

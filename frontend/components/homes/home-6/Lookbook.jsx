@@ -5,7 +5,6 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import Link from "next/link";
 import Image from "next/image";
 import QuickView from "@/components/common/QuickView";
-import AddtoCompare from "@/components/common/AddtoCompare";
 import { Navigation, Pagination } from "swiper/modules";
 import { useEffect, useRef } from "react";
 export default function Lookbook() {
@@ -148,10 +147,7 @@ export default function Lookbook() {
                                                 <li>
                           <QuickView product={product} />
                         </li>
-                        <li className="compare">
-                          <AddtoCompare product={product} />
-                        </li>
-                      </ul>
+                                              </ul>
                       {product.oldPrice && (
                         <div className="badge-box">
                           <span className="badge-item sale">30% OFF</span>

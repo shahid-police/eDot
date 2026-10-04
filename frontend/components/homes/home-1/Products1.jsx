@@ -5,7 +5,6 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import Link from "next/link";
 import Image from "next/image";
 import QuickView from "@/components/common/QuickView";
-import AddtoCompare from "@/components/common/AddtoCompare";
 export default function Products1() {
   return (
     <section className="flat-spacing-3 bg-main-2 overflow-hidden">
@@ -61,10 +60,7 @@ export default function Products1() {
                                                                         <li>
                           <QuickView product={product} />
                         </li>
-                        <li className="compare">
-                          <AddtoCompare product={product} />
-                        </li>
-                      </ul>
+                                              </ul>
                     </div>
                     <div className="card_product-info">
                       <Link

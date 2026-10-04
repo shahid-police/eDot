@@ -1,18 +1,10 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Link from "next/link";
-import Image from "next/image";
-import { useContextElement } from "@/context/Context";
-import { allProducts } from "@/data/products";
+import { useServerCompare } from "@/lib/compare/useServerCompare";
+
 export default function Compare() {
-  const { removeFromCompareItem, compareItem, setCompareItem } =
-    useContextElement();
-  const [items, setItems] = useState([]);
-  useEffect(() => {
-    setItems([
-      ...allProducts.filter((product) => compareItem.includes(product.id)),
-    ]);
-  }, [compareItem]);
+  const { compare, items, remove, clear } = useServerCompare("compare");
 
   return (
     <div className="modal modalCentered fade modal-compare" id="compare">
@@ -27,59 +19,25 @@ export default function Compare() {
           <div className="modal-body main-list-clear">
             <div className="tf-compare-inner">
               <div className="tf-compare-list list-empty">
-                {!compareItem.length ? (
-                  <p className="text-empty">Your compare is curently empty</p>
-                ) : (
-                  ""
+                {compare !== null && items.length === 0 && (
+                  <p className="text-empty">Your compare is currently empty</p>
                 )}
-                {items.map((product, i) => (
-                  <div
-                    key={i}
-                    className="tf-compare-item card_product--V01 file-delete"
-                  >
+                {items.map((item) => (
+                  <div key={item.id} className="tf-compare-item card_product--V01 file-delete">
                     <div className="card_product-wrapper aspect-ratio-1">
-                      <span
-                        className="remove icon-close"
-                        onClick={() => removeFromCompareItem(product.id)}
-                      />
-                      <Link
-                        href={`/product-default/${product.id}`}
-                        className="product-img"
-                      >
-                        <Image
-                          src={product.imgSrc}
-                          alt="Image Product"
-                          className="lazyload img-product"
-                          width={714}
-                          height={900}
-                        />
-                        {product.hoverImgSrc && (
-                          <Image
-                            src={product.hoverImgSrc}
-                            alt="Image Product"
-                            className="lazyload img-hover"
-                            width={714}
-                            height={900}
-                          />
+                      <span className="remove icon-close" role="button" onClick={() => remove(item.id)} />
+                      <Link href={`/product-default/${item.slug}`} className="product-img">
+                        {item.imageUrl && (
+                          <img src={item.imageUrl} alt={item.name} className="lazyload img-product" width={714} height={900} />
                         )}
                       </Link>
                     </div>
                     <div className="card_product-info text-center">
-                      <Link
-                        href={`/product-default/${product.id}`}
-                        className="name-product link text-line-clamp-2"
-                      >
-                        {product.title}
+                      <Link href={`/product-default/${item.slug}`} className="name-product link text-line-clamp-2">
+                        {item.name}
                       </Link>
                       <div className="price-wrap justify-content-center">
-                        <span className="price-new">
-                          ${product.price.toFixed(2)}
-                        </span>
-                        {product.oldPrice && (
-                          <span className="price-old fw-normal text-caption">
-                            ${product.oldPrice.toFixed(2)}
-                          </span>
-                        )}
+                        <span className="price-new">${(item.salePrice ?? item.price).toFixed(2)}</span>
                       </div>
                     </div>
                   </div>
@@ -87,18 +45,10 @@ export default function Compare() {
               </div>
             </div>
             <div className="group-btn">
-              <Link
-                href={`/compare`}
-                className="tf-btn btn-fill animate-btn fw-medium"
-              >
-                COMPARE{" "}
-                <span className="count-item-compare">({items.length})</span>
+              <Link href="/compare" className="tf-btn btn-fill animate-btn fw-medium">
+                COMPARE <span className="count-item-compare">({items.length})</span>
               </Link>
-              <button
-                type="button"
-                onClick={() => setCompareItem([])}
-                className="tf-btn fw-medium clear-list-empty"
-              >
+              <button type="button" onClick={clear} className="tf-btn fw-medium clear-list-empty">
                 <span>CLEAR ALL</span>
               </button>
             </div>

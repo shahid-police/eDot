@@ -11,9 +11,7 @@ export const useContextElement = () => {
 
 export default function Context({ children }) {
   const [cartProducts, setCartProducts] = useState([]);
-  const [compareItem, setCompareItem] = useState([1, 2, 3, 4]);
   const [quickViewItem, setQuickViewItem] = useState(allProducts[0]);
-  const [quickAddItem, setQuickAddItem] = useState(1);
   const [totalPrice, setTotalPrice] = useState(0);
   useEffect(() => {
     const subtotal = cartProducts.reduce((accumulator, product) => {
@@ -53,22 +51,6 @@ export default function Context({ children }) {
     }
   };
 
-  const addToCompareItem = (id) => {
-    if (!compareItem.includes(id)) {
-      setCompareItem((pre) => [...pre, id]);
-    }
-  };
-  const removeFromCompareItem = (id) => {
-    if (compareItem.includes(id)) {
-      setCompareItem((pre) => [...pre.filter((elm) => elm != id)]);
-    }
-  };
-  const isAddedtoCompareItem = (id) => {
-    if (compareItem.includes(id)) {
-      return true;
-    }
-    return false;
-  };
   useEffect(() => {
     localStorage.removeItem("cartList");
   }, []);
@@ -81,13 +63,6 @@ export default function Context({ children }) {
     isAddedToCartProducts,
     quickViewItem,
     setQuickViewItem,
-    quickAddItem,
-    setQuickAddItem,
-    addToCompareItem,
-    isAddedtoCompareItem,
-    removeFromCompareItem,
-    compareItem,
-    setCompareItem,
     updateQuantity,
   };
   return (

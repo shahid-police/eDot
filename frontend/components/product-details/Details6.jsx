@@ -6,7 +6,6 @@ import Link from "next/link";
 import ColorSelect from "./ColorSelect";
 import { useContextElement } from "@/context/Context";
 import QuantitySelect from "../common/QuantitySelect";
-import AddtoCompare from "../common/AddtoCompare";
 
 import Image from "next/image";
 import PairProducts from "./PairProducts";
@@ -148,12 +147,7 @@ export default function Details6({ product }) {
                       
                       <div className="group-btn-action">
                         
-                        <AddtoCompare
-                          tooltipDirection="top"
-                          product={product}
-                          additionalClass="tf-btn-icon"
-                        />
-                      </div>
+                                              </div>
                     </div>
                     <Link
                       href={`/checkout`}

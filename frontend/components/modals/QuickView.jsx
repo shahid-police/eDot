@@ -21,8 +21,6 @@ export default function QuickView() {
   const {
     quickViewItem,
     isAddedToCartProducts,
-    addToCompareItem,
-    isAddedtoCompareItem,
     cartProducts,
   } = useContextElement();
   useEffect(() => {
@@ -160,22 +158,7 @@ export default function QuickView() {
                   
                   <div className="group-btn-action">
                     
-                    <a
-                      className="tf-btn-icon hover-tooltip"
-                      onClick={() => {
-                        if (quickViewItem.id) {
-                          addToCompareItem(quickViewItem.id);
-                        }
-                      }}
-                    >
-                      <span className="icon icon-compare" />
-                      <span className="tooltip">
-                        {" "}
-                        {isAddedtoCompareItem(quickViewItem.id)
-                          ? "Compared"
-                          : "Compare"}
-                      </span>
-                    </a>
+                    
                   </div>
                 </div>
                 <Link

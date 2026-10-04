@@ -5,75 +5,80 @@ import Slider1 from "./sliders/Slider1";
 import QuantitySelect from "../common/QuantitySelect";
 import { addCartItem } from "@/lib/api/cart";
 import { addWishlistItem, getWishlist, removeWishlistItem } from "@/lib/api/wishlist";
+import { addCompareItem, getCompare, removeCompareItem } from "@/lib/api/compare";
 import { useSession } from "@/lib/auth/session";
-import { openModal } from "@/lib/ui/modal";
 
 const GALLERY_KEY = "api";
 
 export default function ApiProductDetail({ product }) {
   const router = useRouter();
+  const session = useSession();
   const initialVariant =
     product.variants.find((variant) => variant.inStock) ?? product.variants[0] ?? null;
   const [selectedVariantId, setSelectedVariantId] = useState(initialVariant?.id ?? null);
   const [quantity, setQuantity] = useState(1);
   const [adding, setAdding] = useState(false);
   const [cartError, setCartError] = useState("");
-  const session = useSession();
-  const [wishlistItemId, setWishlistItemId] = useState(null);
-  const [wishlistBusy, setWishlistBusy] = useState(false);
-  const [wishlistError, setWishlistError] = useState("");
-
-  useEffect(() => {
-    if (!session) {
-      setWishlistItemId(null);
-      return;
-    }
-    getWishlist()
-      .then((wishlist) => {
-        const saved = wishlist.items.find((item) => item.productId === product.id);
-        setWishlistItemId(saved?.id ?? null);
-      })
-      .catch(() => setWishlistItemId(null));
-  }, [session, product.id]);
-
-  const toggleWishlist = async () => {
-    if (!session) {
-      openModal("log");
-      return;
-    }
-    setWishlistError("");
-    setWishlistBusy(true);
-    try {
-      if (wishlistItemId) {
-        await removeWishlistItem(wishlistItemId);
-        setWishlistItemId(null);
-      } else {
-        const wishlist = await addWishlistItem(product.id);
-        setWishlistItemId(wishlist.items.find((item) => item.productId === product.id)?.id ?? null);
-      }
-    } catch (err) {
-      setWishlistError(err.message || "We could not update your wishlist.");
-    } finally {
-      setWishlistBusy(false);
-    }
-  };
+  const [wishlistItems, setWishlistItems] = useState([]);
+  const [compareItems, setCompareItems] = useState([]);
+  const [saveBusy, setSaveBusy] = useState(false);
+  const [saveError, setSaveError] = useState("");
 
   const selectedVariant =
     product.variants.find((variant) => variant.id === selectedVariantId) ?? null;
+  const variantId = selectedVariant?.id ?? null;
 
   const price = selectedVariant ? selectedVariant.price : product.price;
   const salePrice = selectedVariant ? selectedVariant.salePrice : product.salePrice;
   const inStock = selectedVariant ? selectedVariant.inStock : product.inStock;
 
+  const savedToWishlist = wishlistItems.find(
+    (item) => item.productId === product.id && item.variantId === variantId
+  );
+  const savedToCompare = compareItems.find((item) => item.productId === product.id);
+
+  useEffect(() => {
+    getWishlist()
+      .then((list) => setWishlistItems(list.items))
+      .catch(() => setWishlistItems([]));
+    getCompare()
+      .then((list) => setCompareItems(list.items))
+      .catch(() => setCompareItems([]));
+  }, [session]);
+
+  const run = async (action, setItems) => {
+    setSaveError("");
+    setSaveBusy(true);
+    try {
+      const list = await action();
+      setItems(list.items);
+    } catch (err) {
+      setSaveError(err.message || "We could not update your saved items.");
+    } finally {
+      setSaveBusy(false);
+    }
+  };
+
+  const toggleWishlist = () =>
+    run(
+      () =>
+        savedToWishlist
+          ? removeWishlistItem(savedToWishlist.id)
+          : addWishlistItem({ productId: product.id, variantId }),
+      setWishlistItems
+    );
+
+  const toggleCompare = () =>
+    run(
+      () => (savedToCompare ? removeCompareItem(savedToCompare.id) : addCompareItem(product.id)),
+      setCompareItems
+    );
+
   const addToBag = async () => {
     setCartError("");
     setAdding(true);
     try {
-      await addCartItem({
-        productId: product.id,
-        variantId: selectedVariant?.id ?? null,
-        quantity,
-      });
+      await addCartItem({ productId: product.id, variantId, quantity });
       router.push("/shop-cart");
     } catch (err) {
       setCartError(err.message || "We could not add this item to your bag.");
@@ -108,6 +113,7 @@ export default function ApiProductDetail({ product }) {
             </div>
             <div className="col-md-6">
               <div className="tf-product-info-wrap">
+                <div className="tf-zoom-main sticky-top" />
                 <div className="tf-product-info-list other-image-zoom">
                   <div className="tf-product-info-heading">
                     <h3 className="product-info-name fw-normal">{product.name}</h3>
@@ -183,12 +189,20 @@ export default function ApiProductDetail({ product }) {
                     <button
                       type="button"
                       className="tf-btn style-2 w-100 mt-2 fw-medium"
-                      disabled={wishlistBusy}
+                      disabled={saveBusy}
                       onClick={toggleWishlist}
                     >
-                      {wishlistItemId ? "remove from wishlist" : "add to wishlist"}
+                      {savedToWishlist ? "remove from wishlist" : "add to wishlist"}
                     </button>
-                    {wishlistError && <p className="text-danger mt-2 mb-0">{wishlistError}</p>}
+                    <button
+                      type="button"
+                      className="tf-btn style-2 w-100 mt-2 fw-medium"
+                      disabled={saveBusy}
+                      onClick={toggleCompare}
+                    >
+                      {savedToCompare ? "remove from compare" : "add to compare"}
+                    </button>
+                    {saveError && <p className="text-danger mt-2 mb-0">{saveError}</p>}
                   </div>
                 </div>
               </div>

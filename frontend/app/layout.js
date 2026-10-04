@@ -9,7 +9,6 @@ import Context from "@/context/Context";
 import Compare from "@/components/modals/Compare";
 import Login from "@/components/modals/Login";
 import MobileMenu from "@/components/modals/MobileMenu";
-import QuickAdd from "@/components/modals/QuickAdd";
 import QuickView from "@/components/modals/QuickView";
 import Register from "@/components/modals/Register";
 import ResetPass from "@/components/modals/ResetPass";
@@ -39,7 +38,6 @@ export default function RootLayout({ children }) {
             <Login />
             <MobileMenu />
 
-            <QuickAdd />
             <QuickView />
             <Register />
             <ResetPass />

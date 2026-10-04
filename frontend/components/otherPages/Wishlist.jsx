@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { getWishlist, removeWishlistItem } from "@/lib/api/wishlist";
 import { useSession } from "@/lib/auth/session";
-import { openModal } from "@/lib/ui/modal";
 
 export default function Wishlist() {
   const session = useSession();
@@ -12,10 +11,6 @@ export default function Wishlist() {
   const [busyItemId, setBusyItemId] = useState(null);
 
   useEffect(() => {
-    if (!session) {
-      setWishlist(null);
-      return;
-    }
     getWishlist()
       .then(setWishlist)
       .catch((err) => setError(err.message || "We could not load your wishlist."));
@@ -32,23 +27,6 @@ export default function Wishlist() {
       setBusyItemId(null);
     }
   };
-
-  if (!session) {
-    return (
-      <div className="flat-spacing">
-        <div className="container text-center">
-          <p>Log in to see the products you have saved.</p>
-          <button
-            type="button"
-            className="tf-btn btn-fill animate-btn"
-            onClick={() => openModal("log")}
-          >
-            Log in
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   const items = wishlist?.items ?? [];
 
@@ -97,6 +75,7 @@ export default function Wishlist() {
                   <Link href={`/product-default/${item.slug}`} className="name-product h5 fw-normal link">
                     {item.name}
                   </Link>
+                  {item.variantName && <p className="text-caption text-main-4">{item.variantName}</p>}
                   <div className="price-wrap">
                     <span className="price-new h5">
                       ${(item.salePrice ?? item.price).toFixed(2)}

@@ -95,15 +95,6 @@ export default function BoughtTogther() {
             </div>
           </li>
         </ul>
-        <a
-          href="#shoppingCart"
-          data-bs-toggle="offcanvas"
-          className="tf-btn btn-fill text-uppercase fw-medium w-100 animate-btn"
-        >
-          add to bag
-          <i className="icon-minus" />
-          <span className="total-price" />
-        </a>
       </form>
     </div>
   );

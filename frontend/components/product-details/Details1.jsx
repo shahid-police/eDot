@@ -8,7 +8,6 @@ import BoughtTogther from "./BoughtTogther";
 import ColorSelect from "./ColorSelect";
 import { useContextElement } from "@/context/Context";
 import QuantitySelect from "../common/QuantitySelect";
-import AddtoCompare from "../common/AddtoCompare";
 import SizePicker from "./SizeSelect";
 export default function Details1({ product }) {
   const [activeColor, setActiveColor] = useState("gold");
@@ -131,12 +130,7 @@ export default function Details1({ product }) {
                       
                       <div className="group-btn-action">
                         
-                        <AddtoCompare
-                          tooltipDirection="top"
-                          product={product}
-                          additionalClass="tf-btn-icon"
-                        />
-                      </div>
+                                              </div>
                     </div>
                     <Link
                       href={`/checkout`}
