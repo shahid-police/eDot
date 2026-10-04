@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Elegance.Api/Elegance.Api.csproj" />
+  <Project Path="Elegance.Application/Elegance.Application.csproj" />
+  <Project Path="Elegance.Domain/Elegance.Domain.csproj" />
+  <Project Path="Elegance.Infrastructure/Elegance.Infrastructure.csproj" />
+</Solution>

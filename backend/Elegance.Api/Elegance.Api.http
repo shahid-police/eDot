@@ -1,0 +1,6 @@
+@Elegance.Api_HostAddress = http://localhost:5071
+
+GET {{Elegance.Api_HostAddress}}/health
+Accept: application/json
+
+###
