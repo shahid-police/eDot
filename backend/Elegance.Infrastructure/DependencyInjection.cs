@@ -1,3 +1,6 @@
+using Elegance.Application.Categories;
+using Elegance.Application.Products;
+using Elegance.Infrastructure.Catalog;
 using Elegance.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -20,6 +23,9 @@ public static class DependencyInjection
 
         services.AddHealthChecks()
             .AddDbContextCheck<EleganceDbContext>("database");
+
+        services.AddScoped<IProductService, ProductService>();
+        services.AddScoped<ICategoryService, CategoryService>();
 
         return services;
     }
