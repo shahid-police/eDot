@@ -12,6 +12,8 @@ public class ProductListItemDto
     public string? ImageUrl { get; init; }
     public string? HoverImageUrl { get; init; }
     public required string CategorySlug { get; init; }
+    public string? Material { get; init; }
+    public string? Color { get; init; }
     public required bool InStock { get; init; }
     public required bool IsFeatured { get; init; }
     public required bool IsNew { get; init; }

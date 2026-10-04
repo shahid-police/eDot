@@ -7,11 +7,25 @@ import Categories from "@/components/shop/Categories";
 import Products1 from "@/components/shop/Products1";
 import Link from "next/link";
 import React from "react";
+import { getProducts, toTemplateCardProduct } from "@/lib/api/products";
 export const metadata = {
   title: "Shop || Vemus - Jewelry Ecommerce React Nextjs Template",
   description: "Vemus - Jewelry Ecommerce React Nextjs Template",
 };
-export default function page() {
+
+async function loadProducts() {
+  try {
+    const result = await getProducts({ pageSize: 100 });
+    return result.items.map(toTemplateCardProduct);
+  } catch (error) {
+    console.error("Product API unavailable, rendering template data:", error);
+    return undefined;
+  }
+}
+
+export default async function page() {
+  const products = await loadProducts();
+
   return (
     <>
       <Topbar1 parentClass="tf-topbar bg-dark-olive" />
@@ -52,7 +66,7 @@ export default function page() {
         </div>
       </section>
       <Categories />
-      <Products1 />
+      <Products1 products={products} />
       <Features
         parentClass="flat-spacing-8 bg-main"
         iconColorClass="text-primary"

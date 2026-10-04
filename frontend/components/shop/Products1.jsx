@@ -12,9 +12,14 @@ import FilterSidebar from "./FilterSidebar";
 import LayoutHandler from "./LayoutHandler";
 import Link from "next/link";
 import Pagination from "../common/Pagination";
-export default function Products1({ defaultLayout = 4 }) {
+export default function Products1({ defaultLayout = 4, products }) {
+  const source = products ?? products15;
   const [activeLayout, setActiveLayout] = useState(defaultLayout);
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const [state, dispatch] = useReducer(reducer, source, (items) => ({
+    ...initialState,
+    filtered: items,
+    sorted: items,
+  }));
   const {
     price,
     availability,
@@ -100,51 +105,51 @@ export default function Products1({ defaultLayout = 4 }) {
     let filteredArrays = [];
 
     if (categories.length) {
-      const filteredByCategories = [...products15].filter((elm) =>
+      const filteredByCategories = [...source].filter((elm) =>
         categories.includes(elm.category)
       );
       filteredArrays = [...filteredArrays, filteredByCategories];
     }
     if (materials.length) {
-      const filteredByCategories = [...products15].filter((elm) =>
+      const filteredByCategories = [...source].filter((elm) =>
         materials.includes(elm.material)
       );
       filteredArrays = [...filteredArrays, filteredByCategories];
     }
     if (availability !== "All") {
-      const filteredByavailability = [...products15].filter(
+      const filteredByavailability = [...source].filter(
         (elm) => availability.toLowerCase() === elm.availability.toLowerCase()
       );
       filteredArrays = [...filteredArrays, filteredByavailability];
     }
     if (color.length) {
-      const filteredByColor = [...products15].filter((elm) =>
+      const filteredByColor = [...source].filter((elm) =>
         color.every((el) => elm.filterColors.includes(el))
       );
       filteredArrays = [...filteredArrays, filteredByColor];
     }
     if (size !== "All" && size !== "Free Size") {
-      const filteredBysize = [...products15].filter((elm) => elm.size == size);
+      const filteredBysize = [...source].filter((elm) => elm.size == size);
       filteredArrays = [...filteredArrays, filteredBysize];
     }
 
     if (price.includes("u-")) {
-      const filteredByPrice = [...products15].filter(
+      const filteredByPrice = [...source].filter(
         (elm) => elm.price >= Number(price.split("-")[1])
       );
       filteredArrays = [...filteredArrays, filteredByPrice];
     } else if (price.includes("up-")) {
-      const filteredByPrice = [...products15].filter(
+      const filteredByPrice = [...source].filter(
         (elm) => elm.price <= Number(price.split("-")[1])
       );
       filteredArrays = [...filteredArrays, filteredByPrice];
     }
 
-    const commonItems = [...products15].filter((item) =>
+    const commonItems = [...source].filter((item) =>
       filteredArrays.every((array) => array.includes(item))
     );
     dispatch({ type: "SET_FILTERED", payload: commonItems });
-  }, [price, availability, color, materials, size, categories]);
+  }, [price, availability, color, materials, size, categories, source]);
 
   useEffect(() => {
     if (sortingOption === "Price Ascending") {
@@ -334,7 +339,7 @@ export default function Products1({ defaultLayout = 4 }) {
                         product.outOfStock
                           ? "product-notify-avaiable"
                           : "product-default"
-                      }/${product.id}`}
+                      }/${product.slug ?? product.id}`}
                       className="product-img"
                     >
                       <img
@@ -353,7 +358,7 @@ export default function Products1({ defaultLayout = 4 }) {
                       />
                     </Link>
 
-                    {!product.outOfStock && (
+                    {!product.outOfStock && product.source !== "api" && (
                       <ul className="list-product-btn">
                         <li className="wishlist">
                           <AddtoWishlist product={product} />
@@ -414,7 +419,7 @@ export default function Products1({ defaultLayout = 4 }) {
                         product.outOfStock
                           ? "product-notify-avaiable"
                           : "product-default"
-                      }/${product.id}`}
+                      }/${product.slug ?? product.id}`}
                       className="name-product h5 fw-normal link text-line-clamp-2"
                     >
                       {product.title}
@@ -481,7 +486,7 @@ export default function Products1({ defaultLayout = 4 }) {
                         product.outOfStock
                           ? "product-notify-avaiable"
                           : "product-default"
-                      }/${product.id}`}
+                      }/${product.slug ?? product.id}`}
                       className="product-img"
                     >
                       <img
@@ -500,7 +505,7 @@ export default function Products1({ defaultLayout = 4 }) {
                       />
                     </Link>
 
-                    {!product.outOfStock && (
+                    {!product.outOfStock && product.source !== "api" && (
                       <ul className="list-product-btn">
                         <li className="wishlist">
                           <AddtoWishlist product={product} />
@@ -561,7 +566,7 @@ export default function Products1({ defaultLayout = 4 }) {
                         product.outOfStock
                           ? "product-notify-avaiable"
                           : "product-default"
-                      }/${product.id}`}
+                      }/${product.slug ?? product.id}`}
                       className="name-product h5 fw-normal link text-line-clamp-2"
                     >
                       {product.title}

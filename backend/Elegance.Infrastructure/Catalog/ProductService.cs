@@ -68,6 +68,8 @@ public class ProductService(EleganceDbContext dbContext) : IProductService
                     .Select(i => i.MediaFile.Url)
                     .FirstOrDefault(),
                 CategorySlug = p.Category.Slug,
+                Material = p.Material,
+                Color = p.Color,
                 InStock = p.ProductType == ProductType.Simple
                     ? p.StockQuantity > 0
                     : p.Variants.Any(v => v.IsActive && v.StockQuantity > 0),
