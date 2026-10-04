@@ -9,8 +9,6 @@ export default function Compare() {
   const {
     compareItem,
     removeFromCompareItem,
-    addProductToCart,
-    isAddedToCartProducts,
   } = useContextElement();
   const [items, setItems] = useState([]);
   useEffect(() => {
@@ -56,16 +54,7 @@ export default function Compare() {
                           </span>
                         )}
                       </div>
-                      <a
-                        href="#shoppingCart"
-                        data-bs-toggle="offcanvas"
-                        onClick={() => addProductToCart(product.id)}
-                        className="item_btn tf-btn btn-fill animate-btn w-100"
-                      >
-                        {isAddedToCartProducts(product.id)
-                          ? "ALREADY ADDED"
-                          : "ADD TO CART"}
-                      </a>
+                      
                     </div>
                   </th>
                 ))}

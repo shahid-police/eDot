@@ -3,7 +3,6 @@ import { products6 } from "@/data/products";
 import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import Image from "next/image";
-import AddtoWishlist from "@/components/common/AddtoWishlist";
 import AddtoQuickAdd from "@/components/common/AddtoQuickAdd";
 import QuickView from "@/components/common/QuickView";
 import AddtoCompare from "@/components/common/AddtoCompare";
@@ -90,10 +89,7 @@ export default function Products1() {
 
                   {!product.outOfStock && (
                     <ul className="list-product-btn">
-                      <li className="wishlist">
-                        <AddtoWishlist product={product} />
-                      </li>
-                      <li>
+                                            <li>
                         <AddtoQuickAdd product={product} />
                       </li>
                       <li>

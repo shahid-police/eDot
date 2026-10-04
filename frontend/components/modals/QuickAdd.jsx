@@ -7,14 +7,12 @@ import SizePicker from "../product-details/SizeSelect";
 import QuantitySelect from "../common/QuantitySelect";
 import { useContextElement } from "@/context/Context";
 import { allProducts } from "@/data/products";
-import AddtoWishlist from "../common/AddtoWishlist";
 import AddtoCompare from "../common/AddtoCompare";
 export default function QuickAdd() {
   const [activeColor, setActiveColor] = useState("gold");
   const [quantity, setQuantity] = useState(1);
   const [product, setProduct] = useState(allProducts[0]);
   const {
-    addProductToCart,
 
     quickAddItem,
     isAddedToCartProducts,
@@ -108,27 +106,9 @@ export default function QuickAdd() {
               </div>
               <div className="tf-product-total-quantity mb-0">
                 <div className="group-btn">
-                  <a
-                    href="#shoppingCart"
-                    onClick={() => addProductToCart(product.id, quantity)}
-                    data-bs-toggle="offcanvas"
-                    className="tf-btn btn-fill-2 text-uppercase fw-medium animate-btn"
-                  >
-                    {isAddedToCartProducts(product.id)
-                      ? "already added"
-                      : "add to bag"}
-                    <i className="icon-minus d-none d-sm-block" />
-                    <span className="price-add d-none d-sm-block">
-                      {(product.price * quantity).toFixed(2)}
-                    </span>
-                  </a>
+                  
                   <div className="group-btn-action">
-                    <AddtoWishlist
-                      additionalClass="tf-btn-icon btn-add-wishlist"
-                      product={product}
-                      tooltipDirection="top"
-                    />
-
+                    
                     <AddtoCompare
                       tooltipDirection="top"
                       product={product}

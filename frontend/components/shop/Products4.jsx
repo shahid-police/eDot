@@ -2,8 +2,6 @@
 import { products15 } from "@/data/products";
 import React from "react";
 import DiscountMarquee from "../common/DiscountMarquee";
-import AddtoWishlist from "../common/AddtoWishlist";
-import AddtoCart from "../common/AddtoCart";
 import QuickView from "../common/QuickView";
 import AddtoCompare from "../common/AddtoCompare";
 import { initialState, reducer } from "@/reducer/filterReducer";
@@ -365,13 +363,7 @@ export default function Products4() {
 
                     {!product.outOfStock && (
                       <ul className="list-product-btn">
-                        <li className="wishlist">
-                          <AddtoWishlist product={product} />
-                        </li>
-                        <li>
-                          <AddtoCart product={product} />
-                        </li>
-                        <li>
+                                                                        <li>
                           <QuickView product={product} />
                         </li>
                         <li className="compare">
@@ -512,13 +504,7 @@ export default function Products4() {
 
                     {!product.outOfStock && (
                       <ul className="list-product-btn">
-                        <li className="wishlist">
-                          <AddtoWishlist product={product} />
-                        </li>
-                        <li>
-                          <AddtoCart product={product} />
-                        </li>
-                        <li>
+                                                                        <li>
                           <QuickView product={product} />
                         </li>
                         <li className="compare">

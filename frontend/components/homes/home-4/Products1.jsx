@@ -3,8 +3,6 @@ import { products8 } from "@/data/products";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
-import AddtoWishlist from "@/components/common/AddtoWishlist";
-import AddtoCart from "@/components/common/AddtoCart";
 import QuickView from "@/components/common/QuickView";
 import AddtoCompare from "@/components/common/AddtoCompare";
 import DiscountMarquee from "@/components/common/DiscountMarquee";
@@ -110,13 +108,7 @@ export default function Products1() {
 
                         {!product.outOfStock && (
                           <ul className="list-product-btn">
-                            <li className="wishlist">
-                              <AddtoWishlist product={product} />
-                            </li>
-                            <li>
-                              <AddtoCart product={product} />
-                            </li>
-                            <li>
+                                                                                    <li>
                               <QuickView product={product} />
                             </li>
                             <li className="compare">

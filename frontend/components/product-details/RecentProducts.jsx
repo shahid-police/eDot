@@ -4,8 +4,6 @@ import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import Link from "next/link";
 import Image from "next/image";
-import AddtoWishlist from "../common/AddtoWishlist";
-import AddtoCart from "../common/AddtoCart";
 import QuickView from "../common/QuickView";
 import AddtoCompare from "../common/AddtoCompare";
 import { Navigation, Pagination } from "swiper/modules";
@@ -76,13 +74,7 @@ export default function RecentProducts({ containerFull = false }) {
                     />
                   </Link>
                   <ul className="list-product-btn">
-                    <li className="wishlist">
-                      <AddtoWishlist product={product} />
-                    </li>
-                    <li>
-                      <AddtoCart product={product} />
-                    </li>
-                    <li>
+                                                            <li>
                       <QuickView product={product} />
                     </li>
                     <li className="compare">

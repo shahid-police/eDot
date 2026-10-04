@@ -4,14 +4,11 @@ import { products13 } from "@/data/products";
 import { Swiper, SwiperSlide } from "swiper/react";
 import Link from "next/link";
 import Image from "next/image";
-import AddtoWishlist from "@/components/common/AddtoWishlist";
 import QuickView from "@/components/common/QuickView";
 import AddtoCompare from "@/components/common/AddtoCompare";
 import { Navigation, Pagination } from "swiper/modules";
 import { useEffect, useRef } from "react";
-import { useContextElement } from "@/context/Context";
 export default function Lookbook() {
-  const { addProductToCart, isAddedToCartProducts } = useContextElement();
   const swiperRef = useRef(null);
   useEffect(() => {
     const swiperButtons = document.querySelectorAll(".swiper-button");
@@ -148,10 +145,7 @@ export default function Lookbook() {
                         />
                       </a>
                       <ul className="list-product-btn">
-                        <li className="wishlist">
-                          <AddtoWishlist product={product} />
-                        </li>
-                        <li>
+                                                <li>
                           <QuickView product={product} />
                         </li>
                         <li className="compare">
@@ -196,20 +190,7 @@ export default function Lookbook() {
                       </ul>
                     </div>
                     <div className="card_product-btn">
-                      <a
-                        href="#shoppingCart"
-                        onClick={() => {
-                          if (product.id) {
-                            addProductToCart(product.id);
-                          }
-                        }}
-                        data-bs-toggle="offcanvas"
-                        className="tf-btn hover-primary fw-medium w-100"
-                      >
-                        {isAddedToCartProducts(product.id)
-                          ? "Already Added"
-                          : "Add to Cart"}
-                      </a>
+                      
                     </div>
                   </div>
                 </SwiperSlide>

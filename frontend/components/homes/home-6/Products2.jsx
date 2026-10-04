@@ -4,8 +4,6 @@ import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import Link from "next/link";
 import Image from "next/image";
-import AddtoWishlist from "@/components/common/AddtoWishlist";
-import AddtoCart from "@/components/common/AddtoCart";
 import QuickView from "@/components/common/QuickView";
 import AddtoCompare from "@/components/common/AddtoCompare";
 import { Pagination } from "swiper/modules";
@@ -64,13 +62,7 @@ export default function Products2() {
                     />
                   </Link>
                   <ul className="list-product-btn">
-                    <li className="wishlist">
-                      <AddtoWishlist product={product} />
-                    </li>
-                    <li>
-                      <AddtoCart product={product} />
-                    </li>
-                    <li>
+                                                            <li>
                       <QuickView product={product} />
                     </li>
                     <li className="compare">

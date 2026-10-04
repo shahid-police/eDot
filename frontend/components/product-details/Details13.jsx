@@ -8,7 +8,6 @@ import BoughtTogther from "./BoughtTogther";
 import ColorSelect from "./ColorSelect";
 import { useContextElement } from "@/context/Context";
 import QuantitySelect from "../common/QuantitySelect";
-import AddtoWishlist from "../common/AddtoWishlist";
 import AddtoCompare from "../common/AddtoCompare";
 import SizePicker from "./SizeSelect";
 
@@ -17,7 +16,6 @@ export default function Details13({ product }) {
   const [activeColor, setActiveColor] = useState("gold");
   const [quantity, setQuantity] = useState(1);
   const {
-    addProductToCart,
     isAddedToCartProducts,
 
     cartProducts,
@@ -138,27 +136,9 @@ export default function Details13({ product }) {
                   </div>
                   <div className="tf-product-total-quantity">
                     <div className="group-btn">
-                      <a
-                        href="#shoppingCart"
-                        data-bs-toggle="offcanvas"
-                        onClick={() => addProductToCart(product.id, quantity)}
-                        className="tf-btn btn-fill-2 text-uppercase fw-medium animate-btn"
-                      >
-                        {isAddedToCartProducts(product.id)
-                          ? "already added"
-                          : "add to bag"}
-                        <i className="icon-minus d-none d-sm-block" />
-                        <span className="price-add d-none d-sm-block">
-                          {(product.price * quantity).toFixed(2)}
-                        </span>
-                      </a>
+                      
                       <div className="group-btn-action">
-                        <AddtoWishlist
-                          additionalClass="tf-btn-icon btn-add-wishlist"
-                          product={product}
-                          tooltipDirection="top"
-                        />
-
+                        
                         <AddtoCompare
                           tooltipDirection="top"
                           product={product}

@@ -20,12 +20,9 @@ export default function QuickView() {
 
   const {
     quickViewItem,
-    addProductToCart,
     isAddedToCartProducts,
     addToCompareItem,
     isAddedtoCompareItem,
-    addToWishlist,
-    isAddedtoWishlist,
     cartProducts,
   } = useContextElement();
   useEffect(() => {
@@ -160,49 +157,9 @@ export default function QuickView() {
               </div>
               <div className="tf-product-total-quantity">
                 <div className="group-btn">
-                  <a
-                    href="#shoppingCart"
-                    data-bs-toggle="offcanvas"
-                    onClick={() => {
-                      if (quickViewItem.id) {
-                        addProductToCart(quickViewItem.id);
-                      }
-                    }}
-                    className="tf-btn btn-fill-2 text-uppercase fw-medium animate-btn"
-                  >
-                    {isAddedToCartProducts(quickViewItem.id)
-                      ? "added"
-                      : "add to bag"}
-
-                    <i className="icon-minus d-none d-sm-block" />
-                    <span className="price-add d-none d-sm-block">
-                      ${(quickViewItem.price * quantity).toFixed(2)}
-                    </span>
-                  </a>
+                  
                   <div className="group-btn-action">
-                    <a
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        if (quickViewItem.id) {
-                          addToWishlist(quickViewItem.id);
-                        }
-                      }}
-                      className="tf-btn-icon hover-tooltip btn-add-wishlist"
-                    >
-                      <span
-                        className={`icon ${
-                          isAddedtoWishlist(quickViewItem.id)
-                            ? "icon-trash"
-                            : "icon-heart-2"
-                        } `}
-                      />
-                      <span className="tooltip">
-                        {isAddedtoWishlist(quickViewItem.id)
-                          ? "Remove Wishlist"
-                          : "Add to Wishlist"}
-                      </span>
-                    </a>
+                    
                     <a
                       className="tf-btn-icon hover-tooltip"
                       onClick={() => {

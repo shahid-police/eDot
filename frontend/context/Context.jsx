@@ -1,7 +1,6 @@
 "use client";
 import { allProducts } from "@/data/products";
 // import { openCartModal } from "@/utlis/openCartModal";
-// import { openWistlistModal } from "@/utlis/openWishlist";
 
 import React, { useEffect } from "react";
 import { useContext, useState } from "react";
@@ -12,7 +11,6 @@ export const useContextElement = () => {
 
 export default function Context({ children }) {
   const [cartProducts, setCartProducts] = useState([]);
-  const [wishList, setWishList] = useState([1, 2, 3]);
   const [compareItem, setCompareItem] = useState([1, 2, 3, 4]);
   const [quickViewItem, setQuickViewItem] = useState(allProducts[0]);
   const [quickAddItem, setQuickAddItem] = useState(1);
@@ -55,20 +53,6 @@ export default function Context({ children }) {
     }
   };
 
-  const addToWishlist = (id) => {
-    if (!wishList.includes(id)) {
-      setWishList((pre) => [...pre, id]);
-      //   openWistlistModal();
-    } else {
-      setWishList((pre) => pre.filter((elm) => elm != id));
-    }
-  };
-
-  const removeFromWishlist = (id) => {
-    if (wishList.includes(id)) {
-      setWishList((pre) => [...pre.filter((elm) => elm != id)]);
-    }
-  };
   const addToCompareItem = (id) => {
     if (!compareItem.includes(id)) {
       setCompareItem((pre) => [...pre, id]);
@@ -79,12 +63,6 @@ export default function Context({ children }) {
       setCompareItem((pre) => [...pre.filter((elm) => elm != id)]);
     }
   };
-  const isAddedtoWishlist = (id) => {
-    if (wishList.includes(id)) {
-      return true;
-    }
-    return false;
-  };
   const isAddedtoCompareItem = (id) => {
     if (compareItem.includes(id)) {
       return true;
@@ -92,25 +70,8 @@ export default function Context({ children }) {
     return false;
   };
   useEffect(() => {
-    const items = JSON.parse(localStorage.getItem("cartList"));
-    if (items?.length) {
-      setCartProducts(items);
-    }
+    localStorage.removeItem("cartList");
   }, []);
-
-  useEffect(() => {
-    localStorage.setItem("cartList", JSON.stringify(cartProducts));
-  }, [cartProducts]);
-  useEffect(() => {
-    const items = JSON.parse(localStorage.getItem("wishlist"));
-    if (items?.length) {
-      setWishList(items);
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("wishlist", JSON.stringify(wishList));
-  }, [wishList]);
 
   const contextElement = {
     cartProducts,
@@ -118,11 +79,7 @@ export default function Context({ children }) {
     totalPrice,
     addProductToCart,
     isAddedToCartProducts,
-    removeFromWishlist,
-    addToWishlist,
-    isAddedtoWishlist,
     quickViewItem,
-    wishList,
     setQuickViewItem,
     quickAddItem,
     setQuickAddItem,
