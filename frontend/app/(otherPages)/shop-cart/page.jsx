@@ -3,7 +3,7 @@ import Link from "next/link";
 import Header1 from "@/components/headers/Header1";
 import Topbar1 from "@/components/headers/Topbar1";
 import RelatedProducts from "@/components/otherPages/RelatedProducts";
-import ShopCart from "@/components/otherPages/ShopCart";
+import ApiShopCart from "@/components/otherPages/ApiShopCart";
 import React from "react";
 
 export const metadata = {
@@ -48,7 +48,7 @@ export default function page() {
           </div>
         </div>
       </section>
-      <ShopCart />
+      <ApiShopCart />
       <RelatedProducts />
       <Footer1 />
     </>

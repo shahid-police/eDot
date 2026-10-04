@@ -71,7 +71,7 @@ public class AuthService(EleganceDbContext dbContext, TokenService tokenService)
 
     public async Task<AuthSession> RefreshAsync(string refreshToken, CancellationToken cancellationToken = default)
     {
-        var tokenHash = TokenService.HashRefreshToken(refreshToken);
+        var tokenHash = TokenService.HashToken(refreshToken);
         var stored = await dbContext.RefreshTokens
             .Include(r => r.Customer)
             .FirstOrDefaultAsync(r => r.TokenHash == tokenHash, cancellationToken);
@@ -96,8 +96,8 @@ public class AuthService(EleganceDbContext dbContext, TokenService tokenService)
             throw new ApplicationFailure(FailureKind.Unauthorized, InvalidSessionMessage);
         }
 
-        var replacement = TokenService.CreateRefreshToken();
-        var replacementHash = TokenService.HashRefreshToken(replacement);
+        var replacement = TokenService.CreateOpaqueToken();
+        var replacementHash = TokenService.HashToken(replacement);
         var replacementExpiresAt = tokenService.RefreshTokenExpiry();
 
         stored.RevokedAt = now;
@@ -121,7 +121,7 @@ public class AuthService(EleganceDbContext dbContext, TokenService tokenService)
             return;
         }
 
-        var tokenHash = TokenService.HashRefreshToken(refreshToken);
+        var tokenHash = TokenService.HashToken(refreshToken);
         var stored = await dbContext.RefreshTokens.FirstOrDefaultAsync(r => r.TokenHash == tokenHash, cancellationToken);
         if (stored is not null && stored.RevokedAt is null)
         {
@@ -132,13 +132,13 @@ public class AuthService(EleganceDbContext dbContext, TokenService tokenService)
 
     private async Task<AuthSession> IssueSessionAsync(Customer customer, CancellationToken cancellationToken)
     {
-        var refreshToken = TokenService.CreateRefreshToken();
+        var refreshToken = TokenService.CreateOpaqueToken();
         var refreshExpiresAt = tokenService.RefreshTokenExpiry();
 
         dbContext.RefreshTokens.Add(new RefreshToken
         {
             CustomerId = customer.Id,
-            TokenHash = TokenService.HashRefreshToken(refreshToken),
+            TokenHash = TokenService.HashToken(refreshToken),
             ExpiresAt = refreshExpiresAt,
             CreatedAt = DateTime.UtcNow,
         });

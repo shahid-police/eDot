@@ -1,13 +1,20 @@
 "use client";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import Slider1 from "./sliders/Slider1";
+import QuantitySelect from "../common/QuantitySelect";
+import { addCartItem } from "@/lib/api/cart";
 
 const GALLERY_KEY = "api";
 
 export default function ApiProductDetail({ product }) {
+  const router = useRouter();
   const initialVariant =
     product.variants.find((variant) => variant.inStock) ?? product.variants[0] ?? null;
   const [selectedVariantId, setSelectedVariantId] = useState(initialVariant?.id ?? null);
+  const [quantity, setQuantity] = useState(1);
+  const [adding, setAdding] = useState(false);
+  const [cartError, setCartError] = useState("");
 
   const selectedVariant =
     product.variants.find((variant) => variant.id === selectedVariantId) ?? null;
@@ -15,6 +22,22 @@ export default function ApiProductDetail({ product }) {
   const price = selectedVariant ? selectedVariant.price : product.price;
   const salePrice = selectedVariant ? selectedVariant.salePrice : product.salePrice;
   const inStock = selectedVariant ? selectedVariant.inStock : product.inStock;
+
+  const addToBag = async () => {
+    setCartError("");
+    setAdding(true);
+    try {
+      await addCartItem({
+        productId: product.id,
+        variantId: selectedVariant?.id ?? null,
+        quantity,
+      });
+      router.push("/shop-cart");
+    } catch (err) {
+      setCartError(err.message || "We could not add this item to your bag.");
+      setAdding(false);
+    }
+  };
 
   const slideItems = product.images.map((image, index) => ({
     id: index + 1,
@@ -97,6 +120,25 @@ export default function ApiProductDetail({ product }) {
                       </div>
                     </div>
                   )}
+                  <div className="tf-product-info-variant">
+                    <div className="variant-picker-item">
+                      <div className="variant-picker-label h6 fw-normal">Quantity</div>
+                      <div className="variant-picker-values">
+                        <QuantitySelect quantity={quantity} setQuantity={setQuantity} />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="tf-product-total-quantity">
+                    <button
+                      type="button"
+                      className="tf-btn btn-fill-2 text-uppercase fw-medium animate-btn w-100"
+                      disabled={!inStock || adding}
+                      onClick={addToBag}
+                    >
+                      {adding ? "adding..." : inStock ? "add to bag" : "currently unavailable"}
+                    </button>
+                    {cartError && <p className="text-danger mt-2 mb-0">{cartError}</p>}
+                  </div>
                 </div>
               </div>
             </div>

@@ -1,8 +1,10 @@
 using Elegance.Application.Auth;
+using Elegance.Application.Carts;
 using Elegance.Application.Categories;
 using Elegance.Application.Customers;
 using Elegance.Application.Products;
 using Elegance.Infrastructure.Auth;
+using Elegance.Infrastructure.Carts;
 using Elegance.Infrastructure.Catalog;
 using Elegance.Infrastructure.Customers;
 using Elegance.Infrastructure.Persistence;
@@ -38,6 +40,7 @@ public static class DependencyInjection
         services.AddSingleton<TokenService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<ICustomerService, CustomerService>();
+        services.AddScoped<ICartService, CartService>();
 
         return services;
     }

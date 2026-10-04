@@ -1,6 +1,17 @@
 import { apiRequest } from "./client";
 import { getSession, setSession } from "@/lib/auth/session";
 
+const REFRESH_MARGIN_MS = 60_000;
+
+export function ensureFreshSession() {
+  const session = getSession();
+  const expiresAt = session ? new Date(session.accessTokenExpiresAt).getTime() : 0;
+  if (session && expiresAt - Date.now() > REFRESH_MARGIN_MS) {
+    return Promise.resolve();
+  }
+  return restoreSession();
+}
+
 function toSession(response) {
   return {
     accessToken: response.accessToken,

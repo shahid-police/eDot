@@ -1,5 +1,6 @@
 using Elegance.Api.Contracts;
 using Elegance.Application.Auth;
+using Elegance.Application.Carts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 
@@ -7,7 +8,7 @@ namespace Elegance.Api.Controllers.V1;
 
 [ApiController]
 [Route("api/v1/auth")]
-public class AuthController(IAuthService authService) : ControllerBase
+public class AuthController(IAuthService authService, ICartService cartService) : ControllerBase
 {
     public const string RefreshCookieName = "elegance_refresh";
     private const string RefreshCookiePath = "/api/v1/auth";
@@ -17,6 +18,7 @@ public class AuthController(IAuthService authService) : ControllerBase
     public async Task<ActionResult<AuthResponse>> Register([FromBody] RegisterRequest request, CancellationToken cancellationToken)
     {
         var session = await authService.RegisterAsync(request, cancellationToken);
+        await AdoptGuestCartAsync(session.Customer.Id, cancellationToken);
         SetRefreshCookie(session.RefreshToken, session.RefreshTokenExpiresAt);
         return StatusCode(StatusCodes.Status201Created, ToResponse(session));
     }
@@ -26,6 +28,7 @@ public class AuthController(IAuthService authService) : ControllerBase
     public async Task<ActionResult<AuthResponse>> Login([FromBody] LoginRequest request, CancellationToken cancellationToken)
     {
         var session = await authService.LoginAsync(request, cancellationToken);
+        await AdoptGuestCartAsync(session.Customer.Id, cancellationToken);
         SetRefreshCookie(session.RefreshToken, session.RefreshTokenExpiresAt);
         return Ok(ToResponse(session));
     }
@@ -45,6 +48,18 @@ public class AuthController(IAuthService authService) : ControllerBase
         await authService.LogoutAsync(Request.Cookies[RefreshCookieName], cancellationToken);
         Response.Cookies.Delete(RefreshCookieName, RefreshCookieOptions(expires: null));
         return NoContent();
+    }
+
+    private async Task AdoptGuestCartAsync(long customerId, CancellationToken cancellationToken)
+    {
+        var guestToken = Request.Cookies[CartController.GuestCookieName];
+        if (string.IsNullOrEmpty(guestToken))
+        {
+            return;
+        }
+
+        await cartService.MergeGuestCartAsync(customerId, guestToken, cancellationToken);
+        Response.Cookies.Delete(CartController.GuestCookieName, new CookieOptions { Path = "/", Secure = true, SameSite = SameSiteMode.Lax });
     }
 
     private void SetRefreshCookie(string refreshToken, DateTime expiresAt)

@@ -1,3 +1,4 @@
+using Elegance.Domain.Carts;
 using Elegance.Domain.Catalog;
 using Elegance.Domain.Customers;
 using Elegance.Domain.Media;
@@ -20,6 +21,8 @@ public class EleganceDbContext : DbContext
     public DbSet<Customer> Customers => Set<Customer>();
     public DbSet<CustomerAddress> CustomerAddresses => Set<CustomerAddress>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    public DbSet<Cart> Carts => Set<Cart>();
+    public DbSet<CartItem> CartItems => Set<CartItem>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

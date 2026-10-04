@@ -5,6 +5,7 @@ public enum FailureKind
     NotFound,
     Conflict,
     Unauthorized,
+    Validation,
 }
 
 public class ApplicationFailure(FailureKind kind, string message) : Exception(message)

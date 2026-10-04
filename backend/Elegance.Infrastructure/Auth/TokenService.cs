@@ -45,8 +45,8 @@ public sealed class TokenService(IOptions<JwtOptions> options)
 
     public DateTime RefreshTokenExpiry() => DateTime.UtcNow.AddDays(_options.RefreshTokenDays);
 
-    public static string CreateRefreshToken() => Convert.ToHexString(RandomNumberGenerator.GetBytes(64));
+    public static string CreateOpaqueToken() => Convert.ToHexString(RandomNumberGenerator.GetBytes(64));
 
-    public static string HashRefreshToken(string token) =>
+    public static string HashToken(string token) =>
         Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(token)));
 }
