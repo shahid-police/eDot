@@ -1,7 +1,31 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
+import { register } from "@/lib/api/auth";
+import { closeModal } from "@/lib/ui/modal";
 
 export default function Register() {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setError("");
+    setSubmitting(true);
+    try {
+      await register({ firstName, lastName, email, password });
+      setPassword("");
+      await closeModal("register");
+    } catch (err) {
+      setError(err.message || "Unable to create your account. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <div className="modal modalCentered fade modal-log" id="register">
       <div className="modal-dialog modal-dialog-centered">
@@ -13,14 +37,16 @@ export default function Register() {
             <h3 className="title fw-normal text-uppercase">create account</h3>
           </div>
           <div className="modal-bottom">
-            <form className="form-log" onSubmit={(e) => e.preventDefault()}>
+            <form className="form-log" onSubmit={handleSubmit}>
               <div className="form-content">
                 <fieldset className="tf-field">
                   <input
                     className="tf-input"
                     type="text"
                     placeholder=""
-                    defaultValue="Hello@vemus.com"
+                    autoComplete="given-name"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
                     required
                   />
                   <label className="tf-lable">First name *</label>
@@ -30,6 +56,9 @@ export default function Register() {
                     className="tf-input"
                     type="text"
                     placeholder=""
+                    autoComplete="family-name"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
                     required
                   />
                   <label className="tf-lable">Last name *</label>
@@ -39,6 +68,9 @@ export default function Register() {
                     className="tf-input"
                     type="email"
                     placeholder=""
+                    autoComplete="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     required
                   />
                   <label className="tf-lable">Email *</label>
@@ -48,10 +80,15 @@ export default function Register() {
                     className="tf-input"
                     type="password"
                     placeholder=""
+                    autoComplete="new-password"
+                    minLength={8}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     required
                   />
                   <label className="tf-lable">Password *</label>
                 </fieldset>
+                {error && <p className="text-danger mb-0">{error}</p>}
               </div>
               <div className="bottom">
                 <div className="checkbox-wrap align-items-start">
@@ -71,8 +108,9 @@ export default function Register() {
               <button
                 type="submit"
                 className="btn-submit tf-btn btn-fill-2 w-100"
+                disabled={submitting}
               >
-                LOG IN
+                {submitting ? "CREATING ACCOUNT..." : "CREATE ACCOUNT"}
               </button>
             </form>
             <div className="other-login">

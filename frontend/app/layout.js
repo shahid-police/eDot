@@ -3,6 +3,7 @@ import LayoutWrapper from "@/components/common/LayoutWrapper";
 import "../public/scss/main.scss";
 import "photoswipe/dist/photoswipe.css";
 import ScrollTop from "@/components/common/ScrollTop";
+import AuthBootstrap from "@/components/common/AuthBootstrap";
 import Toolbar from "@/components/common/Toolbar";
 import Context from "@/context/Context";
 import Compare from "@/components/modals/Compare";
@@ -32,6 +33,7 @@ export default function RootLayout({ children }) {
             <div id="wrapper">{children}</div>
             <Toolbar />
 
+            <AuthBootstrap />
             <ScrollTop />
             <Compare />
             <Login />

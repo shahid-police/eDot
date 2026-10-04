@@ -1,7 +1,29 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
+import { login } from "@/lib/api/auth";
+import { closeModal } from "@/lib/ui/modal";
 
 export default function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setError("");
+    setSubmitting(true);
+    try {
+      await login(email, password);
+      setPassword("");
+      await closeModal("log");
+    } catch (err) {
+      setError(err.message || "Unable to sign in. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <div className="modal modalCentered fade modal-log" id="log">
       <div className="modal-dialog modal-dialog-centered">
@@ -13,27 +35,33 @@ export default function Login() {
             <h3 className="title fw-normal text-uppercase">login</h3>
           </div>
           <div className="modal-bottom">
-            <form className="form-log" onSubmit={(e) => e.preventDefault()}>
+            <form className="form-log" onSubmit={handleSubmit}>
               <div className="form-content">
                 <fieldset className="tf-field">
                   <input
                     className="tf-input"
-                    type="text"
+                    type="email"
                     placeholder=""
-                    defaultValue="Hello@vemus.com"
+                    autoComplete="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     required
                   />
-                  <label className="tf-lable">Username *</label>
+                  <label className="tf-lable">Email *</label>
                 </fieldset>
                 <fieldset className="tf-field">
                   <input
                     className="tf-input"
                     type="password"
                     placeholder=""
+                    autoComplete="current-password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     required
                   />
                   <label className="tf-lable">Password *</label>
                 </fieldset>
+                {error && <p className="text-danger mb-0">{error}</p>}
               </div>
               <div className="bottom">
                 <div className="checkbox-wrap">
@@ -47,8 +75,9 @@ export default function Login() {
               <button
                 type="submit"
                 className="btn-submit tf-btn btn-fill-2 w-100"
+                disabled={submitting}
               >
-                LOG IN
+                {submitting ? "SIGNING IN..." : "LOG IN"}
               </button>
             </form>
             <div className="other-login">

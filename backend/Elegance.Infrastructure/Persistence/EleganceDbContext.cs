@@ -1,4 +1,5 @@
 using Elegance.Domain.Catalog;
+using Elegance.Domain.Customers;
 using Elegance.Domain.Media;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,6 +17,9 @@ public class EleganceDbContext : DbContext
     public DbSet<ProductVariant> ProductVariants => Set<ProductVariant>();
     public DbSet<ProductImage> ProductImages => Set<ProductImage>();
     public DbSet<MediaFile> MediaFiles => Set<MediaFile>();
+    public DbSet<Customer> Customers => Set<Customer>();
+    public DbSet<CustomerAddress> CustomerAddresses => Set<CustomerAddress>();
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

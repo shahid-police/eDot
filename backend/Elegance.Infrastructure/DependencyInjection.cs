@@ -1,6 +1,10 @@
+using Elegance.Application.Auth;
 using Elegance.Application.Categories;
+using Elegance.Application.Customers;
 using Elegance.Application.Products;
+using Elegance.Infrastructure.Auth;
 using Elegance.Infrastructure.Catalog;
+using Elegance.Infrastructure.Customers;
 using Elegance.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -26,6 +30,14 @@ public static class DependencyInjection
 
         services.AddScoped<IProductService, ProductService>();
         services.AddScoped<ICategoryService, CategoryService>();
+
+        services.AddOptions<JwtOptions>()
+            .Bind(configuration.GetSection(JwtOptions.SectionName))
+            .Validate(options => options.Key.Length >= 32, "Jwt:Key must be set to at least 32 characters.")
+            .ValidateOnStart();
+        services.AddSingleton<TokenService>();
+        services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<ICustomerService, CustomerService>();
 
         return services;
     }

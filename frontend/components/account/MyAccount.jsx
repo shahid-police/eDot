@@ -1,20 +1,47 @@
+"use client";
 import React from "react";
 import CountdownTimer from "../common/Countdown";
 import Link from "next/link";
+import { useSession } from "@/lib/auth/session";
+import { logout } from "@/lib/api/auth";
 
 export default function MyAccount() {
+  const session = useSession();
+  const customer = session?.customer;
+  const fullName = customer ? `${customer.firstName} ${customer.lastName}` : "";
+
   return (
     <div className="my-acount-content account-dashboard">
       <div className="heading">
         <p className="hello-name">
-          <span className="hello fw-normal h4">Hello</span> VINCENT PHAM!{" "}
-          <span>
-            (not <span className="name text-main">Vincent Pham</span>?{" "}
-          </span>
-          <a href="#" className="link text-body">
-            Log Out
-          </a>
-          <span>)</span>
+          <span className="hello fw-normal h4">Hello</span>{" "}
+          {customer ? fullName.toUpperCase() : "GUEST"}!{" "}
+          {customer ? (
+            <>
+              <span>
+                (not <span className="name text-main">{fullName}</span>?{" "}
+              </span>
+              <a
+                href="#"
+                className="link text-body"
+                onClick={(e) => {
+                  e.preventDefault();
+                  logout();
+                }}
+              >
+                Log Out
+              </a>
+              <span>)</span>
+            </>
+          ) : (
+            <span>
+              Please{" "}
+              <a href="#log" data-bs-toggle="modal" className="link text-body">
+                log in
+              </a>{" "}
+              to see your account.
+            </span>
+          )}
         </p>
       </div>
       <p className="notice">
