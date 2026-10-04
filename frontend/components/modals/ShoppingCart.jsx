@@ -2,22 +2,12 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useContextElement } from "@/context/Context";
 import ProgressBarComponent from "../common/Progressbar";
 import { useState } from "react";
+import { useServerCart } from "@/lib/cart/useServerCart";
 export default function ShoppingCart() {
   const [openTool, setOpenTool] = useState(-1);
-  const {
-    cartProducts,
-    totalPrice,
-    setCartProducts,
-
-    updateQuantity,
-  } = useContextElement();
-
-  const removeItem = (id) => {
-    setCartProducts((pre) => [...pre.filter((elm) => elm.id != id)]);
-  };
+  const { cart, items, busy, change, clear } = useServerCart("shoppingCart");
 
   return (
     <div
@@ -45,12 +35,15 @@ export default function ShoppingCart() {
             </div>
             <div className="tf-number-count">
               <p className="text-uppercase">
-                <span className="prd-count">{cartProducts.length}</span>{" "}
+                <span className="prd-count">{items.length}</span>{" "}
                 products
               </p>
               <a
                 href="#"
-                onClick={() => setCartProducts([])}
+                onClick={(e) => {
+                  e.preventDefault();
+                  clear();
+                }}
                 className="tf-btn-line style-line-2 clear-file-delete"
               >
                 <span className="text-caption"> Empty cart </span>
@@ -61,7 +54,7 @@ export default function ShoppingCart() {
             <div className="tf-mini-cart-main">
               <div className="tf-mini-cart-sroll">
                 <ul className="tf-mini-cart-items">
-                  {!cartProducts.length ? (
+                  {!items.length ? (
                     <>
                       <div>Your Cart is Empty</div>
                       <Link
@@ -74,34 +67,30 @@ export default function ShoppingCart() {
                   ) : (
                     ""
                   )}
-                  {cartProducts.map((product, i) => (
-                    <li key={i} className="tf-mini-cart-item file-delete">
+                  {items.map((item) => (
+                    <li key={item.id} className="tf-mini-cart-item file-delete">
                       <div className="tf-mini-cart-image">
-                        <Image
-                          alt=""
-                          width={714}
-                          height={900}
-                          src={product.imgSrc}
-                        />
+                        {item.imageUrl && (
+                          <img alt={item.productName} width={714} height={900} src={item.imageUrl} />
+                        )}
                       </div>
                       <div className="tf-mini-cart-info">
                         <Link
-                          href={`/product-default/${product.id}`}
+                          href={`/product-default/${item.productSlug}`}
                           className="prd-name link"
                         >
-                          {product.title}
+                          {item.productName}
                         </Link>
-                        <p className="type-select text-main-4">
-                          Rose Gold / 50
-                        </p>
+                        {item.variantName && (
+                          <p className="type-select text-main-4">{item.variantName}</p>
+                        )}
                         <div className="prd-quantity">
                           <p className="text-caption">Qty:</p>
                           <div className="wg-quantity style-2">
                             <button
                               className="btn-quantity minus-quantity"
-                              onClick={() =>
-                                updateQuantity(product.id, product.quantity - 1)
-                              }
+                              disabled={busy || item.quantity <= 1}
+                              onClick={() => change(item.id, item.quantity - 1)}
                             >
                               <i className="icon-minus" />
                             </button>
@@ -110,28 +99,33 @@ export default function ShoppingCart() {
                               type="text"
                               name="number"
                               readOnly
-                              value={product.quantity}
+                              value={item.quantity}
                             />
                             <button
                               className="btn-quantity plus-quantity"
-                              onClick={() =>
-                                updateQuantity(product.id, product.quantity + 1)
-                              }
+                              disabled={busy || item.quantity >= 99}
+                              onClick={() => change(item.id, item.quantity + 1)}
                             >
                               <i className="icon-plus" />
                             </button>
                           </div>
                         </div>
+                        {!item.isAvailable && (
+                          <p className="text-danger text-caption">Only {item.availableQuantity} left</p>
+                        )}
                         <a
                           href="#"
                           className="tf-btn-line style-line-2 remove"
-                          onClick={() => removeItem(product.id)}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            change(item.id, null);
+                          }}
                         >
                           <span className="text-caption"> Remove </span>
                         </a>
                       </div>
                       <p className="tf-mini-card-price h6 fw-normal">
-                        ${product.price.toFixed(2)}
+                        ${item.lineTotal.toFixed(2)}
                       </p>
                     </li>
                   ))}
@@ -168,7 +162,7 @@ export default function ShoppingCart() {
                     total:
                   </h6>
                   <div className="tf-totals-total-value h6 fw-normal">
-                    {totalPrice.toFixed(2)}
+                    {(cart?.subtotal ?? 0).toFixed(2)}
                   </div>
                 </div>
                 <div className="tf-mini-cart-view-checkout">

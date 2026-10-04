@@ -2,9 +2,10 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useContextElement } from "@/context/Context";
+import { useServerCart } from "@/lib/cart/useServerCart";
 export default function Checkout() {
-  const { cartProducts, totalPrice } = useContextElement();
+  const { items, cart } = useServerCart();
+  const subtotal = cart?.subtotal ?? 0;
 
   return (
     <section className="flat-spacing">
@@ -398,7 +399,7 @@ export default function Checkout() {
           <div className="right-col sticky-top">
             <div className="tf-page-cart-sidebar">
               <h4 className="checkout-title">YOUR CART</h4>
-              {!cartProducts.length ? (
+              {!items.length ? (
                 <>
                   <div>Your Cart is Empty</div>
                   <Link href={`/shop-default`} className="tf-btn w-100 style-2">
@@ -407,31 +408,32 @@ export default function Checkout() {
                 </>
               ) : (
                 <ul className="list-order-product">
-                  {cartProducts.map((product, i) => (
-                    <li key={i} className="order-item">
+                  {items.map((item) => (
+                    <li key={item.id} className="order-item">
                       <div className="content">
                         <div className="img-product">
-                          <Image
-                            alt=""
-                            className="prd"
-                            src={product.imgSrc}
-                            width={714}
-                            height={900}
-                          />
+                          {item.imageUrl && (
+                            <img
+                              alt={item.productName}
+                              className="prd"
+                              src={item.imageUrl}
+                              width={714}
+                              height={900}
+                            />
+                          )}
                           <span className="text-caption quantity">
                             {" "}
-                            {product.quantity}
+                            {item.quantity}
                           </span>
                         </div>
                         <div className="info">
-                          <p className="name">{product.title}</p>
-                          <span className="variant">Rose Gold / 50</span>
+                          <p className="name">{item.productName}</p>
+                          {item.variantName && (
+                            <span className="variant">{item.variantName}</span>
+                          )}
                         </div>
                       </div>
-                      <h6 className="price">
-                        {" "}
-                        ${(product.price * product.quantity).toFixed(2)}
-                      </h6>
+                      <h6 className="price"> ${item.lineTotal.toFixed(2)}</h6>
                     </li>
                   ))}
                 </ul>
@@ -440,26 +442,18 @@ export default function Checkout() {
               <ul className="list-total">
                 <li className="total-item">
                   <span>SUBTOTAL:</span>
-                  <span>${totalPrice.toFixed(2)} USD</span>
+                  <span>${subtotal.toFixed(2)} USD</span>
                 </li>
                 <li className="total-item">
-                  <span>DISCOUNT:</span>
-                  <span>-$48.00 USD</span>
-                </li>
-                <li className="total-item">
-                  <span>SHIPPING:</span>
-                  <span>$10.00 USD</span>
-                </li>
-                <li className="total-item">
-                  <span>TAXES:</span>
-                  <span>$48.00 USD</span>
+                  <span>SHIPPING AND TAXES:</span>
+                  <span>Calculated at checkout</span>
                 </li>
               </ul>
               <span className="br-line" />
               <h4 className="last-total d-flex justify-content-between">
                 <span>SUBTOTAL:</span>
                 <span className="total-price-order">
-                  ${totalPrice.toFixed(2)} USD
+                  ${subtotal.toFixed(2)} USD
                 </span>
               </h4>
               <Link
