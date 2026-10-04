@@ -1,0 +1,18 @@
+# ===== .NET (backend/) =====
+bin/
+obj/
+*.user
+*.userosscache
+*.suo
+.vs/
+*.slnx.user
+
+# ===== General =====
+.vscode/
+.idea/
+*.log
+.env
+.env.*
+!.env.example
+.DS_Store
+Thumbs.db
