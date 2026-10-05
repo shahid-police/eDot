@@ -9,7 +9,11 @@
 // default configuration. Development sets RateLimiting:AuthRequestsPerMinute
 // higher; run against Development or wait a minute between runs.
 
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
 import { chromium } from "playwright-core";
+
+const run = promisify(execFile);
 
 const BASE = process.env.E2E_WEB_URL ?? "http://localhost:3000";
 const BROWSER_PATH =
@@ -18,6 +22,19 @@ const HEADLESS = process.env.E2E_HEADLESS !== "false";
 const EMAIL = `e2e${Date.now()}@example.com`;
 const PASSWORD = "Passw0rd!long";
 const PRODUCT_NAME = "Oval Halo Engagement Ring";
+// Optional: restock the seeded ring before the run, so repeated runs keep placing orders.
+// Set E2E_DB_CONTAINER to the MySQL dev container name (for example elegance-mysql-dev).
+const DB_CONTAINER = process.env.E2E_DB_CONTAINER;
+
+const restockRing = async () => {
+  if (!DB_CONTAINER) return;
+  await run("docker", [
+    "exec", DB_CONTAINER, "mysql", "-uroot", "-pelegance_root_dev_only", "elegance_dev",
+    "-e", "UPDATE products SET StockQuantity = 500 WHERE Sku = \"EL-RING-001\";",
+  ]);
+};
+
+await restockRing();
 
 const results = [];
 const pageErrors = [];
@@ -173,13 +190,78 @@ await step("cart drawer lists the server cart", async () => {
   await page.locator("#shoppingCart").getByText(PRODUCT_NAME).waitFor({ timeout: 15000 });
 });
 
-await step("checkout shows the server subtotal and no template discount", async () => {
+await step("checkout shows server totals and no template discount", async () => {
   await go("/checkout");
-  await text("SHIPPING AND TAXES").waitFor({ timeout: 15000 });
-  await text("$24900.00").waitFor({ timeout: 10000 });
+  await text("SUBTOTAL:").waitFor({ timeout: 15000 });
+  await text("TOTAL:").waitFor({ timeout: 10000 });
   if ((await page.getByText("DISCOUNT:", { exact: false }).count()) > 0) {
     throw new Error("template discount line present");
   }
+});
+
+await step("signed-in customer places a cash on delivery order", async () => {
+  // A newly registered account has no saved address, so the form asks for one.
+  if ((await page.locator("form.form-checkout select").count()) === 0) {
+    const values = ["Browser Tester", "+923001234567", "House 12, Street 4", "Lahore", "Punjab", "54000"];
+    const indexes = [0, 1, 2, 4, 5, 6];
+    for (let i = 0; i < values.length; i += 1) {
+      await page.evaluate(
+        ({ index, value }) => {
+          const input = document.querySelectorAll("form.form-checkout input.tf-input")[index];
+          const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").set;
+          setter.call(input, value);
+          input.dispatchEvent(new Event("input", { bubbles: true }));
+        },
+        { index: indexes[i], value: values[i] }
+      );
+    }
+  }
+  await page.getByRole("button", { name: "PLACE ORDER" }).click();
+  try {
+    await page.waitForURL("**/thank-you?order=E-*", { timeout: 20000 });
+  } catch (err) {
+    const shown = await page.locator(".text-danger").allInnerTexts();
+    const invalid = await page.evaluate(() => [...document.querySelectorAll("form.form-checkout :invalid")].map((e) => e.tagName + "." + e.className + "|" + String(e.value ?? "").slice(0, 20)));
+    const select = await page.evaluate(() => document.querySelector("form.form-checkout select")?.value ?? "no select");
+    throw new Error(`order not placed; errors ${JSON.stringify(shown)}, invalid ${JSON.stringify(invalid)}, select ${select}`);
+  }
+  await text("Thank you for your order").waitFor({ timeout: 10000 });
+  await text("Cash on delivery").waitFor({ timeout: 10000 });
+});
+
+await step("order appears in account order history", async () => {
+  await go("/account-orders");
+  await text("Order History").waitFor({ timeout: 15000 });
+  await page.locator(".table-order-history tbody tr td", { hasText: /^E-\d{4}-\d{6}$/ }).first().waitFor({ timeout: 15000 });
+});
+
+await step("guest checkout in a separate session places an order", async () => {
+  const guestContext = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  const guest = await guestContext.newPage();
+  guest.on("pageerror", (err) => pageErrors.push(err.message));
+  await guest.goto(`${BASE}/product-default/oval-halo-engagement-ring`, { waitUntil: "domcontentloaded" });
+  await guest.waitForTimeout(1500);
+  await guest.getByRole("button", { name: "add to bag" }).click();
+  await guest.waitForURL("**/shop-cart", { timeout: 15000 });
+  await guest.goto(`${BASE}/checkout`, { waitUntil: "domcontentloaded" });
+  await guest.waitForTimeout(1500);
+  const values = ["guest.e2e@example.com", "Guest Buyer", "+923001112233", "House 9, Street 3", "", "Lahore", "Punjab", "54000"];
+  for (let index = 0; index < values.length; index += 1) {
+    if (values[index] === "") continue;
+    await guest.evaluate(
+      ({ index, value }) => {
+        const input = document.querySelectorAll("form.form-checkout input.tf-input")[index];
+        const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").set;
+        setter.call(input, value);
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+      },
+      { index, value: values[index] }
+    );
+  }
+  await guest.getByRole("button", { name: "PLACE ORDER" }).click();
+  await guest.waitForURL("**/thank-you?order=E-*", { timeout: 20000 });
+  await guest.getByText("Thank you for your order", { exact: false }).first().waitFor({ timeout: 10000 });
+  await guestContext.close();
 });
 
 await browser.close();
