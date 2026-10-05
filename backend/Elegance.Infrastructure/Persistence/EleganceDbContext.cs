@@ -1,7 +1,10 @@
+using Elegance.Domain.Admin;
+using Elegance.Domain.Audit;
 using Elegance.Domain.Carts;
 using Elegance.Domain.Catalog;
 using Elegance.Domain.Compare;
 using Elegance.Domain.Customers;
+using Elegance.Domain.Inventory;
 using Elegance.Domain.Media;
 using Elegance.Domain.Orders;
 using Elegance.Domain.Wishlists;
@@ -35,6 +38,10 @@ public class EleganceDbContext : DbContext
     public DbSet<OrderAddress> OrderAddresses => Set<OrderAddress>();
     public DbSet<OrderStatusHistory> OrderStatusHistory => Set<OrderStatusHistory>();
     public DbSet<Payment> Payments => Set<Payment>();
+    public DbSet<AdminUser> AdminUsers => Set<AdminUser>();
+    public DbSet<AdminRoleAssignment> AdminRoleAssignments => Set<AdminRoleAssignment>();
+    public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+    public DbSet<StockMovement> StockMovements => Set<StockMovement>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

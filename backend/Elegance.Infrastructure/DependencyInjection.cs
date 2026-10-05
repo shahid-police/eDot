@@ -1,5 +1,7 @@
+using Elegance.Application.Admin;
 using Elegance.Application.Auth;
 using Elegance.Application.Carts;
+using Elegance.Infrastructure.Admin;
 using Elegance.Application.Checkout;
 using Elegance.Application.Payments;
 using Elegance.Application.Compare;
@@ -9,6 +11,7 @@ using Elegance.Application.Products;
 using Elegance.Infrastructure.Auth;
 using Elegance.Infrastructure.Carts;
 using Elegance.Infrastructure.Checkout;
+using Elegance.Infrastructure.Orders;
 using Elegance.Infrastructure.Payments;
 using Elegance.Infrastructure.Compare;
 using Elegance.Infrastructure.Catalog;
@@ -56,6 +59,15 @@ public static class DependencyInjection
         services.AddSingleton<IPaymentGateway, CashOnDeliveryGateway>();
         services.AddSingleton<IPaymentGateway, BankTransferGateway>();
         services.AddScoped<ICheckoutService, CheckoutService>();
+        services.AddScoped<OrderDetailBuilder>();
+
+        services.AddScoped<IAuditLogService, AuditLogService>();
+        services.AddScoped<IAdminAuthService, AdminAuthService>();
+        services.AddScoped<IAdminCatalogService, AdminCatalogService>();
+        services.AddScoped<IAdminOrderService, AdminOrderService>();
+        services.AddScoped<IAdminInventoryService, AdminInventoryService>();
+        services.AddScoped<IAdminCustomerService, AdminCustomerService>();
+        services.AddScoped<IAdminDashboardService, AdminDashboardService>();
 
         return services;
     }

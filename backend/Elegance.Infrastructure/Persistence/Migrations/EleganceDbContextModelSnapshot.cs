@@ -22,6 +22,112 @@ namespace Elegance.Infrastructure.Persistence.Migrations
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
+            modelBuilder.Entity("Elegance.Domain.Admin.AdminRoleAssignment", b =>
+                {
+                    b.Property<long>("AdminUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Role")
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)");
+
+                    b.HasKey("AdminUserId", "Role");
+
+                    b.ToTable("admin_role_assignments", (string)null);
+                });
+
+            modelBuilder.Entity("Elegance.Domain.Admin.AdminUser", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(254)
+                        .HasColumnType("varchar(254)");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("varchar(512)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.ToTable("admin_users", (string)null);
+                });
+
+            modelBuilder.Entity("Elegance.Domain.Audit.AuditLog", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("AdminEmail")
+                        .IsRequired()
+                        .HasMaxLength(254)
+                        .HasColumnType("varchar(254)");
+
+                    b.Property<long?>("AdminUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("EntityId")
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)");
+
+                    b.Property<string>("EntityType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("Summary")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AdminUserId");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.ToTable("audit_logs", (string)null);
+                });
+
             modelBuilder.Entity("Elegance.Domain.Carts.Cart", b =>
                 {
                     b.Property<long>("Id")
@@ -616,6 +722,50 @@ namespace Elegance.Infrastructure.Persistence.Migrations
                     b.ToTable("refresh_tokens", (string)null);
                 });
 
+            modelBuilder.Entity("Elegance.Domain.Inventory.StockMovement", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long?>("AdminUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Note")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<long?>("OrderId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("ProductId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("QuantityDelta")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<long?>("VariantId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("stock_movements", (string)null);
+                });
+
             modelBuilder.Entity("Elegance.Domain.Media.MediaFile", b =>
                 {
                     b.Property<long>("Id")
@@ -1003,6 +1153,17 @@ namespace Elegance.Infrastructure.Persistence.Migrations
                     b.ToTable("wishlist_items", (string)null);
                 });
 
+            modelBuilder.Entity("Elegance.Domain.Admin.AdminRoleAssignment", b =>
+                {
+                    b.HasOne("Elegance.Domain.Admin.AdminUser", "AdminUser")
+                        .WithMany("Roles")
+                        .HasForeignKey("AdminUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AdminUser");
+                });
+
             modelBuilder.Entity("Elegance.Domain.Carts.Cart", b =>
                 {
                     b.HasOne("Elegance.Domain.Customers.Customer", "Customer")
@@ -1162,6 +1323,15 @@ namespace Elegance.Infrastructure.Persistence.Migrations
                     b.Navigation("Customer");
                 });
 
+            modelBuilder.Entity("Elegance.Domain.Inventory.StockMovement", b =>
+                {
+                    b.HasOne("Elegance.Domain.Catalog.Product", null)
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Elegance.Domain.Orders.Order", b =>
                 {
                     b.HasOne("Elegance.Domain.Customers.Customer", "Customer")
@@ -1265,6 +1435,11 @@ namespace Elegance.Infrastructure.Persistence.Migrations
                     b.Navigation("Variant");
 
                     b.Navigation("Wishlist");
+                });
+
+            modelBuilder.Entity("Elegance.Domain.Admin.AdminUser", b =>
+                {
+                    b.Navigation("Roles");
                 });
 
             modelBuilder.Entity("Elegance.Domain.Carts.Cart", b =>

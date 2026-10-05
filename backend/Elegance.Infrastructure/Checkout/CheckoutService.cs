@@ -6,10 +6,12 @@ using Elegance.Application.Payments;
 using Elegance.Domain.Carts;
 using Elegance.Domain.Catalog;
 using Elegance.Domain.Customers;
+using Elegance.Domain.Inventory;
 using Elegance.Domain.Orders;
 using Elegance.Domain.Orders.Enums;
 using Elegance.Infrastructure.Auth;
 using Elegance.Infrastructure.Catalog;
+using Elegance.Infrastructure.Orders;
 using Elegance.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -19,7 +21,8 @@ namespace Elegance.Infrastructure.Checkout;
 public class CheckoutService(
     EleganceDbContext dbContext,
     IOptions<CheckoutOptions> options,
-    IEnumerable<IPaymentGateway> gateways) : ICheckoutService
+    IEnumerable<IPaymentGateway> gateways,
+    OrderDetailBuilder detailBuilder) : ICheckoutService
 {
     private readonly CheckoutOptions _options = options.Value;
 
@@ -153,6 +156,16 @@ public class CheckoutService(
 
         dbContext.Orders.Add(order);
         await dbContext.SaveChangesAsync(cancellationToken);
+
+        dbContext.StockMovements.AddRange(lines.Select(l => new StockMovement
+        {
+            ProductId = l.Product.Id,
+            VariantId = l.Variant?.Id,
+            QuantityDelta = -l.Quantity,
+            Reason = StockMovementReason.Sale,
+            OrderId = order.Id,
+            CreatedAt = now,
+        }));
 
         order.OrderNumber = $"E-{now:yyyy}-{order.Id:D6}";
         await dbContext.CartItems
@@ -341,72 +354,8 @@ public class CheckoutService(
         return (shipping, tax, subtotal + shipping + tax);
     }
 
-    private async Task<OrderDetailDto> BuildDetailAsync(long orderId, CancellationToken cancellationToken)
-    {
-        var order = await dbContext.Orders
-            .AsNoTracking()
-            .Include(o => o.Items)
-            .Include(o => o.Addresses)
-            .Include(o => o.StatusHistory)
-            .Include(o => o.Payments)
-            .FirstAsync(o => o.Id == orderId, cancellationToken);
-
-        var address = order.Addresses.First(a => a.Type == AddressType.Shipping);
-        var gatewayByMethod = gateways.ToDictionary(g => g.Method);
-
-        return new OrderDetailDto
-        {
-            Id = order.Id,
-            OrderNumber = order.OrderNumber,
-            Status = order.Status.ToString(),
-            Email = order.Email,
-            Phone = order.Phone,
-            Subtotal = order.Subtotal,
-            ShippingTotal = order.ShippingTotal,
-            TaxTotal = order.TaxTotal,
-            GrandTotal = order.GrandTotal,
-            Currency = order.Currency,
-            Notes = order.Notes,
-            CreatedAt = order.CreatedAt,
-            ShippingAddress = new OrderAddressDto
-            {
-                FullName = address.FullName,
-                Phone = address.Phone,
-                AddressLine1 = address.AddressLine1,
-                AddressLine2 = address.AddressLine2,
-                City = address.City,
-                Province = address.Province,
-                PostalCode = address.PostalCode,
-                Country = address.Country,
-            },
-            Items = order.Items.OrderBy(i => i.Id).Select(i => new OrderItemDto
-            {
-                ProductId = i.ProductId,
-                VariantId = i.VariantId,
-                Sku = i.Sku,
-                ProductName = i.ProductName,
-                VariantName = i.VariantName,
-                UnitPrice = i.UnitPrice,
-                Quantity = i.Quantity,
-                LineTotal = i.LineTotal,
-            }).ToList(),
-            Payments = order.Payments.Select(p => new OrderPaymentDto
-            {
-                Method = p.Method.ToString(),
-                Status = p.Status.ToString(),
-                Amount = p.Amount,
-                Currency = p.Currency,
-                Instructions = gatewayByMethod[p.Method].Describe(order.OrderNumber, p.Amount, p.Currency),
-            }).ToList(),
-            History = order.StatusHistory.OrderBy(h => h.Id).Select(h => new OrderStatusEntryDto
-            {
-                Status = h.Status.ToString(),
-                Note = h.Note,
-                CreatedAt = h.CreatedAt,
-            }).ToList(),
-        };
-    }
-
+    private Task<OrderDetailDto> BuildDetailAsync(long orderId, CancellationToken cancellationToken) =>
+        detailBuilder.BuildAsync(orderId, cancellationToken);
     private static PaymentMethod ParsePaymentMethod(string value) =>
         Enum.TryParse<PaymentMethod>(value, ignoreCase: true, out var method) && Enum.IsDefined(method)
             ? method

@@ -1,4 +1,5 @@
 using System.Text;
+using Elegance.Api.Auth;
 using Elegance.Api.Middleware;
 using Elegance.Infrastructure;
 using Elegance.Infrastructure.Auth;
@@ -41,7 +42,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             RoleClaimType = "role",
         };
     });
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options => options.AddAdminPolicies());
 
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<ApplicationFailureExceptionHandler>();
@@ -82,6 +83,7 @@ if (app.Environment.IsDevelopment())
     using var scope = app.Services.CreateScope();
     var dbContext = scope.ServiceProvider.GetRequiredService<EleganceDbContext>();
     await DevelopmentSeeder.SeedAsync(dbContext);
+    await DevelopmentAdminSeeder.SeedAsync(dbContext, app.Configuration["Seed:AdminEmail"], app.Configuration["Seed:AdminPassword"]);
 }
 
 app.UseExceptionHandler();
