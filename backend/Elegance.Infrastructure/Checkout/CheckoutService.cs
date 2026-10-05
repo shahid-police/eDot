@@ -95,6 +95,7 @@ public class CheckoutService(
         {
             OrderNumber = Guid.NewGuid().ToString("N"),
             CustomerId = customer?.Id,
+            GuestTokenHash = customer is null && owner.GuestToken is not null ? TokenService.HashToken(owner.GuestToken) : null,
             Email = email,
             Phone = shipping.Phone,
             Subtotal = subtotal,
@@ -164,11 +165,10 @@ public class CheckoutService(
         return await BuildDetailAsync(order.Id, cancellationToken);
     }
 
-    public async Task<IReadOnlyList<OrderSummaryDto>> GetOrdersAsync(long customerId, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<OrderSummaryDto>> GetOrdersAsync(ListOwner owner, CancellationToken cancellationToken = default)
     {
-        var orders = await dbContext.Orders
+        var orders = await OwnedOrders(owner)
             .AsNoTracking()
-            .Where(o => o.CustomerId == customerId)
             .OrderByDescending(o => o.CreatedAt)
             .ThenByDescending(o => o.Id)
             .Take(50)
@@ -196,17 +196,42 @@ public class CheckoutService(
         }).ToList();
     }
 
-    public async Task<OrderDetailDto> GetOrderAsync(long customerId, long orderId, CancellationToken cancellationToken = default)
+    public async Task<OrderDetailDto> GetOrderAsync(ListOwner owner, long orderId, CancellationToken cancellationToken = default)
     {
-        var owned = await dbContext.Orders
-            .AsNoTracking()
-            .AnyAsync(o => o.Id == orderId && o.CustomerId == customerId, cancellationToken);
-        if (!owned)
+        var id = await OwnedOrders(owner).Where(o => o.Id == orderId).Select(o => (long?)o.Id).FirstOrDefaultAsync(cancellationToken)
+            ?? throw new ApplicationFailure(FailureKind.NotFound, "The requested order was not found.");
+        return await BuildDetailAsync(id, cancellationToken);
+    }
+
+    public async Task<OrderDetailDto> GetOrderByNumberAsync(ListOwner owner, string orderNumber, CancellationToken cancellationToken = default)
+    {
+        var id = await OwnedOrders(owner).Where(o => o.OrderNumber == orderNumber).Select(o => (long?)o.Id).FirstOrDefaultAsync(cancellationToken)
+            ?? throw new ApplicationFailure(FailureKind.NotFound, "The requested order was not found.");
+        return await BuildDetailAsync(id, cancellationToken);
+    }
+
+    public async Task AdoptGuestOrdersAsync(long customerId, string guestToken, CancellationToken cancellationToken = default)
+    {
+        var hash = TokenService.HashToken(guestToken);
+        await dbContext.Orders
+            .Where(o => o.GuestTokenHash == hash && o.CustomerId == null)
+            .ExecuteUpdateAsync(s => s.SetProperty(o => o.CustomerId, customerId).SetProperty(o => o.GuestTokenHash, (string?)null), cancellationToken);
+    }
+
+    private IQueryable<Order> OwnedOrders(ListOwner owner)
+    {
+        if (owner.CustomerId is { } customerId)
         {
-            throw new ApplicationFailure(FailureKind.NotFound, "The requested order was not found.");
+            return dbContext.Orders.Where(o => o.CustomerId == customerId);
         }
 
-        return await BuildDetailAsync(orderId, cancellationToken);
+        if (!string.IsNullOrEmpty(owner.GuestToken))
+        {
+            var hash = TokenService.HashToken(owner.GuestToken);
+            return dbContext.Orders.Where(o => o.GuestTokenHash == hash);
+        }
+
+        return dbContext.Orders.Where(o => false);
     }
 
     private async Task<(Cart? Cart, List<CartLine> Lines)> LoadCartAsync(ListOwner owner, CancellationToken cancellationToken)

@@ -6,7 +6,7 @@ namespace Elegance.Api.Auth;
 
 public static class ListOwnerResolver
 {
-    private static readonly TimeSpan GuestCookieLifetime = TimeSpan.FromDays(30);
+    public static readonly TimeSpan GuestSessionLifetime = TimeSpan.FromDays(30);
 
     public static ListOwner Resolve(ClaimsPrincipal user, HttpRequest request, HttpResponse response, string guestCookieName, bool issueGuestToken)
     {
@@ -16,19 +16,25 @@ public static class ListOwnerResolver
         }
 
         var guestToken = request.Cookies[guestCookieName];
-        if (string.IsNullOrEmpty(guestToken) && issueGuestToken)
+        if (string.IsNullOrEmpty(guestToken))
         {
-            guestToken = TokenService.CreateOpaqueToken();
-            response.Cookies.Append(guestCookieName, guestToken, new CookieOptions
+            if (!issueGuestToken)
             {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Lax,
-                Path = "/",
-                MaxAge = GuestCookieLifetime,
-            });
+                return new ListOwner(null, null);
+            }
+            guestToken = TokenService.CreateOpaqueToken();
         }
 
-        return new ListOwner(null, string.IsNullOrEmpty(guestToken) ? null : guestToken);
+        // Renewed on every guest request so an active guest session does not expire.
+        response.Cookies.Append(guestCookieName, guestToken, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.Lax,
+            Path = "/",
+            MaxAge = GuestSessionLifetime,
+        });
+
+        return new ListOwner(null, guestToken);
     }
 }

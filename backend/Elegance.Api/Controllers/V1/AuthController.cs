@@ -1,6 +1,7 @@
 using Elegance.Api.Contracts;
 using Elegance.Application.Auth;
 using Elegance.Application.Carts;
+using Elegance.Application.Checkout;
 using Elegance.Application.Compare;
 using Elegance.Application.Wishlists;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +15,7 @@ public class AuthController(
     IAuthService authService,
     ICartService cartService,
     IWishlistService wishlistService,
+    ICheckoutService checkoutService,
     ICompareService compareService) : ControllerBase
 {
     public const string RefreshCookieName = "elegance_refresh";
@@ -58,7 +60,11 @@ public class AuthController(
 
     private async Task AdoptGuestListsAsync(long customerId, CancellationToken cancellationToken)
     {
-        await AdoptGuestListAsync(CartController.GuestCookieName, token => cartService.MergeGuestCartAsync(customerId, token, cancellationToken), cancellationToken);
+        await AdoptGuestListAsync(CartController.GuestCookieName, async token =>
+        {
+            await cartService.MergeGuestCartAsync(customerId, token, cancellationToken);
+            await checkoutService.AdoptGuestOrdersAsync(customerId, token, cancellationToken);
+        }, cancellationToken);
         await AdoptGuestListAsync(WishlistController.GuestCookieName, token => wishlistService.MergeGuestWishlistAsync(customerId, token, cancellationToken), cancellationToken);
         await AdoptGuestListAsync(CompareController.GuestCookieName, token => compareService.MergeGuestCompareAsync(customerId, token, cancellationToken), cancellationToken);
     }

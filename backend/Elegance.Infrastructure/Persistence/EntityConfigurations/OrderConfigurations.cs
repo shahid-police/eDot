@@ -29,6 +29,8 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
             .HasForeignKey(o => o.CustomerId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        builder.Property(o => o.GuestTokenHash).HasMaxLength(128);
+        builder.HasIndex(o => o.GuestTokenHash);
         builder.HasIndex(o => o.CustomerId);
         builder.HasIndex(o => o.Status);
         builder.HasIndex(o => o.CreatedAt);

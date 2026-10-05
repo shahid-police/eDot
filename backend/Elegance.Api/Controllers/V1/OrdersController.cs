@@ -1,7 +1,6 @@
 using Elegance.Api.Auth;
 using Elegance.Application.Checkout;
 using Elegance.Application.Orders;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Elegance.Api.Controllers.V1;
@@ -19,16 +18,23 @@ public class OrdersController(ICheckoutService checkoutService) : ControllerBase
     }
 
     [HttpGet]
-    [Authorize(Roles = "Customer")]
     public async Task<ActionResult<IReadOnlyList<OrderSummaryDto>>> GetOrders(CancellationToken cancellationToken)
     {
-        return Ok(await checkoutService.GetOrdersAsync(User.GetCustomerId(), cancellationToken));
+        var owner = ListOwnerResolver.Resolve(User, Request, Response, CartController.GuestCookieName, issueGuestToken: false);
+        return Ok(await checkoutService.GetOrdersAsync(owner, cancellationToken));
+    }
+
+    [HttpGet("by-number/{orderNumber}")]
+    public async Task<ActionResult<OrderDetailDto>> GetOrderByNumber(string orderNumber, CancellationToken cancellationToken)
+    {
+        var owner = ListOwnerResolver.Resolve(User, Request, Response, CartController.GuestCookieName, issueGuestToken: false);
+        return Ok(await checkoutService.GetOrderByNumberAsync(owner, orderNumber, cancellationToken));
     }
 
     [HttpGet("{orderId:long}")]
-    [Authorize(Roles = "Customer")]
     public async Task<ActionResult<OrderDetailDto>> GetOrder(long orderId, CancellationToken cancellationToken)
     {
-        return Ok(await checkoutService.GetOrderAsync(User.GetCustomerId(), orderId, cancellationToken));
+        var owner = ListOwnerResolver.Resolve(User, Request, Response, CartController.GuestCookieName, issueGuestToken: false);
+        return Ok(await checkoutService.GetOrderAsync(owner, orderId, cancellationToken));
     }
 }

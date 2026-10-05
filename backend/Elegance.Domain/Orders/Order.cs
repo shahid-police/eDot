@@ -11,6 +11,8 @@ public class Order
     public long? CustomerId { get; set; }
     public Customer? Customer { get; set; }
 
+    public string? GuestTokenHash { get; set; }
+
     public required string Email { get; set; }
     public required string Phone { get; set; }
 
