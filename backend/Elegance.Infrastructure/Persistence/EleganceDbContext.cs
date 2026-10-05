@@ -3,6 +3,7 @@ using Elegance.Domain.Catalog;
 using Elegance.Domain.Compare;
 using Elegance.Domain.Customers;
 using Elegance.Domain.Media;
+using Elegance.Domain.Orders;
 using Elegance.Domain.Wishlists;
 using Microsoft.EntityFrameworkCore;
 
@@ -29,6 +30,11 @@ public class EleganceDbContext : DbContext
     public DbSet<WishlistItem> WishlistItems => Set<WishlistItem>();
     public DbSet<CompareList> CompareLists => Set<CompareList>();
     public DbSet<CompareItem> CompareItems => Set<CompareItem>();
+    public DbSet<Order> Orders => Set<Order>();
+    public DbSet<OrderItem> OrderItems => Set<OrderItem>();
+    public DbSet<OrderAddress> OrderAddresses => Set<OrderAddress>();
+    public DbSet<OrderStatusHistory> OrderStatusHistory => Set<OrderStatusHistory>();
+    public DbSet<Payment> Payments => Set<Payment>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -4,6 +4,7 @@ using Elegance.Domain.Carts;
 using Elegance.Domain.Catalog;
 using Elegance.Domain.Catalog.Enums;
 using Elegance.Infrastructure.Auth;
+using Elegance.Infrastructure.Catalog;
 using Elegance.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -250,10 +251,7 @@ public class CartService(EleganceDbContext dbContext) : ICartService
         var product = item.Product;
         var variant = item.Variant;
 
-        var basePrice = variant?.Price ?? product.Price;
-        var unitPrice = variant is null
-            ? product.SalePrice ?? product.Price
-            : variant.SalePrice ?? basePrice;
+        var unitPrice = PricingRules.UnitPrice(product, variant);
 
         var available = AvailableStock(product, variant);
         var primaryImage = product.Images

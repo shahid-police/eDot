@@ -1,11 +1,15 @@
 using Elegance.Application.Auth;
 using Elegance.Application.Carts;
+using Elegance.Application.Checkout;
+using Elegance.Application.Payments;
 using Elegance.Application.Compare;
 using Elegance.Application.Categories;
 using Elegance.Application.Customers;
 using Elegance.Application.Products;
 using Elegance.Infrastructure.Auth;
 using Elegance.Infrastructure.Carts;
+using Elegance.Infrastructure.Checkout;
+using Elegance.Infrastructure.Payments;
 using Elegance.Infrastructure.Compare;
 using Elegance.Infrastructure.Catalog;
 using Elegance.Infrastructure.Customers;
@@ -47,6 +51,11 @@ public static class DependencyInjection
         services.AddScoped<ICartService, CartService>();
         services.AddScoped<IWishlistService, WishlistService>();
         services.AddScoped<ICompareService, CompareService>();
+        services.AddOptions<CheckoutOptions>()
+            .Bind(configuration.GetSection(CheckoutOptions.SectionName));
+        services.AddSingleton<IPaymentGateway, CashOnDeliveryGateway>();
+        services.AddSingleton<IPaymentGateway, BankTransferGateway>();
+        services.AddScoped<ICheckoutService, CheckoutService>();
 
         return services;
     }
