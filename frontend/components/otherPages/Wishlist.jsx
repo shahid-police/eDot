@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { getWishlist, removeWishlistItem } from "@/lib/api/wishlist";
 import { useSession } from "@/lib/auth/session";
+import { formatPrice } from "@/lib/format/price";
 
 export default function Wishlist() {
   const session = useSession();
@@ -78,10 +79,10 @@ export default function Wishlist() {
                   {item.variantName && <p className="text-caption text-main-4">{item.variantName}</p>}
                   <div className="price-wrap">
                     <span className="price-new h5">
-                      ${(item.salePrice ?? item.price).toFixed(2)}
+                      {formatPrice((item.salePrice ?? item.price))}
                     </span>
                     {item.salePrice !== null && item.salePrice !== undefined && (
-                      <span className="price-old fw-normal">${item.price.toFixed(2)}</span>
+                      <span className="price-old fw-normal">{formatPrice(item.price)}</span>
                     )}
                   </div>
                 </div>

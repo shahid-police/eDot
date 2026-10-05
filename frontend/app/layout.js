@@ -21,7 +21,6 @@ import Engrave from "@/components/modals/Engrave";
 import Pickup from "@/components/modals/Pickup";
 import ProductDes from "@/components/modals/ProductDes";
 import UnavailableModal from "@/components/modals/UnavailableModal";
-import OrderDetails from "@/components/modals/OrderDetails";
 
 export default function RootLayout({ children }) {
   return (
@@ -50,7 +49,6 @@ export default function RootLayout({ children }) {
             <Pickup />
             <ProductDes />
             <UnavailableModal />
-            <OrderDetails />
           </Context>
         </LayoutWrapper>
       </body>

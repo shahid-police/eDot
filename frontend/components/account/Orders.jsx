@@ -1,10 +1,10 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import Link from "next/link";
 import { getOrder, getOrders } from "@/lib/api/orders";
 import { useSession } from "@/lib/auth/session";
+import { formatPrice } from "@/lib/format/price";
 
-const money = (value) => `$${value.toFixed(2)}`;
+const money = formatPrice;
 
 export default function Orders() {
   const session = useSession();
@@ -14,10 +14,6 @@ export default function Orders() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!session) {
-      setOrders(null);
-      return;
-    }
     getOrders()
       .then(setOrders)
       .catch((err) => setError(err.message || "We could not load your orders."));
@@ -38,17 +34,6 @@ export default function Orders() {
       }
     }
   };
-
-  if (!session) {
-    return (
-      <div className="my-acount-content account-order">
-        <h4 className="heading fw-normal">Order History</h4>
-        <p>
-          <Link href="/shop-default" className="link">Sign in</Link> to see your orders.
-        </p>
-      </div>
-    );
-  }
 
   return (
     <div className="my-acount-content account-order">
@@ -75,7 +60,7 @@ export default function Orders() {
                 <React.Fragment key={order.id}>
                   <tr>
                     <td>{order.orderNumber}</td>
-                    <td>{new Date(`${order.createdAt}Z`).toLocaleDateString()}</td>
+                    <td>{new Date(order.createdAt).toLocaleDateString()}</td>
                     <td>{order.status}</td>
                     <td>{money(order.grandTotal)}</td>
                     <td>

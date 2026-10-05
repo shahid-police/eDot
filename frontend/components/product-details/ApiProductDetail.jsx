@@ -7,6 +7,7 @@ import { addCartItem } from "@/lib/api/cart";
 import { addWishlistItem, getWishlist, removeWishlistItem } from "@/lib/api/wishlist";
 import { addCompareItem, getCompare, removeCompareItem } from "@/lib/api/compare";
 import { useSession } from "@/lib/auth/session";
+import { formatPrice } from "@/lib/format/price";
 
 const GALLERY_KEY = "api";
 
@@ -120,11 +121,11 @@ export default function ApiProductDetail({ product }) {
                     <div className="product-info-price">
                       <div className="price-wrap">
                         <span className="price-new price-on-sale h4">
-                          ${(salePrice ?? price).toFixed(2)}
+                          {formatPrice((salePrice ?? price))}
                         </span>
                         {salePrice !== null && salePrice !== undefined && (
                           <span className="price-old compare-at-price fw-normal h6">
-                            ${price.toFixed(2)}
+                            {formatPrice(price)}
                           </span>
                         )}
                       </div>

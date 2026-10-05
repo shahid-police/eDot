@@ -2,6 +2,7 @@
 import React from "react";
 import Link from "next/link";
 import { useServerCompare } from "@/lib/compare/useServerCompare";
+import { formatPrice } from "@/lib/format/price";
 
 export default function Compare() {
   const { compare, items, remove, clear } = useServerCompare("compare");
@@ -37,7 +38,7 @@ export default function Compare() {
                         {item.name}
                       </Link>
                       <div className="price-wrap justify-content-center">
-                        <span className="price-new">${(item.salePrice ?? item.price).toFixed(2)}</span>
+                        <span className="price-new">{formatPrice((item.salePrice ?? item.price))}</span>
                       </div>
                     </div>
                   </div>

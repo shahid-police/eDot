@@ -2,8 +2,9 @@
 import React from "react";
 import Link from "next/link";
 import { useServerCompare } from "@/lib/compare/useServerCompare";
+import { formatPrice } from "@/lib/format/price";
 
-const money = (value) => `$${value.toFixed(2)}`;
+const money = (value) => `${formatPrice(value)}`;
 
 export default function Compare() {
   const { compare, items, error, remove, clear } = useServerCompare();

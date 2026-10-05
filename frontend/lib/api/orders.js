@@ -7,3 +7,7 @@ export function getOrders() {
 export function getOrder(orderId) {
   return savedRequest(`/api/v1/orders/${orderId}`);
 }
+
+export function getOrderByNumber(orderNumber) {
+  return savedRequest(`/api/v1/orders/by-number/${encodeURIComponent(orderNumber)}`);
+}

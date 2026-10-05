@@ -2,6 +2,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { getCart, removeCartItem, updateCartItem } from "@/lib/api/cart";
+import { formatPrice } from "@/lib/format/price";
 
 export default function ApiShopCart() {
   const [cart, setCart] = useState(null);
@@ -91,7 +92,7 @@ export default function ApiShopCart() {
                               </div>
                             </div>
                           </td>
-                          <td className="order_price each-price">${item.unitPrice.toFixed(2)}</td>
+                          <td className="order_price each-price">{formatPrice(item.unitPrice)}</td>
                           <td>
                             <div className="order_quantity">
                               <div className="wg-quantity style-2">
@@ -126,7 +127,7 @@ export default function ApiShopCart() {
                             </div>
                           </td>
                           <td className="order_subtotal each-subtotal-price">
-                            ${item.lineTotal.toFixed(2)}
+                            {formatPrice(item.lineTotal)}
                           </td>
                         </tr>
                       ))}
@@ -142,7 +143,7 @@ export default function ApiShopCart() {
                 <form className="form-checkout-sidebar" onSubmit={(e) => e.preventDefault()}>
                   <div className="form-content">
                     <h4 className="title-total">
-                      TOTAL: ${(cart?.subtotal ?? 0).toFixed(2)}
+                      TOTAL: {formatPrice((cart?.subtotal ?? 0))}
                     </h4>
                     <p className="tax-text">Taxes and shipping calculated at checkout</p>
                   </div>

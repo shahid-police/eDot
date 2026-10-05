@@ -6,6 +6,7 @@ import { getCart } from "@/lib/api/cart";
 import { getCheckoutSummary, placeOrder } from "@/lib/api/checkout";
 import { getAddresses } from "@/lib/api/customers";
 import { useSession } from "@/lib/auth/session";
+import { formatPrice } from "@/lib/format/price";
 
 const NEW_ADDRESS = "new";
 const EMPTY_ADDRESS = {
@@ -18,7 +19,7 @@ const EMPTY_ADDRESS = {
   postalCode: "",
 };
 
-const money = (value) => `$${value.toFixed(2)}`;
+const money = (value) => `${formatPrice(value)}`;
 
 export default function Checkout() {
   const router = useRouter();
@@ -75,7 +76,6 @@ export default function Checkout() {
     };
     try {
       const order = await placeOrder(payload);
-      sessionStorage.setItem("lastOrder", JSON.stringify(order));
       router.push(`/thank-you?order=${encodeURIComponent(order.orderNumber)}`);
     } catch (err) {
       setError(err.message || "We could not place your order. Please try again.");

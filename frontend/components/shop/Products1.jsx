@@ -9,6 +9,7 @@ import FilterSidebar from "./FilterSidebar";
 import LayoutHandler from "./LayoutHandler";
 import Link from "next/link";
 import Pagination from "../common/Pagination";
+import { formatPrice } from "@/lib/format/price";
 export default function Products1({ defaultLayout = 4, products }) {
   const source = products ?? products15;
   const [activeLayout, setActiveLayout] = useState(defaultLayout);
@@ -414,11 +415,11 @@ export default function Products1({ defaultLayout = 4, products }) {
                     </Link>
                     <div className="price-wrap">
                       <span className="price-new h5">
-                        ${product.price.toFixed(2)}
+                        {formatPrice(product.price)}
                       </span>
                       {product.oldPrice && (
                         <span className="price-old fw-normal">
-                          ${product.oldPrice.toFixed(2)}
+                          {formatPrice(product.oldPrice)}
                         </span>
                       )}
                     </div>
@@ -552,11 +553,11 @@ export default function Products1({ defaultLayout = 4, products }) {
                     </Link>
                     <div className="price-wrap">
                       <span className="price-new h5">
-                        ${product.price.toFixed(2)}
+                        {formatPrice(product.price)}
                       </span>
                       {product.oldPrice && (
                         <span className="price-old fw-normal">
-                          ${product.oldPrice.toFixed(2)}
+                          {formatPrice(product.oldPrice)}
                         </span>
                       )}
                     </div>

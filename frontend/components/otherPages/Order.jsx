@@ -2,30 +2,37 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import OrderPageTestimonials from "./OrderPageTestimonials";
+import { getOrderByNumber } from "@/lib/api/orders";
+import { useSession } from "@/lib/auth/session";
+import { formatPrice } from "@/lib/format/price";
 
-const money = (value) => `$${value.toFixed(2)}`;
+const money = (value) => `${formatPrice(value)}`;
 
 export default function Order() {
+  const session = useSession();
   const [order, setOrder] = useState(null);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     const requested = new URLSearchParams(window.location.search).get("order");
-    try {
-      const stored = JSON.parse(sessionStorage.getItem("lastOrder") ?? "null");
-      if (stored && (!requested || stored.orderNumber === requested)) {
-        setOrder(stored);
-      }
-    } catch {
-      setOrder(null);
+    if (!requested) {
+      setLoaded(true);
+      return;
     }
-  }, []);
+    getOrderByNumber(requested)
+      .then(setOrder)
+      .catch(() => setOrder(null))
+      .finally(() => setLoaded(true));
+  }, [session]);
 
   return (
     <section className="flat-spacing">
       <div className="container">
         <div className="row justify-content-center">
           <div className="col-lg-7">
-            {order ? (
+            {!loaded ? (
+              <p className="text-center">Loading your order...</p>
+            ) : order ? (
               <div className="tf-page-cart-sidebar">
                 <h3 className="checkout-title">Thank you for your order</h3>
                 <p>

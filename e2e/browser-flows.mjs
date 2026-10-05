@@ -121,7 +121,7 @@ await step("guest add to bag lands on cart", async () => {
   await page.getByRole("button", { name: "add to bag" }).click();
   await page.waitForURL("**/shop-cart", { timeout: 15000 });
   await text(PRODUCT_NAME).waitFor({ timeout: 15000 });
-  await text("$24900.00").waitFor({ timeout: 10000 });
+  await text("PKR 24,900.00").waitFor({ timeout: 10000 });
 });
 
 await step("demo product page has no add-to-bag control", async () => {
@@ -261,6 +261,12 @@ await step("guest checkout in a separate session places an order", async () => {
   await guest.getByRole("button", { name: "PLACE ORDER" }).click();
   await guest.waitForURL("**/thank-you?order=E-*", { timeout: 20000 });
   await guest.getByText("Thank you for your order", { exact: false }).first().waitFor({ timeout: 10000 });
+  // The confirmation is loaded from the server, so it survives a reload.
+  await guest.reload({ waitUntil: "domcontentloaded" });
+  await guest.getByText("has been placed", { exact: false }).first().waitFor({ timeout: 15000 });
+  // The guest session keeps their orders in order history.
+  await guest.goto(`${BASE}/account-orders`, { waitUntil: "domcontentloaded" });
+  await guest.locator(".table-order-history tbody tr td", { hasText: /^E-\d{4}-\d{6}$/ }).first().waitFor({ timeout: 15000 });
   await guestContext.close();
 });
 

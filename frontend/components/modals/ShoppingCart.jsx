@@ -5,6 +5,7 @@ import Image from "next/image";
 import ProgressBarComponent from "../common/Progressbar";
 import { useState } from "react";
 import { useServerCart } from "@/lib/cart/useServerCart";
+import { formatPrice } from "@/lib/format/price";
 export default function ShoppingCart() {
   const [openTool, setOpenTool] = useState(-1);
   const { cart, items, busy, change, clear } = useServerCart("shoppingCart");
@@ -125,7 +126,7 @@ export default function ShoppingCart() {
                         </a>
                       </div>
                       <p className="tf-mini-card-price h6 fw-normal">
-                        ${item.lineTotal.toFixed(2)}
+                        {formatPrice(item.lineTotal)}
                       </p>
                     </li>
                   ))}
