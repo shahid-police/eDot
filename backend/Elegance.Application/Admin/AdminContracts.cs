@@ -72,6 +72,15 @@ public class AdminVariantDto
     public string? Size { get; init; }
     public string? Color { get; init; }
     public required bool IsActive { get; init; }
+    public string? ImageUrl { get; init; }
+}
+
+public class AdminProductImageDto
+{
+    public required long Id { get; init; }
+    public required string Url { get; init; }
+    public required string ImageType { get; init; }
+    public required int SortOrder { get; init; }
 }
 
 public class AdminProductDto
@@ -101,7 +110,9 @@ public class AdminProductDto
     public string? SeoTitle { get; init; }
     public string? SeoDescription { get; init; }
     public string? SeoKeywords { get; init; }
+    public string? VideoUrl { get; init; }
     public required IReadOnlyList<AdminVariantDto> Variants { get; init; }
+    public required IReadOnlyList<AdminProductImageDto> Images { get; init; }
 }
 
 public class AdminVariantRequest
@@ -199,6 +210,10 @@ public class AdminProductRequest
     [StringLength(500)]
     public string? SeoKeywords { get; init; }
 
+    [StringLength(500)]
+    [Url]
+    public string? VideoUrl { get; init; }
+
     public List<AdminVariantRequest> Variants { get; init; } = [];
 }
 
@@ -238,6 +253,21 @@ public interface IAdminCatalogService
     Task<IReadOnlyList<AdminCategoryDto>> ListCategoriesAsync(CancellationToken cancellationToken = default);
     Task<AdminCategoryDto> CreateCategoryAsync(AdminActor actor, AdminCategoryRequest request, CancellationToken cancellationToken = default);
     Task<AdminCategoryDto> UpdateCategoryAsync(AdminActor actor, long categoryId, AdminCategoryRequest request, CancellationToken cancellationToken = default);
+}
+
+public interface IAdminMediaService
+{
+    Task<AdminProductImageDto> UploadProductImageAsync(
+        AdminActor actor, long productId, string imageType, Stream content, string contentType, long contentLength, CancellationToken cancellationToken = default);
+
+    Task DeleteProductImageAsync(AdminActor actor, long productId, long imageId, CancellationToken cancellationToken = default);
+
+    Task<AdminProductImageDto> ReorderProductImageAsync(AdminActor actor, long productId, long imageId, int sortOrder, CancellationToken cancellationToken = default);
+
+    Task<string> UploadVariantImageAsync(
+        AdminActor actor, long productId, long variantId, Stream content, string contentType, long contentLength, CancellationToken cancellationToken = default);
+
+    Task RemoveVariantImageAsync(AdminActor actor, long productId, long variantId, CancellationToken cancellationToken = default);
 }
 
 public class AdminOrderQuery

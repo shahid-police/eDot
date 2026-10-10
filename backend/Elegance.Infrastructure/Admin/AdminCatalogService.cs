@@ -75,7 +75,8 @@ public class AdminCatalogService(EleganceDbContext dbContext, IAuditLogService a
     {
         var product = await dbContext.Products
             .AsNoTracking()
-            .Include(p => p.Variants)
+            .Include(p => p.Variants).ThenInclude(v => v.ImageMediaFile)
+            .Include(p => p.Images).ThenInclude(i => i.MediaFile)
             .FirstOrDefaultAsync(p => p.Id == productId, cancellationToken)
             ?? throw NotFound();
         return ToDto(product);
@@ -344,6 +345,7 @@ public class AdminCatalogService(EleganceDbContext dbContext, IAuditLogService a
         product.SeoTitle = request.SeoTitle;
         product.SeoDescription = request.SeoDescription;
         product.SeoKeywords = request.SeoKeywords;
+        product.VideoUrl = string.IsNullOrWhiteSpace(request.VideoUrl) ? null : request.VideoUrl.Trim();
     }
 
     private static AdminProductDto ToDto(Product product) => new()
@@ -373,6 +375,7 @@ public class AdminCatalogService(EleganceDbContext dbContext, IAuditLogService a
         SeoTitle = product.SeoTitle,
         SeoDescription = product.SeoDescription,
         SeoKeywords = product.SeoKeywords,
+        VideoUrl = product.VideoUrl,
         Variants = product.Variants.OrderBy(v => v.Id).Select(v => new AdminVariantDto
         {
             Id = v.Id,
@@ -385,6 +388,14 @@ public class AdminCatalogService(EleganceDbContext dbContext, IAuditLogService a
             Size = v.Size,
             Color = v.Color,
             IsActive = v.IsActive,
+            ImageUrl = v.ImageMediaFile != null ? v.ImageMediaFile.Url : null,
+        }).ToList(),
+        Images = product.Images.OrderBy(i => i.SortOrder).Select(i => new AdminProductImageDto
+        {
+            Id = i.Id,
+            Url = i.MediaFile.Url,
+            ImageType = i.ImageType.ToString(),
+            SortOrder = i.SortOrder,
         }).ToList(),
     };
 

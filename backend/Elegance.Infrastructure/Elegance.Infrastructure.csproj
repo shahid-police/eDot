@@ -11,9 +11,14 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.12" />
     <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="10.0.12" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="9.0.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.15.0" />
+    <PackageReference Include="AWSSDK.S3" Version="4.0.104.1" />
+    <PackageReference Include="SkiaSharp" Version="4.153.1" />
+    <!-- Needed before a Linux deploy: SkiaSharp's own native assets only cover Windows/macOS by
+         default. Re-add once this restores (it was very slow on this network): SkiaSharp.NativeAssets.Linux 4.153.1. -->
   </ItemGroup>
 
   <PropertyGroup>

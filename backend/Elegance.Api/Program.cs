@@ -90,6 +90,10 @@ app.UseExceptionHandler();
 
 app.UseHttpsRedirection();
 
+// Serves wwwroot/uploads when Storage:Provider is "Local" (development only - see
+// Elegance.Infrastructure/Media/LocalDiskFileStorage.cs). Harmless, and unused, under "R2".
+app.UseStaticFiles();
+
 app.UseCors("Frontend");
 
 app.UseRateLimiter();

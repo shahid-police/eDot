@@ -7,6 +7,10 @@ obj/
 .vs/
 *.slnx.user
 
+# Local-disk media storage (development only; see Elegance.Infrastructure/Media/LocalDiskFileStorage.cs)
+backend/Elegance.Api/wwwroot/uploads/*
+!backend/Elegance.Api/wwwroot/uploads/.gitkeep
+
 # ===== General =====
 .vscode/
 .idea/
@@ -16,3 +20,4 @@ obj/
 !.env.example
 .DS_Store
 Thumbs.db
+keys.md

@@ -2,6 +2,7 @@ using Elegance.Application.Admin;
 using Elegance.Application.Auth;
 using Elegance.Application.Carts;
 using Elegance.Infrastructure.Admin;
+using Elegance.Infrastructure.Media;
 using Elegance.Application.Checkout;
 using Elegance.Application.Payments;
 using Elegance.Application.Compare;
@@ -22,6 +23,8 @@ using Elegance.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 
 namespace Elegance.Infrastructure;
 
@@ -68,6 +71,17 @@ public static class DependencyInjection
         services.AddScoped<IAdminInventoryService, AdminInventoryService>();
         services.AddScoped<IAdminCustomerService, AdminCustomerService>();
         services.AddScoped<IAdminDashboardService, AdminDashboardService>();
+
+        services.AddOptions<StorageOptions>()
+            .Bind(configuration.GetSection(StorageOptions.SectionName));
+        services.AddScoped<IFileStorage>(sp =>
+        {
+            var storageOptions = sp.GetRequiredService<IOptions<StorageOptions>>();
+            return storageOptions.Value.Provider.Equals("R2", StringComparison.OrdinalIgnoreCase)
+                ? new R2FileStorage(storageOptions)
+                : new LocalDiskFileStorage(sp.GetRequiredService<IHostEnvironment>(), storageOptions);
+        });
+        services.AddScoped<IAdminMediaService, AdminMediaService>();
 
         return services;
     }

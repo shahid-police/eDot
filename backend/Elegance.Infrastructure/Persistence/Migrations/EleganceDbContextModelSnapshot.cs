@@ -366,6 +366,10 @@ namespace Elegance.Infrastructure.Persistence.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<string>("VideoUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
                     b.Property<decimal?>("WeightGrams")
                         .HasPrecision(10, 2)
                         .HasColumnType("decimal(10,2)");

@@ -41,6 +41,9 @@ public class Product
     public string? SeoDescription { get; set; }
     public string? SeoKeywords { get; set; }
 
+    // A link to a hosted video (YouTube/Vimeo), not an uploaded file. See docs/MEDIA-STORAGE.md.
+    public string? VideoUrl { get; set; }
+
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 

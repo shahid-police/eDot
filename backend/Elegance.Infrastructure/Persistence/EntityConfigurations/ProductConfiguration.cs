@@ -40,6 +40,8 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.Property(p => p.SeoDescription).HasMaxLength(500);
         builder.Property(p => p.SeoKeywords).HasMaxLength(500);
 
+        builder.Property(p => p.VideoUrl).HasMaxLength(500);
+
         builder.HasOne(p => p.Category)
             .WithMany(c => c.Products)
             .HasForeignKey(p => p.CategoryId)
