@@ -137,7 +137,7 @@ export default function MyAccount() {
             won’t last long.
           </p>
           <Link
-            href={`/shop-collection-list`}
+            href={`/shop-default`}
             className="tf-btn text-uppercase type-large"
           >
             SHOP COLLECTION

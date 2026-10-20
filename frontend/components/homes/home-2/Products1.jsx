@@ -8,7 +8,9 @@ import DiscountMarquee from "@/components/common/DiscountMarquee";
 import { Navigation, Pagination } from "swiper/modules";
 import CountdownTimer from "@/components/common/Countdown";
 import Link from "next/link";
-export default function Products1() {
+import { formatPrice } from "@/lib/format/price";
+export default function Products1({ products }) {
+  const source = products?.length ? products : products4;
   return (
     <section className="flat-spacing-6 bg-dark-brown">
       <div className="container">
@@ -52,7 +54,7 @@ export default function Products1() {
               nextEl: ".snbn9",
             }}
           >
-            {products4.map((product) => (
+            {source.map((product) => (
               <SwiperSlide className={`swiper-slide`} key={product.id}>
                 <div
                   className={`card_product--V01 type-space-35 ${
@@ -65,7 +67,7 @@ export default function Products1() {
                         product.outOfStock
                           ? "product-notify-avaiable"
                           : "product-default"
-                      }/${product.id}`}
+                      }/${product.slug ?? product.id}`}
                       className="product-img"
                     >
                       <Image
@@ -84,7 +86,7 @@ export default function Products1() {
                       />
                     </Link>
 
-                    {!product.outOfStock && (
+                    {!product.outOfStock && product.source !== "api" && (
                       <ul className="list-product-btn">
                                                                         <li>
                           <QuickView product={product} />
@@ -129,14 +131,14 @@ export default function Products1() {
                       </div>
                     )}
 
-                    {product.variantType === "notify" && product.outOfStock && (
+                    {product.outOfStock && product.variantType !== "text" && (
                       <a
                         href="#unavailable"
                         data-bs-toggle="modal"
                         className="variant-box stock bg-main link text-white"
                       >
                         <p className="text-center d-none d-md-block">
-                          {product.variantText}
+                          {product.variantText ?? "Notify me when available"}
                         </p>
                         <p className="text-center d-md-none">Notify Me</p>
                       </a>
@@ -149,24 +151,18 @@ export default function Products1() {
                         product.outOfStock
                           ? "product-notify-avaiable"
                           : "product-default"
-                      }/${product.id}`}
+                      }/${product.slug ?? product.id}`}
                       className={`name-product h5 fw-normal text-white link text-line-clamp-2`}
                     >
                       {product.title}
                     </Link>
                     <div className="price-wrap style-white">
-                      <span className={`price-new h5 ${product.textColor}`}>
-                        $
-                        {product.price.toLocaleString(undefined, {
-                          minimumFractionDigits: 2,
-                        })}
+                      <span className={`price-new h5 ${product.textColor ?? ""}`}>
+                        {formatPrice(product.price)}
                       </span>
                       {product.oldPrice && (
                         <span className="price-old fw-normal">
-                          $
-                          {product.oldPrice.toLocaleString(undefined, {
-                            minimumFractionDigits: 2,
-                          })}
+                          {formatPrice(product.oldPrice)}
                         </span>
                       )}
                     </div>

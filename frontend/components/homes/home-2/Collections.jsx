@@ -11,7 +11,7 @@ export default function Collections() {
         </p>
         <div className="cls-wrap">
           <Link
-            href={`/shop-collection-list`}
+            href={`/shop-default`}
             className="box_collection--V02 hover-img wow fadeInUp"
           >
             <div className="image img-style">
@@ -29,7 +29,7 @@ export default function Collections() {
             </div>
           </Link>
           <Link
-            href={`/shop-collection-list`}
+            href={`/shop-default`}
             className="box_collection--V02 hover-img wow fadeInUp"
             data-wow-delay="0.1s"
           >
@@ -48,7 +48,7 @@ export default function Collections() {
             </div>
           </Link>
           <Link
-            href={`/shop-collection-list`}
+            href={`/shop-default`}
             className="box_collection--V02 hover-img wow fadeInUp"
           >
             <div className="image img-style">
@@ -66,7 +66,7 @@ export default function Collections() {
             </div>
           </Link>
           <Link
-            href={`/shop-collection-list`}
+            href={`/shop-default`}
             className="box_collection--V02 hover-img wow fadeInUp"
             data-wow-delay="0.1s"
           >
@@ -85,7 +85,7 @@ export default function Collections() {
             </div>
           </Link>
           <Link
-            href={`/shop-collection-list`}
+            href={`/shop-default`}
             className="box_collection--V02 hover-img wow fadeInUp"
           >
             <div className="image img-style">
@@ -103,7 +103,7 @@ export default function Collections() {
             </div>
           </Link>
           <Link
-            href={`/shop-collection-list`}
+            href={`/shop-default`}
             className="box_collection--V02 hover-img wow fadeInUp"
             data-wow-delay="0.1s"
           >

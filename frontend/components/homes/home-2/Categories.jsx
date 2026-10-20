@@ -47,7 +47,7 @@ export default function Categories() {
           {categories.map((item, index) => (
             <SwiperSlide className="swiper-slide" key={index}>
               <Link
-                href={`/shop-collection-list`}
+                href={`/shop-default`}
                 className="box_collection--V01 style_2 hover-img"
               >
                 <div className="image img-style">

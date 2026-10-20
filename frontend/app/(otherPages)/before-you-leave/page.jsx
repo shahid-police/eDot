@@ -13,12 +13,25 @@ import TextBanner from "@/components/homes/home-1/TextBanner";
 import TextSlider from "@/components/common/TextSlider";
 
 import BeforeLeave from "@/components/modals/BeforeLeave";
+import { getProducts, toTemplateCardProduct } from "@/lib/api/products";
 
 export const metadata = {
   title: "Home || Vemus - Jewelry Ecommerce React Nextjs Template",
   description: "Vemus - Jewelry Ecommerce React Nextjs Template",
 };
-export default function Home() {
+
+async function loadRecommended() {
+  try {
+    const result = await getProducts({ isNew: true, pageSize: 4 });
+    return result.items.map(toTemplateCardProduct);
+  } catch (error) {
+    console.error("Product API unavailable, rendering template data:", error);
+    return undefined;
+  }
+}
+
+export default async function Home() {
+  const recommended = await loadRecommended();
   return (
     <>
       <div className="bg-surface">
@@ -36,7 +49,7 @@ export default function Home() {
           <Banner />
           <Features />
           <Footer1 />
-          <BeforeLeave />
+          <BeforeLeave products={recommended} />
         </div>
       </div>
     </>

@@ -24,7 +24,7 @@ export default function Products3() {
                   Shine with Seasonal Picks
                 </h3>
                 <Link
-                  href={`/shop-collection-list`}
+                  href={`/shop-default`}
                   className="tf-btn-line gap-10"
                 >
                   <span className="h5">Explore Collection</span>

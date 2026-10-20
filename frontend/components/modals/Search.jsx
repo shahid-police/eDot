@@ -35,7 +35,7 @@ export default function Search() {
                 <ul className="quick-link-list">
                   <li>
                     <Link
-                      href={`/shop-collection-list`}
+                      href={`/shop-default`}
                       className="link-item text-main-4 link"
                     >
                       Best Sellers
@@ -43,7 +43,7 @@ export default function Search() {
                   </li>
                   <li>
                     <Link
-                      href={`/shop-collection-list`}
+                      href={`/shop-default`}
                       className="link-item text-main-4 link"
                     >
                       Bracelets
@@ -51,7 +51,7 @@ export default function Search() {
                   </li>
                   <li>
                     <Link
-                      href={`/shop-collection-list`}
+                      href={`/shop-default`}
                       className="link-item text-main-4 link"
                     >
                       Earrings
@@ -59,7 +59,7 @@ export default function Search() {
                   </li>
                   <li>
                     <Link
-                      href={`/shop-collection-list`}
+                      href={`/shop-default`}
                       className="link-item text-main-4 link"
                     >
                       Rings

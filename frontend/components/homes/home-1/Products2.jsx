@@ -26,7 +26,7 @@ export default function Products2() {
               <span className="fst-italic">Wear Confidence</span>
             </p>
             <Link
-              href={`/shop-collection-list`}
+              href={`/shop-default`}
               className="tf-btn btn-fill-2 type-large animate-btn text-uppercase"
             >
               Shop Collection

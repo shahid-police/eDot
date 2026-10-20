@@ -120,7 +120,7 @@ export default function Hero() {
                 <i className="icon-arrow-right-3 fs-24" />
               </Link>
               <Link
-                href={`/shop-collection-list`}
+                href={`/shop-default`}
                 className="link text-uppercase"
               >
                 explore more

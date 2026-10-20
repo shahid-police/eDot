@@ -37,7 +37,7 @@ export default function Banner() {
               and personalized service.
             </p>
             <Link
-              href={`/shop-collection-list`}
+              href={`/shop-default`}
               className="tf-btn type-large text-uppercase"
             >
               Shop Collection

@@ -32,7 +32,7 @@ export default function Collections() {
         >
           {collectionItems.map((item, index) => (
             <SwiperSlide className="swiper-slide" key={index}>
-              <Link href={`/shop-collection-list`} className="wg-cls hover-img">
+              <Link href={`/shop-default`} className="wg-cls hover-img">
                 <div className="image img-style">
                   <Image
                     src={item.image}

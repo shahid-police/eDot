@@ -51,7 +51,7 @@ export default function Hero() {
                         </p>
                         <div className="fade-item fade-item-3">
                           <Link
-                            href={`/shop-collection-list`}
+                            href={`/shop-default`}
                             className="tf-btn btn-fill-white animate-btn animate-dark fw-medium"
                           >
                             Shop Collection

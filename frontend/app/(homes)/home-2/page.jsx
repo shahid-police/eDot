@@ -13,28 +13,66 @@ import Products2 from "@/components/homes/home-2/Products2";
 import Testimonials from "@/components/homes/home-2/Testimonials";
 import BeforeLeave from "@/components/modals/BeforeLeave";
 import React from "react";
+import { getProducts, toTemplateCardProduct } from "@/lib/api/products";
 
 export const metadata = {
   title: "Home 02 || Vemus - Jewelry Ecommerce React Nextjs Template",
   description: "Vemus - Jewelry Ecommerce React Nextjs Template",
 };
-export default function page() {
+
+async function loadBestSellers() {
+  try {
+    const result = await getProducts({ isBestSeller: true, pageSize: 8 });
+    return result.items.map(toTemplateCardProduct);
+  } catch (error) {
+    console.error("Product API unavailable, rendering template data:", error);
+    return undefined;
+  }
+}
+
+async function loadTrendyCollection() {
+  try {
+    const result = await getProducts({ isFeatured: true, pageSize: 8 });
+    return result.items.map(toTemplateCardProduct);
+  } catch (error) {
+    console.error("Product API unavailable, rendering template data:", error);
+    return undefined;
+  }
+}
+
+async function loadRecommended() {
+  try {
+    const result = await getProducts({ isNew: true, pageSize: 4 });
+    return result.items.map(toTemplateCardProduct);
+  } catch (error) {
+    console.error("Product API unavailable, rendering template data:", error);
+    return undefined;
+  }
+}
+
+export default async function page() {
+  const [bestSellers, trendyCollection, recommended] = await Promise.all([
+    loadBestSellers(),
+    loadTrendyCollection(),
+    loadRecommended(),
+  ]);
+
   return (
     <>
       <Topbar2 />
       <Header2 />
       <Hero />
       <Categories />
-      <Products1 />
+      <Products1 products={bestSellers} />
       <Collections />
-      <Products2 />
+      <Products2 products={trendyCollection} />
       <Banner />
       <Features />
       <Testimonials />
       <Blogs />
       <Cta />
       <Footer2 />
-      <BeforeLeave />
+      <BeforeLeave products={recommended} />
     </>
   );
 }

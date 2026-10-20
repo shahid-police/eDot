@@ -4,10 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   blogMenuLinks,
-  demoPages,
   otherPages,
   productDetailPages,
-  shopPages,
 } from "@/data/menu";
 
 export default function MobileNav() {
@@ -25,78 +23,14 @@ export default function MobileNav() {
     <>
       {" "}
       <li className="nav-mb-item">
-        <a
-          href="#dropdown-menu-home"
-          className="collapsed mb-menu-link"
-          data-bs-toggle="collapse"
-          aria-expanded="true"
-          aria-controls="dropdown-menu-home"
-        >
+        <Link href="/" className="mb-menu-link">
           <span>Home</span>
-          <span className="btn-open-sub" />
-        </a>
-        <div id="dropdown-menu-home" className="collapse">
-          <ul className="sub-nav-menu">
-            {demoPages.map((page, index) => (
-              <li key={index}>
-                <Link href={page.href} className="sub-nav-link">
-                  {page.name}
-                  {page.label && (
-                    <span
-                      className={`demo-label ${page.labelType || ""}`.trim()}
-                    >
-                      {page.label}
-                    </span>
-                  )}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
+        </Link>
       </li>
       <li className="nav-mb-item">
-        <a
-          href="#dropdown-menu-shop"
-          className="collapsed mb-menu-link"
-          data-bs-toggle="collapse"
-          aria-expanded="true"
-          aria-controls="dropdown-menu-shop"
-        >
+        <Link href="/shop-default" className="mb-menu-link">
           <span>Shop</span>
-          <span className="btn-open-sub" />
-        </a>
-        <div id="dropdown-menu-shop" className="collapse">
-          <ul className="sub-nav-menu">
-            {shopPages.map((section, index) => (
-              <li key={index}>
-                <a
-                  href={`#sub-shop-layout${index}`}
-                  className="sub-nav-link collapsed"
-                  data-bs-toggle="collapse"
-                  aria-expanded="true"
-                  aria-controls={`sub-shop-layout${index}`}
-                >
-                  <span>{section.heading}</span>
-                  <span className="btn-open-sub" />
-                </a>
-                <div id={`sub-shop-layout${index}`} className="collapse">
-                  <ul className="sub-nav-menu sub-menu-level-2">
-                    {section.links.map((link, linkIndex) => (
-                      <li key={linkIndex}>
-                        <Link
-                          href={link.href2 ? link.href2 : link.href}
-                          className="sub-nav-link"
-                        >
-                          {link.label}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
+        </Link>
       </li>
       <li className="nav-mb-item">
         <a

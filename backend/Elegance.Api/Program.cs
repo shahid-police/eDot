@@ -84,6 +84,7 @@ if (app.Environment.IsDevelopment())
     var dbContext = scope.ServiceProvider.GetRequiredService<EleganceDbContext>();
     await DevelopmentSeeder.SeedAsync(dbContext);
     await DevelopmentAdminSeeder.SeedAsync(dbContext, app.Configuration["Seed:AdminEmail"], app.Configuration["Seed:AdminPassword"]);
+    await CatalogDemoSeeder.SeedAsync(dbContext, app.Configuration.GetValue("Seed:LoadDemoCatalog", false));
 }
 
 app.UseExceptionHandler();

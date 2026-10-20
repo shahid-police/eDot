@@ -6,7 +6,9 @@ import Link from "next/link";
 import Image from "next/image";
 import QuickView from "@/components/common/QuickView";
 import { Navigation, Pagination } from "swiper/modules";
-export default function Products2() {
+import { formatPrice } from "@/lib/format/price";
+export default function Products2({ products }) {
+  const source = products?.length ? products : products5;
   return (
     <section className="flat-spacing-6 pt-0">
       <div className="container">
@@ -50,12 +52,20 @@ export default function Products2() {
               nextEl: ".snbn10",
             }}
           >
-            {products5.map((product) => (
+            {source.map((product) => (
               <SwiperSlide className="swiper-slide" key={product.id}>
-                <div className="card_product--V01 type-space-35">
+                <div
+                  className={`card_product--V01 type-space-35 ${
+                    product.outOfStock ? "out-of-stock" : ""
+                  }`}
+                >
                   <div className="card_product-wrapper">
                     <Link
-                      href={`/product-default/${product.id}`}
+                      href={`/${
+                        product.outOfStock
+                          ? "product-notify-avaiable"
+                          : "product-default"
+                      }/${product.slug ?? product.id}`}
                       className="product-img"
                     >
                       <Image
@@ -74,11 +84,13 @@ export default function Products2() {
                       />
                     </Link>
 
-                    <ul className="list-product-btn">
+                    {!product.outOfStock && product.source !== "api" && (
+                      <ul className="list-product-btn">
                                                                   <li>
                         <QuickView product={product} />
                       </li>
                                           </ul>
+                    )}
 
                     {product.badge && (
                       <div className="badge-box">
@@ -87,28 +99,39 @@ export default function Products2() {
                         </span>
                       </div>
                     )}
+
+                    {product.outOfStock && (
+                      <a
+                        href="#unavailable"
+                        data-bs-toggle="modal"
+                        className="variant-box stock bg-main link text-white"
+                      >
+                        <p className="text-center d-none d-md-block">
+                          {product.variantText ?? "Notify me when available"}
+                        </p>
+                        <p className="text-center d-md-none">Notify Me</p>
+                      </a>
+                    )}
                   </div>
 
                   <div className="card_product-info">
                     <Link
-                      href={`/product-default/${product.id}`}
+                      href={`/${
+                        product.outOfStock
+                          ? "product-notify-avaiable"
+                          : "product-default"
+                      }/${product.slug ?? product.id}`}
                       className="name-product h5 fw-normal link text-line-clamp-2"
                     >
                       {product.title}
                     </Link>
                     <div className="price-wrap">
-                      <span className={`price-new h5 ${product.textColor}`}>
-                        $
-                        {product.price.toLocaleString(undefined, {
-                          minimumFractionDigits: 2,
-                        })}
+                      <span className={`price-new h5 ${product.textColor ?? ""}`}>
+                        {formatPrice(product.price)}
                       </span>
                       {product.oldPrice && (
                         <span className="price-old fw-normal">
-                          $
-                          {product.oldPrice.toLocaleString(undefined, {
-                            minimumFractionDigits: 2,
-                          })}
+                          {formatPrice(product.oldPrice)}
                         </span>
                       )}
                     </div>

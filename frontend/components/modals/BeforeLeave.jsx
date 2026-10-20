@@ -4,8 +4,10 @@ import { products1 } from "@/data/products";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useRef } from "react";
+import { formatPrice } from "@/lib/format/price";
 
-export default function BeforeLeave() {
+export default function BeforeLeave({ products }) {
+  const source = products?.length ? products : products1;
   const modalElement = useRef();
   useEffect(() => {
     const showModal = async () => {
@@ -76,10 +78,14 @@ export default function BeforeLeave() {
               </h4>
               <div className="tf-mini-cart-main wrapper-leave-main">
                 <div className="tf-mini-cart-sroll wrapper-leave-scroll p-0">
-                  {products1.map((product, i) => (
+                  {source.map((product, i) => (
                     <div key={i} className="tf-product-mini-view">
                       <Link
-                        href={`/product-default/${product.id}`}
+                        href={`/${
+                          product.outOfStock
+                            ? "product-notify-avaiable"
+                            : "product-default"
+                        }/${product.slug ?? product.id}`}
                         className="prd-image"
                       >
                         <Image
@@ -91,18 +97,22 @@ export default function BeforeLeave() {
                       </Link>
                       <div className="prd-content">
                         <Link
-                          href={`/product-default/${product.id}`}
+                          href={`/${
+                            product.outOfStock
+                              ? "product-notify-avaiable"
+                              : "product-default"
+                          }/${product.slug ?? product.id}`}
                           className="prd-name link"
                         >
                           {product.title}
                         </Link>
                         <div className="price-wrap">
                           <span className="price-new price-on-sale fw-medium">
-                            ${product.price.toFixed(2)}
+                            {formatPrice(product.price)}
                           </span>
                           {product.oldPrice && (
                             <span className="price-old compare-at-price text-caption">
-                              ${product.oldPrice.toFixed(2)}
+                              {formatPrice(product.oldPrice)}
                             </span>
                           )}
                         </div>

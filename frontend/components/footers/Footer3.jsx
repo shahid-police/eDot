@@ -87,7 +87,7 @@ export default function Footer3() {
             {menuItems.map((item, index) => (
               <li key={index}>
                 <Link
-                  href="/shop-collection-list"
+                  href="/shop-default"
                   className="tf-btn btn-line has-icon link"
                 >
                   <span className="text h6 text-uppercase fw-normal">

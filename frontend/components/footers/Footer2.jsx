@@ -115,7 +115,7 @@ export default function Footer2() {
                 <ul className="footer-menu-list">
                   <li>
                     <Link
-                      href={`/shop-collection-list`}
+                      href={`/shop-default`}
                       className="text-white link"
                     >
                       Bracelets
@@ -123,7 +123,7 @@ export default function Footer2() {
                   </li>
                   <li>
                     <Link
-                      href={`/shop-collection-list`}
+                      href={`/shop-default`}
                       className="text-white link"
                     >
                       Rings
@@ -131,7 +131,7 @@ export default function Footer2() {
                   </li>
                   <li>
                     <Link
-                      href={`/shop-collection-list`}
+                      href={`/shop-default`}
                       className="text-white link"
                     >
                       Necklaces
@@ -139,7 +139,7 @@ export default function Footer2() {
                   </li>
                   <li>
                     <Link
-                      href={`/shop-collection-list`}
+                      href={`/shop-default`}
                       className="text-white link"
                     >
                       Earrings
@@ -147,7 +147,7 @@ export default function Footer2() {
                   </li>
                   <li>
                     <Link
-                      href={`/shop-collection-list`}
+                      href={`/shop-default`}
                       className="text-white link"
                     >
                       Gifts
@@ -155,7 +155,7 @@ export default function Footer2() {
                   </li>
                   <li>
                     <Link
-                      href={`/shop-collection-list`}
+                      href={`/shop-default`}
                       className="text-white link"
                     >
                       Collections
