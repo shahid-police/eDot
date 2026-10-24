@@ -356,12 +356,12 @@ export default function Products1({ defaultLayout = 4, products }) {
                       />
                     </Link>
 
-                    {!product.outOfStock && product.source !== "api" && (
-                      <ul className="list-product-btn">
-                                                                        <li>
+                    {!product.outOfStock && (
+                      <ul className="list-product-btn" style={{ display: "flex" }}>
+                        <li style={{ opacity: 1, visibility: "visible" }}>
                           <QuickView product={product} />
                         </li>
-                                              </ul>
+                      </ul>
                     )}
 
                     {product.badge && (
@@ -494,12 +494,12 @@ export default function Products1({ defaultLayout = 4, products }) {
                       />
                     </Link>
 
-                    {!product.outOfStock && product.source !== "api" && (
-                      <ul className="list-product-btn">
-                                                                        <li>
+                    {!product.outOfStock && (
+                      <ul className="list-product-btn" style={{ display: "flex" }}>
+                        <li style={{ opacity: 1, visibility: "visible" }}>
                           <QuickView product={product} />
                         </li>
-                                              </ul>
+                      </ul>
                     )}
 
                     {product.badge && (

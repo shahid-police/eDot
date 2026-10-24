@@ -6,8 +6,8 @@ import Image from "next/image";
 import CountdownTimer from "@/components/common/Countdown";
 import CommingSoonForm from "@/components/otherPages/CommingSoonForm";
 export const metadata = {
-  title: "Comming Soon || Vemus - Jewelry Ecommerce React Nextjs Template",
-  description: "Vemus - Jewelry Ecommerce React Nextjs Template",
+  title: "Comming Soon || E.",
+  description: "The Choice of Elegant Women, Every Day",
 };
 export default function page() {
   return (

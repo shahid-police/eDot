@@ -2,8 +2,6 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Nav from "./Nav";
-import CurrencySelect from "../common/CurrencySelect";
-import LanguageSelect from "../common/LanguageSelect";
 export default function Header2() {
   return (
     <header className="tf-header style-2 header-absolute">
@@ -19,36 +17,38 @@ export default function Header2() {
                 <span />
               </a>
             </div>
-            <div className="col-xl-3 d-none d-xl-block">
-              <div className="header-right">
-                <div className="tf-currencies">
-                  <CurrencySelect topStart />
-                </div>
-                <div className="tf-languages">
-                  <LanguageSelect topStart />
-                </div>
-              </div>
-            </div>
-            <div className="col-xl-6 col-md-4 col-6">
-              <Link
-                href={`/`}
-                className="logo-site justify-content-center w-100"
-              >
+            <div className="col-xl-3 col-md-4 col-6">
+              <Link href={`/`} className="logo-site">
                 <Image
-                  alt=""
+                  alt="E."
                   className="logo-black"
-                  src="/images/logo/logo.svg"
-                  width={122}
-                  height={32}
+                  src="/images/logo/logo-transparent.png"
+                  width={495}
+                  height={383}
+                  style={{ width: "90px", height: "auto" }}
                 />
                 <Image
-                  alt=""
+                  alt="E."
                   className="logo-white"
-                  src="/images/logo/logo-white.svg"
-                  width={122}
-                  height={31}
+                  src="/images/logo/logo-transparent.png"
+                  width={495}
+                  height={383}
+                  style={{ width: "90px", height: "auto" }}
                 />
               </Link>
+            </div>
+            <div className="col-xl-6 d-none d-xl-flex align-items-center justify-content-center">
+              <span
+                className="font-2 fst-italic text-center"
+                style={{
+                  fontSize: "26px",
+                  letterSpacing: "0.04em",
+                  color: "#7a6530",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                The Choice of Elegant Women, Every Day
+              </span>
             </div>
             <div className="col-xl-3 col-md-4 col-3">
               <ul className="nav-icon">
@@ -56,7 +56,7 @@ export default function Header2() {
                   <a
                     href="#search"
                     data-bs-toggle="offcanvas"
-                    className="nav-icon-item text-black link"
+                    className="nav-icon-item text-primary link"
                   >
                     <i className="icon icon-search" />
                   </a>
@@ -66,7 +66,7 @@ export default function Header2() {
                   <a
                     href="#log"
                     data-bs-toggle="modal"
-                    className="nav-icon-item text-black link"
+                    className="nav-icon-item text-primary link"
                   >
                     <i className="icon icon-user" />
                   </a>
@@ -74,7 +74,7 @@ export default function Header2() {
                 <li className="d-none d-md-inline-flex">
                   <Link
                     href={`/wishlist`}
-                    className="nav-icon-item text-black link"
+                    className="nav-icon-item text-primary link"
                   >
                     <i className="icon icon-hearth" />
                   </Link>
@@ -83,7 +83,7 @@ export default function Header2() {
                   <a
                     href="#shoppingCart"
                     data-bs-toggle="offcanvas"
-                    className="nav-icon-item text-black link"
+                    className="nav-icon-item text-primary link"
                   >
                     <i className="icon icon-cart" />
                     <span className="count-notice" />

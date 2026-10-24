@@ -6,6 +6,7 @@ using Elegance.Infrastructure.Auth;
 using Elegance.Infrastructure.Persistence;
 using Elegance.Infrastructure.Persistence.Seed;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 using System.Threading.RateLimiting;
@@ -22,6 +23,30 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 builder.Services.AddOpenApi();
 
 builder.Services.AddInfrastructure(builder.Configuration);
+
+// Encrypts admin TOTP secrets at rest (see TwoFactorSecretProtector). The key ring is the only
+// thing that can decrypt those secrets, so it must live outside the database and survive
+// restarts/redeploys: a database copy without the key ring cannot produce valid codes, and
+// losing the key ring means every enrolled authenticator must be re-enrolled (there is no
+// plaintext fallback). In production, point DataProtection:KeyPath at a persistent,
+// access-controlled volume or secrets mount (or swap in a cloud KMS-backed provider) rather than
+// using the default below, which is fine for single-instance local development only.
+var dataProtectionKeyPath = builder.Configuration["DataProtection:KeyPath"]
+    ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Elegance", "dataprotection-keys");
+var dataProtectionBuilder = builder.Services.AddDataProtection()
+    .SetApplicationName("Elegance.Admin")
+    .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionKeyPath));
+
+// Without this, each key in the ring above is written to disk unencrypted (DataProtection
+// authenticates and encrypts application data with the key, but by default does nothing to
+// protect the key file itself). DPAPI ties it to this Windows machine/user, which is right for
+// local dev but not portable - a Linux/container production deployment needs
+// ProtectKeysWithCertificate(...) or a cloud KMS provider instead, so the key ring survives
+// redeploys and isn't tied to one host's DPAPI profile.
+if (OperatingSystem.IsWindows())
+{
+    dataProtectionBuilder.ProtectKeysWithDpapi();
+}
 
 var jwtOptions = builder.Configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>() ?? new JwtOptions();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -107,3 +132,6 @@ app.MapControllers();
 app.MapHealthChecks("/health");
 
 app.Run();
+
+// Exposes the top-level-statement Program for WebApplicationFactory<Program> in Elegance.Tests.
+public partial class Program { }

@@ -14,8 +14,8 @@ import TextSlider from "@/components/common/TextSlider";
 import NewsLetter from "@/components/modals/NewsLetter";
 
 export const metadata = {
-  title: "Home 01 || Vemus - Jewelry Ecommerce React Nextjs Template",
-  description: "Vemus - Jewelry Ecommerce React Nextjs Template",
+  title: "Home 01 || E.",
+  description: "The Choice of Elegant Women, Every Day",
 };
 export default function Home() {
   return (

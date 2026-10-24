@@ -37,6 +37,23 @@ public class AdminRoleAssignmentConfiguration : IEntityTypeConfiguration<AdminRo
     }
 }
 
+public class AdminTwoFactorCredentialConfiguration : IEntityTypeConfiguration<AdminTwoFactorCredential>
+{
+    public void Configure(EntityTypeBuilder<AdminTwoFactorCredential> builder)
+    {
+        builder.ToTable("admin_two_factor_credentials");
+        builder.HasKey(c => c.AdminUserId);
+
+        builder.Property(c => c.EncryptedSecret).HasColumnType("text").IsRequired();
+        builder.Property(c => c.Status).HasConversion<string>().HasMaxLength(20);
+
+        builder.HasOne(c => c.AdminUser)
+            .WithOne()
+            .HasForeignKey<AdminTwoFactorCredential>(c => c.AdminUserId)
+            .OnDelete(DeleteBehavior.Cascade);
+    }
+}
+
 public class AuditLogConfiguration : IEntityTypeConfiguration<AuditLog>
 {
     public void Configure(EntityTypeBuilder<AuditLog> builder)

@@ -5,8 +5,8 @@ import Contact from "@/components/otherPages/Contact";
 import React from "react";
 import Link from "next/link";
 export const metadata = {
-  title: "Contact Us || Vemus - Jewelry Ecommerce React Nextjs Template",
-  description: "Vemus - Jewelry Ecommerce React Nextjs Template",
+  title: "Contact Us || E.",
+  description: "The Choice of Elegant Women, Every Day",
 };
 export default function page() {
   return (

@@ -11,8 +11,8 @@ import Testimonials from "@/components/otherPages/about/Testimonials";
 import React from "react";
 
 export const metadata = {
-  title: "About Us || Vemus - Jewelry Ecommerce React Nextjs Template",
-  description: "Vemus - Jewelry Ecommerce React Nextjs Template",
+  title: "About Us || E.",
+  description: "The Choice of Elegant Women, Every Day",
 };
 export default function page() {
   return (
@@ -33,12 +33,12 @@ export default function page() {
                 <li>About Us</li>
               </ul>
               <h1 className="heading fw-normal text-uppercase">
-                welcome to vemus
+                welcome to E.
               </h1>
             </div>
             <div className="box-text">
               <p className="text-main-4">
-                At Vemus, we believe jewelry is more than an accessory—it’s a
+                At E., we believe jewelry is more than an accessory—it’s a
                 reflection of your story. With a
                 <br className="d-none d-xxl-block" />
                 passion for craftsmanship and a commitment to quality, we create

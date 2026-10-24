@@ -107,7 +107,7 @@ export default function Footer1() {
               <div className="footer-inner-wrap flex-lg-nowrap align-items-end">
                 <div className="box-title">
                   <h6>
-                    JOIN THE <span className="text-primary">#VEMUS</span> TRIBE
+                    JOIN THE <span className="text-primary">#E.</span> TRIBE
                   </h6>
                   <p className="notice font-2">
                     <span className="fst-italic">Shiny Things</span> Await - 10%
@@ -328,7 +328,7 @@ export default function Footer1() {
                 <LanguageSelect />
               </div>
             </div>
-            <p className="text-nocopy">All Rights Reserved 2025 VEMUS.</p>
+            <p className="text-nocopy">All Rights Reserved 2025 E.</p>
             <ul className="paymend-method-list">
               <li>
                 <a href="#">

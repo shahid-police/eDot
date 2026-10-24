@@ -3,4 +3,5 @@
   <Project Path="Elegance.Application/Elegance.Application.csproj" />
   <Project Path="Elegance.Domain/Elegance.Domain.csproj" />
   <Project Path="Elegance.Infrastructure/Elegance.Infrastructure.csproj" />
+  <Project Path="Elegance.Tests/Elegance.Tests.csproj" />
 </Solution>

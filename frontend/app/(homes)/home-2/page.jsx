@@ -16,8 +16,8 @@ import React from "react";
 import { getProducts, toTemplateCardProduct } from "@/lib/api/products";
 
 export const metadata = {
-  title: "Home 02 || Vemus - Jewelry Ecommerce React Nextjs Template",
-  description: "Vemus - Jewelry Ecommerce React Nextjs Template",
+  title: "Home 02 || E.",
+  description: "The Choice of Elegant Women, Every Day",
 };
 
 async function loadBestSellers() {

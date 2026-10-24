@@ -8,8 +8,8 @@ import Link from "next/link";
 import React from "react";
 
 export const metadata = {
-  title: "Account Address || Vemus - Jewelry Ecommerce React Nextjs Template",
-  description: "Vemus - Jewelry Ecommerce React Nextjs Template",
+  title: "Account Address || E.",
+  description: "The Choice of Elegant Women, Every Day",
 };
 export default function page() {
   return (

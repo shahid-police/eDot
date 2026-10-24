@@ -86,7 +86,7 @@ export default function Products1({ products }) {
                       />
                     </Link>
 
-                    {!product.outOfStock && product.source !== "api" && (
+                    {!product.outOfStock && (
                       <ul className="list-product-btn">
                                                                         <li>
                           <QuickView product={product} />

@@ -36,6 +36,37 @@ namespace Elegance.Infrastructure.Persistence.Migrations
                     b.ToTable("admin_role_assignments", (string)null);
                 });
 
+            modelBuilder.Entity("Elegance.Domain.Admin.AdminTwoFactorCredential", b =>
+                {
+                    b.Property<long>("AdminUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("ActivatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("EncryptedSecret")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long>("LastAcceptedTimeStep")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("PendingExpiresAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.HasKey("AdminUserId");
+
+                    b.ToTable("admin_two_factor_credentials", (string)null);
+                });
+
             modelBuilder.Entity("Elegance.Domain.Admin.AdminUser", b =>
                 {
                     b.Property<long>("Id")
@@ -1162,6 +1193,17 @@ namespace Elegance.Infrastructure.Persistence.Migrations
                     b.HasOne("Elegance.Domain.Admin.AdminUser", "AdminUser")
                         .WithMany("Roles")
                         .HasForeignKey("AdminUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AdminUser");
+                });
+
+            modelBuilder.Entity("Elegance.Domain.Admin.AdminTwoFactorCredential", b =>
+                {
+                    b.HasOne("Elegance.Domain.Admin.AdminUser", "AdminUser")
+                        .WithOne()
+                        .HasForeignKey("Elegance.Domain.Admin.AdminTwoFactorCredential", "AdminUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

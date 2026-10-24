@@ -4,8 +4,8 @@ import Topbar1 from "@/components/headers/Topbar1";
 import Order from "@/components/otherPages/Order";
 import React from "react";
 export const metadata = {
-  title: "Shop Order || Vemus - Jewelry Ecommerce React Nextjs Template",
-  description: "Vemus - Jewelry Ecommerce React Nextjs Template",
+  title: "Shop Order || E.",
+  description: "The Choice of Elegant Women, Every Day",
 };
 export default function page() {
   return (

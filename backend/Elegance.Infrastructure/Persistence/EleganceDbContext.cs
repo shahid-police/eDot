@@ -40,6 +40,7 @@ public class EleganceDbContext : DbContext
     public DbSet<Payment> Payments => Set<Payment>();
     public DbSet<AdminUser> AdminUsers => Set<AdminUser>();
     public DbSet<AdminRoleAssignment> AdminRoleAssignments => Set<AdminRoleAssignment>();
+    public DbSet<AdminTwoFactorCredential> AdminTwoFactorCredentials => Set<AdminTwoFactorCredential>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
     public DbSet<StockMovement> StockMovements => Set<StockMovement>();
 

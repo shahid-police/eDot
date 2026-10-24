@@ -15,8 +15,8 @@ import Details17 from "@/components/product-details/Details17";
 import { loadApiProductBySlug } from "@/lib/api/products";
 
 const DEFAULT_METADATA = {
-  title: "Product Details || Vemus - Jewelry Ecommerce React Nextjs Template",
-  description: "Vemus - Jewelry Ecommerce React Nextjs Template",
+  title: "Product Details || E.",
+  description: "The Choice of Elegant Women, Every Day",
 };
 
 export async function generateMetadata({ params }) {
@@ -26,7 +26,7 @@ export async function generateMetadata({ params }) {
     return DEFAULT_METADATA;
   }
   return {
-    title: `${product.name} || Vemus`,
+    title: `${product.name} || E.`,
     description: product.shortDescription ?? DEFAULT_METADATA.description,
   };
 }

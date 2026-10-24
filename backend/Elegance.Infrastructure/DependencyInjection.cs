@@ -51,7 +51,10 @@ public static class DependencyInjection
             .Bind(configuration.GetSection(JwtOptions.SectionName))
             .Validate(options => options.Key.Length >= 32, "Jwt:Key must be set to at least 32 characters.")
             .ValidateOnStart();
+        services.AddSingleton(TimeProvider.System);
         services.AddSingleton<TokenService>();
+        services.AddSingleton<TotpService>();
+        services.AddSingleton<TwoFactorSecretProtector>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<ICustomerService, CustomerService>();
         services.AddScoped<ICartService, CartService>();
@@ -66,6 +69,7 @@ public static class DependencyInjection
 
         services.AddScoped<IAuditLogService, AuditLogService>();
         services.AddScoped<IAdminAuthService, AdminAuthService>();
+        services.AddScoped<IAdminTwoFactorService, AdminTwoFactorService>();
         services.AddScoped<IAdminCatalogService, AdminCatalogService>();
         services.AddScoped<IAdminOrderService, AdminOrderService>();
         services.AddScoped<IAdminInventoryService, AdminInventoryService>();

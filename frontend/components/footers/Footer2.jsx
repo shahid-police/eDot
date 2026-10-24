@@ -41,10 +41,11 @@ export default function Footer2() {
               <div className="box-title">
                 <Link href={`/home-2`} className="logo-site d-inline-block">
                   <Image
-                    alt=""
-                    src="/images/logo/logo-white.svg"
-                    width={122}
-                    height={31}
+                    alt="E."
+                    src="/images/logo/logo-transparent.png"
+                    width={495}
+                    height={383}
+                    style={{ width: "64px", height: "auto" }}
                   />
                 </Link>
                 <p className="text-main-5 lt-sp-nor">
@@ -253,7 +254,7 @@ export default function Footer2() {
         <div className="container">
           <div className="footer-bottom-wrap">
             <p className="text-nocopy text-white">
-              All Rights Reserved 2025 VEMUS.
+              All Rights Reserved 2025 E.
             </p>
             <div className="tf-currencies">
               <CurrencySelect light />
@@ -366,13 +367,12 @@ export default function Footer2() {
       <div className="logo-bottom wow fadeInUp" data-wow-delay="0.1s">
         <div className="container">
           <div className="d-flex justify-content-center">
-            <Image
-              className="lazyload"
-              alt="Logo"
-              src="/images/logo/logo-very-large.svg"
-              width={1422}
-              height={185}
-            />
+            <span
+              className="font-2 fst-italic text-white"
+              style={{ fontSize: "clamp(60px, 11vw, 160px)", lineHeight: 1 }}
+            >
+              E.
+            </span>
           </div>
         </div>
       </div>

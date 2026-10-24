@@ -56,7 +56,7 @@ export default function DescriptionSideAccordion() {
                 </tr>
                 <tr>
                   <td className="h6">Brand</td>
-                  <td className="h6">Vemus</td>
+                  <td className="h6">E.</td>
                 </tr>
                 <tr>
                   <td className="h6">Size</td>

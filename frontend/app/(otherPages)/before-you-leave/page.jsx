@@ -16,8 +16,8 @@ import BeforeLeave from "@/components/modals/BeforeLeave";
 import { getProducts, toTemplateCardProduct } from "@/lib/api/products";
 
 export const metadata = {
-  title: "Home || Vemus - Jewelry Ecommerce React Nextjs Template",
-  description: "Vemus - Jewelry Ecommerce React Nextjs Template",
+  title: "Home || E.",
+  description: "The Choice of Elegant Women, Every Day",
 };
 
 async function loadRecommended() {

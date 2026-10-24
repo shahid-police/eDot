@@ -5,8 +5,8 @@ import Topbar1 from "@/components/headers/Topbar1";
 import React from "react";
 import Link from "next/link";
 export const metadata = {
-  title: "Blog Single || Vemus - Jewelry Ecommerce React Nextjs Template",
-  description: "Vemus - Jewelry Ecommerce React Nextjs Template",
+  title: "Blog Single || E.",
+  description: "The Choice of Elegant Women, Every Day",
 };
 export default function page() {
   return (

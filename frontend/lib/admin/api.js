@@ -62,7 +62,11 @@ export async function adminRequest(path, { method = "GET", body, query } = {}) {
 
   const data = await response.json().catch(() => null);
 
-  if (response.status === 401 && !path.startsWith("/auth/")) {
+  // These can 401 for reasons that have nothing to do with the session token itself (a wrong
+  // password or code re-entered to confirm a sensitive action) - redirecting to login on those
+  // would hide the real error and sign the admin out of an otherwise perfectly valid session.
+  const isReauthPath = path === "/2fa/enroll/start" || path === "/2fa/enroll/verify" || path === "/2fa/disable";
+  if (response.status === 401 && !path.startsWith("/auth/") && !isReauthPath) {
     clearAdminToken();
     window.location.assign("/admin/login");
   }

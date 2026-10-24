@@ -4,8 +4,8 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 export const metadata = {
-  title: "Page Not Found || Vemus - Jewelry Ecommerce React Nextjs Template",
-  description: "Vemus - Jewelry Ecommerce React Nextjs Template",
+  title: "Page Not Found || E.",
+  description: "The Choice of Elegant Women, Every Day",
 };
 export default function page() {
   return (

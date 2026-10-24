@@ -5,8 +5,8 @@ import Wishlist from "@/components/otherPages/Wishlist";
 import Link from "next/link";
 import React from "react";
 export const metadata = {
-  title: "Wishlist || Vemus - Jewelry Ecommerce React Nextjs Template",
-  description: "Vemus - Jewelry Ecommerce React Nextjs Template",
+  title: "Wishlist || E.",
+  description: "The Choice of Elegant Women, Every Day",
 };
 export default function page() {
   return (

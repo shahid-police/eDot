@@ -7,8 +7,8 @@ import ApiShopCart from "@/components/otherPages/ApiShopCart";
 import React from "react";
 
 export const metadata = {
-  title: "Shop Cart || Vemus - Jewelry Ecommerce React Nextjs Template",
-  description: "Vemus - Jewelry Ecommerce React Nextjs Template",
+  title: "Shop Cart || E.",
+  description: "The Choice of Elegant Women, Every Day",
 };
 export default function page() {
   return (

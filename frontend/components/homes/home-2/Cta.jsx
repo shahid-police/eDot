@@ -14,7 +14,7 @@ export default function Cta() {
         />
       </div>
       <div className="bn-content bg-light-peach">
-        <h6 className="caption wow fadeInUp">JOIN THE #VEMUS TRIBE</h6>
+        <h6 className="caption wow fadeInUp">JOIN THE #E. TRIBE</h6>
         <h2 className="title font-2 fw-normal wow fadeInUp">
           <span className="fst-italic">Shiny Things</span> Await -
           <br className="d-none d-lg-block" />

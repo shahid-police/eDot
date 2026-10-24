@@ -12,8 +12,8 @@ import TextSlider from "@/components/common/TextSlider3";
 
 import Details6 from "@/components/product-details/Details6";
 export const metadata = {
-  title: "Product Details || Vemus - Jewelry Ecommerce React Nextjs Template",
-  description: "Vemus - Jewelry Ecommerce React Nextjs Template",
+  title: "Product Details || E.",
+  description: "The Choice of Elegant Women, Every Day",
 };
 export default async function ProductDetailPage({ params }) {
   const { id } = await params;

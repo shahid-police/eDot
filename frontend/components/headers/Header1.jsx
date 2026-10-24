@@ -19,10 +19,11 @@ export default function Header1({ parentClass = "tf-header line-bt-2" }) {
           <div className="col-xl-2 col-md-4 col-6">
             <Link href={`/`} className="logo-site">
               <Image
-                alt=""
-                width={122}
-                height={32}
-                src="/images/logo/logo.svg"
+                alt="E."
+                width={495}
+                height={383}
+                src="/images/logo/logo-transparent.png"
+                style={{ width: "48px", height: "auto" }}
               />
             </Link>
           </div>
@@ -39,7 +40,7 @@ export default function Header1({ parentClass = "tf-header line-bt-2" }) {
                 <a
                   href="#search"
                   data-bs-toggle="offcanvas"
-                  className="nav-icon-item text-black link"
+                  className="nav-icon-item text-primary link"
                 >
                   <i className="icon icon-search" />
                 </a>
@@ -49,7 +50,7 @@ export default function Header1({ parentClass = "tf-header line-bt-2" }) {
                 <a
                   href="#log"
                   data-bs-toggle="modal"
-                  className="nav-icon-item text-black link"
+                  className="nav-icon-item text-primary link"
                 >
                   <i className="icon icon-user" />
                 </a>
@@ -57,7 +58,7 @@ export default function Header1({ parentClass = "tf-header line-bt-2" }) {
               <li className="d-none d-md-inline-flex">
                 <Link
                   href={`/wishlist`}
-                  className="nav-icon-item text-black link"
+                  className="nav-icon-item text-primary link"
                 >
                   <i className="icon icon-hearth" />
                 </Link>
@@ -66,7 +67,7 @@ export default function Header1({ parentClass = "tf-header line-bt-2" }) {
                 <a
                   href="#shoppingCart"
                   data-bs-toggle="offcanvas"
-                  className="nav-icon-item text-black link"
+                  className="nav-icon-item text-primary link"
                 >
                   <i className="icon icon-cart" />
                   <span className="count-notice" />

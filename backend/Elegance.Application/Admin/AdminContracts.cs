@@ -32,9 +32,74 @@ public class AdminSession
     public required AdminProfileDto Admin { get; init; }
 }
 
+// Login returns exactly one of these. When TwoFactor is set, Session is null and the caller must
+// submit a TOTP code via IAdminAuthService.VerifyTwoFactorAsync before getting a real session -
+// the PendingToken alone cannot authorize any admin endpoint.
+public class AdminLoginResult
+{
+    public AdminSession? Session { get; init; }
+    public AdminTwoFactorChallenge? TwoFactor { get; init; }
+}
+
+public class AdminTwoFactorChallenge
+{
+    public required string PendingToken { get; init; }
+    public required DateTime PendingTokenExpiresAt { get; init; }
+}
+
+public class VerifyAdminTwoFactorRequest
+{
+    [Required]
+    public string PendingToken { get; init; } = string.Empty;
+
+    [Required, StringLength(6, MinimumLength = 6)]
+    public string Code { get; init; } = string.Empty;
+}
+
 public interface IAdminAuthService
 {
-    Task<AdminSession> LoginAsync(AdminLoginRequest request, CancellationToken cancellationToken = default);
+    Task<AdminLoginResult> LoginAsync(AdminLoginRequest request, CancellationToken cancellationToken = default);
+    Task<AdminSession> VerifyTwoFactorAsync(VerifyAdminTwoFactorRequest request, CancellationToken cancellationToken = default);
+}
+
+public class StartTwoFactorEnrollmentRequest
+{
+    [Required, StringLength(128)]
+    public string Password { get; init; } = string.Empty;
+}
+
+public class TwoFactorEnrollmentDto
+{
+    public required string ManualEntryKey { get; init; }
+    public required string QrCodePngBase64 { get; init; }
+}
+
+public class VerifyTwoFactorEnrollmentRequest
+{
+    [Required, StringLength(6, MinimumLength = 6)]
+    public string Code { get; init; } = string.Empty;
+}
+
+public class DisableTwoFactorRequest
+{
+    [Required, StringLength(128)]
+    public string Password { get; init; } = string.Empty;
+
+    [Required, StringLength(6, MinimumLength = 6)]
+    public string Code { get; init; } = string.Empty;
+}
+
+public class TwoFactorStatusDto
+{
+    public required bool Enabled { get; init; }
+}
+
+public interface IAdminTwoFactorService
+{
+    Task<TwoFactorEnrollmentDto> StartEnrollmentAsync(long adminId, StartTwoFactorEnrollmentRequest request, CancellationToken cancellationToken = default);
+    Task ConfirmEnrollmentAsync(long adminId, VerifyTwoFactorEnrollmentRequest request, CancellationToken cancellationToken = default);
+    Task DisableAsync(long adminId, DisableTwoFactorRequest request, CancellationToken cancellationToken = default);
+    Task<TwoFactorStatusDto> GetStatusAsync(long adminId, CancellationToken cancellationToken = default);
 }
 
 public class AdminProductQuery

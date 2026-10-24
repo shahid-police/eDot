@@ -5,8 +5,8 @@ import Compare from "@/components/otherPages/Compare";
 import Link from "next/link";
 import React from "react";
 export const metadata = {
-  title: "Compare || Vemus - Jewelry Ecommerce React Nextjs Template",
-  description: "Vemus - Jewelry Ecommerce React Nextjs Template",
+  title: "Compare || E.",
+  description: "The Choice of Elegant Women, Every Day",
 };
 export default function page() {
   return (
