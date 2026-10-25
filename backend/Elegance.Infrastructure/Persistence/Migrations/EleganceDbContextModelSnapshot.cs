@@ -237,6 +237,10 @@ namespace Elegance.Infrastructure.Persistence.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
 
+                    b.Property<string>("Code")
+                        .HasMaxLength(10)
+                        .HasColumnType("varchar(10)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
 
@@ -277,6 +281,9 @@ namespace Elegance.Infrastructure.Persistence.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
 
                     b.HasIndex("ImageMediaFileId");
 

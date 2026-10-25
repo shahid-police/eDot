@@ -212,8 +212,11 @@ public class AdminVariantRequest
 
 public class AdminProductRequest
 {
-    [Required, StringLength(64)]
-    public string Sku { get; init; } = string.Empty;
+    // Leave blank to auto-generate JEW-{CategoryCode}-NNN from the chosen category. Provide a
+    // value to set the SKU explicitly instead - it is then validated and must be unique, exactly
+    // like today.
+    [StringLength(64)]
+    public string? Sku { get; init; }
 
     [Required, StringLength(300)]
     public string Name { get; init; } = string.Empty;
@@ -292,6 +295,10 @@ public class AdminCategoryDto
     public required int SortOrder { get; init; }
     public required bool IsActive { get; init; }
     public required int ProductCount { get; init; }
+
+    // Short uppercase code used to build this category's product SKUs (JEW-{Code}-NNN). Null if
+    // not configured yet - see AdminCatalogService.PreviewNextSkuAsync for how that is handled.
+    public string? Code { get; init; }
 }
 
 public class AdminCategoryRequest
@@ -306,6 +313,14 @@ public class AdminCategoryRequest
     public long? ParentCategoryId { get; init; }
     public int SortOrder { get; init; }
     public bool IsActive { get; init; } = true;
+
+    [StringLength(10)]
+    public string? Code { get; init; }
+}
+
+public class NextSkuDto
+{
+    public required string Sku { get; init; }
 }
 
 public interface IAdminCatalogService
@@ -318,6 +333,7 @@ public interface IAdminCatalogService
     Task<IReadOnlyList<AdminCategoryDto>> ListCategoriesAsync(CancellationToken cancellationToken = default);
     Task<AdminCategoryDto> CreateCategoryAsync(AdminActor actor, AdminCategoryRequest request, CancellationToken cancellationToken = default);
     Task<AdminCategoryDto> UpdateCategoryAsync(AdminActor actor, long categoryId, AdminCategoryRequest request, CancellationToken cancellationToken = default);
+    Task<NextSkuDto> PreviewNextSkuAsync(long categoryId, CancellationToken cancellationToken = default);
 }
 
 public interface IAdminMediaService

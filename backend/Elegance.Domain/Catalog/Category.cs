@@ -9,6 +9,10 @@ public class Category
     public required string Slug { get; set; }
     public string? Description { get; set; }
 
+    // Short uppercase code used to build product SKUs for this category (JEW-{Code}-001).
+    // Null means this category has no SKU code configured yet - see AdminCatalogService.
+    public string? Code { get; set; }
+
     public long? ParentCategoryId { get; set; }
     public Category? ParentCategory { get; set; }
     public ICollection<Category> ChildCategories { get; set; } = [];

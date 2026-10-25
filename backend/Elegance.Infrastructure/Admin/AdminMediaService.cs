@@ -12,12 +12,14 @@ namespace Elegance.Infrastructure.Admin;
 
 public class AdminMediaService(EleganceDbContext dbContext, IFileStorage fileStorage, IAuditLogService auditLog) : IAdminMediaService
 {
-    // Rules documented for the admin at upload time and in docs/MEDIA-STORAGE.md.
+    // Rules documented for the admin at upload time and in docs/MEDIA-STORAGE.md. No minimum
+    // dimensions are enforced - any image that decodes is accepted and auto-resized down to
+    // MaxStoredEdge for storage. MaxInputEdge stays as a generous safety ceiling (not a UX
+    // limit): without it, a small-but-highly-compressed file could decode into gigabytes of
+    // pixel data in memory (a decompression-bomb DoS), regardless of the byte-size cap below.
     private const long MaxUploadBytes = 8 * 1024 * 1024;
-    private const int MaxInputEdge = 4000;
+    private const int MaxInputEdge = 10000;
     private const int MaxStoredEdge = 2000;
-    private const int MinProductEdgeWidth = 1000;
-    private const int MinProductEdgeHeight = 1250;
     private const int MaxGalleryImages = 8;
 
     private static readonly Dictionary<string, string> AllowedTypes = new()
@@ -41,7 +43,7 @@ public class AdminMediaService(EleganceDbContext dbContext, IFileStorage fileSto
             throw NotFound();
         }
 
-        var processed = await ReadAndProcessAsync(content, contentType, contentLength, MinProductEdgeWidth, MinProductEdgeHeight, cancellationToken);
+        var processed = await ReadAndProcessAsync(content, contentType, contentLength, cancellationToken);
 
         if (type is ProductImageType.Primary or ProductImageType.Hover)
         {
@@ -132,7 +134,7 @@ public class AdminMediaService(EleganceDbContext dbContext, IFileStorage fileSto
             .FirstOrDefaultAsync(v => v.Id == variantId && v.ProductId == productId, cancellationToken)
             ?? throw NotFound();
 
-        var processed = await ReadAndProcessAsync(content, contentType, contentLength, MinProductEdgeWidth, MinProductEdgeHeight, cancellationToken);
+        var processed = await ReadAndProcessAsync(content, contentType, contentLength, cancellationToken);
 
         var previousMediaFile = variant.ImageMediaFile;
 
@@ -211,7 +213,7 @@ public class AdminMediaService(EleganceDbContext dbContext, IFileStorage fileSto
     }
 
     private static async Task<ProcessedImage> ReadAndProcessAsync(
-        Stream content, string contentType, long contentLength, int minWidth, int minHeight, CancellationToken cancellationToken)
+        Stream content, string contentType, long contentLength, CancellationToken cancellationToken)
     {
         if (!AllowedTypes.TryGetValue(contentType, out var extension))
         {
@@ -242,10 +244,6 @@ public class AdminMediaService(EleganceDbContext dbContext, IFileStorage fileSto
         if (bitmap.Width > MaxInputEdge || bitmap.Height > MaxInputEdge)
         {
             throw new ApplicationFailure(FailureKind.Validation, $"Images must be {MaxInputEdge}×{MaxInputEdge} pixels or smaller. Resize it and try again.");
-        }
-        if (bitmap.Width < minWidth || bitmap.Height < minHeight)
-        {
-            throw new ApplicationFailure(FailureKind.Validation, $"Images need to be at least {minWidth}×{minHeight} pixels.");
         }
 
         var longEdge = Math.Max(bitmap.Width, bitmap.Height);

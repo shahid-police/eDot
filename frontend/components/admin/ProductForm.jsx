@@ -149,7 +149,9 @@ export function fromApi(product) {
 function toPayload(form) {
   const isVariant = form.productType === "Variant";
   return {
-    sku: form.sku.trim(),
+    // Blank means "auto-generate from the category" - the server does the same thing the live
+    // preview does, so this also covers the case where the preview call failed or never ran.
+    sku: form.sku.trim() || null,
     name: form.name.trim(),
     slug: form.slug.trim(),
     shortDescription: form.shortDescription || null,
@@ -193,6 +195,11 @@ export default function ProductForm({ productId = null, initial = null }) {
   const [form, setForm] = useState(initial ?? EMPTY_PRODUCT);
   const [categories, setCategories] = useState([]);
   const [slugTouched, setSlugTouched] = useState(!isNew);
+  // Mirrors slugTouched: once the admin edits the SKU themselves, picking a different category
+  // stops overwriting it. Editing an existing product always starts "touched" (its real SKU).
+  const [skuTouched, setSkuTouched] = useState(!isNew);
+  const [skuStatus, setSkuStatus] = useState(""); // "", "loading", "error"
+  const [skuHint, setSkuHint] = useState("");
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
@@ -202,6 +209,31 @@ export default function ProductForm({ productId = null, initial = null }) {
   useEffect(() => {
     adminRequest("/categories").then(setCategories).catch((err) => setError(err.message));
   }, []);
+
+  // Auto-fills the SKU from the chosen category, same "unless the admin has typed their own
+  // value" pattern as the slug. Re-runs whenever the category changes, so switching categories
+  // before saving updates the suggestion to match.
+  useEffect(() => {
+    if (!isNew || skuTouched || !form.categoryId) return;
+    let active = true;
+    setSkuStatus("loading");
+    setSkuHint("");
+    adminRequest("/products/next-sku", { query: { categoryId: form.categoryId } })
+      .then((result) => {
+        if (!active) return;
+        setForm((current) => ({ ...current, sku: result.sku }));
+        setSkuStatus("");
+      })
+      .catch((err) => {
+        if (!active) return;
+        setForm((current) => ({ ...current, sku: "" }));
+        setSkuStatus("error");
+        setSkuHint(err.message);
+      });
+    return () => {
+      active = false;
+    };
+  }, [form.categoryId, isNew, skuTouched]);
 
   function update(field, value) {
     setForm((current) => ({ ...current, [field]: value }));
@@ -339,7 +371,16 @@ export default function ProductForm({ productId = null, initial = null }) {
       <section className="row g-3">
         <div className="col-md-4">
           <label className="form-label">SKU</label>
-          <input className="form-control" value={form.sku} onChange={(e) => update("sku", e.target.value)} required maxLength={64} />
+          <input
+            className="form-control"
+            value={form.sku}
+            onChange={(e) => { setSkuTouched(true); update("sku", e.target.value); }}
+            required
+            maxLength={64}
+            placeholder={isNew && skuStatus === "loading" ? "Generating..." : undefined}
+          />
+          {isNew && skuStatus === "loading" && <div className="form-text">Generating SKU from category...</div>}
+          {isNew && skuStatus === "error" && <div className="form-text text-danger">{skuHint}</div>}
         </div>
         <div className="col-md-8">
           <label className="form-label">Name</label>
@@ -422,7 +463,7 @@ export default function ProductForm({ productId = null, initial = null }) {
             )}
           </div>
           <p className="small text-muted mb-0">
-            JPEG, PNG, or WebP, up to 8 MB, at least 1000{"×"}1250 px. Uploading a new Primary or Hover photo replaces the old one.
+            JPEG, PNG, or WebP, up to 8 MB, any dimensions. Uploading a new Primary or Hover photo replaces the old one.
           </p>
         </section>
       ) : (

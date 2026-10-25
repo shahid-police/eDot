@@ -3,14 +3,16 @@ import { products4 } from "@/data/products";
 import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import Image from "next/image";
-import QuickView from "@/components/common/QuickView";
+import ProductQuickActions from "@/components/common/ProductQuickActions";
 import DiscountMarquee from "@/components/common/DiscountMarquee";
 import { Navigation, Pagination } from "swiper/modules";
 import CountdownTimer from "@/components/common/Countdown";
 import Link from "next/link";
 import { formatPrice } from "@/lib/format/price";
+import useSavedProducts from "@/hooks/useSavedProducts";
 export default function Products1({ products }) {
   const source = products?.length ? products : products4;
+  const { wishlistMap, compareMap, toggleWishlist, toggleCompare } = useSavedProducts();
   return (
     <section className="flat-spacing-6 bg-dark-brown">
       <div className="container">
@@ -88,10 +90,14 @@ export default function Products1({ products }) {
 
                     {!product.outOfStock && (
                       <ul className="list-product-btn">
-                                                                        <li>
-                          <QuickView product={product} />
-                        </li>
-                                              </ul>
+                        <ProductQuickActions
+                          product={product}
+                          isSaved={wishlistMap.has(product.id)}
+                          isCompared={compareMap.has(product.id)}
+                          onToggleWishlist={toggleWishlist}
+                          onToggleCompare={toggleCompare}
+                        />
+                      </ul>
                     )}
 
                     {product.badge && (

@@ -87,3 +87,59 @@ picture.jarallax-img img {
 .nav-prev-swiper {
   cursor: pointer;
 }
+
+// A periodic light sweep + soft gold glow across the "E." logo mark, masked to its own
+// transparent-PNG silhouette so the highlight only plays over the gold artwork, not the empty
+// space around it. Used by the header logo(s) - see components/headers/Header1.jsx/Header2.jsx.
+.logo-shine {
+  position: relative;
+  display: inline-block;
+  animation: logo-shine-glow 3.6s ease-in-out infinite;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      100deg,
+      rgba(255, 255, 255, 0) 35%,
+      rgba(255, 255, 255, 0.95) 50%,
+      rgba(255, 255, 255, 0) 65%
+    );
+    background-size: 220% 100%;
+    background-position: -160% 0;
+    mix-blend-mode: overlay;
+    -webkit-mask-image: url("/images/logo/logo-transparent.png");
+    mask-image: url("/images/logo/logo-transparent.png");
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    animation: logo-shine-sweep 3.6s ease-in-out infinite;
+    pointer-events: none;
+  }
+}
+
+@keyframes logo-shine-sweep {
+  0%,
+  15% {
+    background-position: -160% 0;
+  }
+  65%,
+  100% {
+    background-position: 160% 0;
+  }
+}
+
+@keyframes logo-shine-glow {
+  0%,
+  15%,
+  100% {
+    filter: drop-shadow(0 0 0 rgba(212, 175, 102, 0));
+  }
+  40% {
+    filter: drop-shadow(0 0 6px rgba(212, 175, 102, 0.6));
+  }
+}

@@ -2,7 +2,7 @@
 import { products15 } from "@/data/products";
 import React from "react";
 import DiscountMarquee from "../common/DiscountMarquee";
-import QuickView from "../common/QuickView";
+import ProductQuickActions from "../common/ProductQuickActions";
 import { initialState, reducer } from "@/reducer/filterReducer";
 import { useEffect, useReducer, useState } from "react";
 import FilterSidebar from "./FilterSidebar";
@@ -10,8 +10,10 @@ import LayoutHandler from "./LayoutHandler";
 import Link from "next/link";
 import Pagination from "../common/Pagination";
 import { formatPrice } from "@/lib/format/price";
+import useSavedProducts from "@/hooks/useSavedProducts";
 export default function Products1({ defaultLayout = 4, products }) {
   const source = products ?? products15;
+  const { wishlistMap, compareMap, toggleWishlist, toggleCompare } = useSavedProducts();
   const [activeLayout, setActiveLayout] = useState(defaultLayout);
   const [state, dispatch] = useReducer(reducer, source, (items) => ({
     ...initialState,
@@ -358,9 +360,14 @@ export default function Products1({ defaultLayout = 4, products }) {
 
                     {!product.outOfStock && (
                       <ul className="list-product-btn" style={{ display: "flex" }}>
-                        <li style={{ opacity: 1, visibility: "visible" }}>
-                          <QuickView product={product} />
-                        </li>
+                        <ProductQuickActions
+                          product={product}
+                          alwaysVisible
+                          isSaved={wishlistMap.has(product.id)}
+                          isCompared={compareMap.has(product.id)}
+                          onToggleWishlist={toggleWishlist}
+                          onToggleCompare={toggleCompare}
+                        />
                       </ul>
                     )}
 
@@ -496,9 +503,14 @@ export default function Products1({ defaultLayout = 4, products }) {
 
                     {!product.outOfStock && (
                       <ul className="list-product-btn" style={{ display: "flex" }}>
-                        <li style={{ opacity: 1, visibility: "visible" }}>
-                          <QuickView product={product} />
-                        </li>
+                        <ProductQuickActions
+                          product={product}
+                          alwaysVisible
+                          isSaved={wishlistMap.has(product.id)}
+                          isCompared={compareMap.has(product.id)}
+                          onToggleWishlist={toggleWishlist}
+                          onToggleCompare={toggleCompare}
+                        />
                       </ul>
                     )}
 

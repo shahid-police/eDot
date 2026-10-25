@@ -19,22 +19,26 @@ export default function Header2() {
             </div>
             <div className="col-xl-3 col-md-4 col-6">
               <Link href={`/`} className="logo-site">
-                <Image
-                  alt="E."
-                  className="logo-black"
-                  src="/images/logo/logo-transparent.png"
-                  width={495}
-                  height={383}
-                  style={{ width: "90px", height: "auto" }}
-                />
-                <Image
-                  alt="E."
-                  className="logo-white"
-                  src="/images/logo/logo-transparent.png"
-                  width={495}
-                  height={383}
-                  style={{ width: "90px", height: "auto" }}
-                />
+                <span className="logo-shine d-inline-block">
+                  <Image
+                    alt="E."
+                    className="logo-black"
+                    src="/images/logo/logo-transparent.png"
+                    width={495}
+                    height={383}
+                    style={{ width: "90px", height: "auto" }}
+                  />
+                </span>
+                <span className="logo-shine d-inline-block">
+                  <Image
+                    alt="E."
+                    className="logo-white"
+                    src="/images/logo/logo-transparent.png"
+                    width={495}
+                    height={383}
+                    style={{ width: "90px", height: "auto" }}
+                  />
+                </span>
               </Link>
             </div>
             <div className="col-xl-6 d-none d-xl-flex align-items-center justify-content-center">

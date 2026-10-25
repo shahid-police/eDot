@@ -18,13 +18,15 @@ export default function Header1({ parentClass = "tf-header line-bt-2" }) {
           </div>
           <div className="col-xl-2 col-md-4 col-6">
             <Link href={`/`} className="logo-site">
-              <Image
-                alt="E."
-                width={495}
-                height={383}
-                src="/images/logo/logo-transparent.png"
-                style={{ width: "48px", height: "auto" }}
-              />
+              <span className="logo-shine d-inline-block">
+                <Image
+                  alt="E."
+                  width={495}
+                  height={383}
+                  src="/images/logo/logo-transparent.png"
+                  style={{ width: "48px", height: "auto" }}
+                />
+              </span>
             </Link>
           </div>
           <div className="col-xl-8 d-none d-xl-block">

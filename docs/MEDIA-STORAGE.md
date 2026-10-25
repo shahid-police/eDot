@@ -68,8 +68,8 @@ business crosses a revenue threshold) to decode and re-encode.
 |---|---|
 | Accepted formats | JPEG, PNG, WebP |
 | Max upload size | 8 MB |
-| Max input dimensions | 4000×4000 px (reject above; ask the admin to downscale) |
-| Minimum dimensions | 1000×1250 px (matches the storefront's portrait product card ratio) |
+| Max input dimensions | 10000×10000 px (a safety ceiling against decompression-bomb files, not a UX limit; reject above and ask the admin to downscale) |
+| Minimum dimensions | none - any image that decodes is accepted |
 | Stored size | downscaled to a 2000 px long edge if larger, same format, quality 85 |
 | Gallery cap | 8 images per product |
 | Primary / Hover | exactly 0 or 1 each; a new upload replaces the existing one automatically |

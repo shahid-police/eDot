@@ -11,7 +11,6 @@ import Hero from "@/components/homes/home-2/Hero";
 import Products1 from "@/components/homes/home-2/Products1";
 import Products2 from "@/components/homes/home-2/Products2";
 import Testimonials from "@/components/homes/home-2/Testimonials";
-import BeforeLeave from "@/components/modals/BeforeLeave";
 import React from "react";
 import { getProducts, toTemplateCardProduct } from "@/lib/api/products";
 
@@ -40,21 +39,10 @@ async function loadTrendyCollection() {
   }
 }
 
-async function loadRecommended() {
-  try {
-    const result = await getProducts({ isNew: true, pageSize: 4 });
-    return result.items.map(toTemplateCardProduct);
-  } catch (error) {
-    console.error("Product API unavailable, rendering template data:", error);
-    return undefined;
-  }
-}
-
 export default async function page() {
-  const [bestSellers, trendyCollection, recommended] = await Promise.all([
+  const [bestSellers, trendyCollection] = await Promise.all([
     loadBestSellers(),
     loadTrendyCollection(),
-    loadRecommended(),
   ]);
 
   return (
@@ -72,7 +60,6 @@ export default async function page() {
       <Blogs />
       <Cta />
       <Footer2 />
-      <BeforeLeave products={recommended} />
     </>
   );
 }

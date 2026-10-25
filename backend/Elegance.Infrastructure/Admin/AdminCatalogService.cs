@@ -10,6 +10,9 @@ namespace Elegance.Infrastructure.Admin;
 
 public class AdminCatalogService(EleganceDbContext dbContext, IAuditLogService auditLog) : IAdminCatalogService
 {
+    // JEW-{CategoryCode}-{number, zero-padded to at least 3 digits}.
+    private const string SkuPrefix = "JEW";
+    private const int MaxSkuGenerationAttempts = 5;
     public async Task<PagedResult<AdminProductSummaryDto>> ListProductsAsync(AdminProductQuery query, CancellationToken cancellationToken = default)
     {
         var page = Math.Max(1, query.Page);
@@ -86,46 +89,110 @@ public class AdminCatalogService(EleganceDbContext dbContext, IAuditLogService a
     {
         var productType = ParseProductType(request.ProductType);
         ValidateVariants(productType, request.Variants);
-        await EnsureProductKeysFreeAsync(request.Sku, request.Slug, excludeProductId: null, cancellationToken);
-        await EnsureCategoryExistsAsync(request.CategoryId, cancellationToken);
+        var category = await dbContext.Categories.AsNoTracking().FirstOrDefaultAsync(c => c.Id == request.CategoryId, cancellationToken)
+            ?? throw new ApplicationFailure(FailureKind.Validation, "Choose a valid category.");
         await EnsureVariantSkusFreeAsync(request.Variants.Select(v => v.Sku), excludeProductId: null, cancellationToken);
 
+        var autoGenerateSku = string.IsNullOrWhiteSpace(request.Sku);
         var now = DateTime.UtcNow;
-        var product = new Product
-        {
-            Sku = request.Sku.Trim(),
-            Name = request.Name.Trim(),
-            Slug = request.Slug.Trim(),
-            CreatedAt = now,
-            UpdatedAt = now,
-            CategoryId = request.CategoryId,
-            ProductType = productType,
-            StockQuantity = productType == ProductType.Simple ? request.StockQuantity : 0,
-        };
-        ApplyProductFields(product, request);
 
-        foreach (var variantRequest in request.Variants)
+        // Auto-generated SKUs are computed from the current max in the category (see
+        // ComputeNextSkuAsync), so two admins creating in the same category at once can both
+        // compute the same "next" number. The unique index on Product.Sku is the real guarantee;
+        // on a collision there, this retries with a freshly computed number instead of failing
+        // the request. A manually-entered SKU is never silently changed - it either saves as
+        // given or is rejected as a duplicate, same as before this feature existed.
+        for (var attempt = 1; ; attempt++)
         {
-            product.Variants.Add(NewVariant(variantRequest, now));
+            var sku = autoGenerateSku ? await ComputeNextSkuAsync(category, cancellationToken) : request.Sku!.Trim();
+            await EnsureProductKeysFreeAsync(sku, request.Slug, excludeProductId: null, cancellationToken);
+
+            var product = new Product
+            {
+                Sku = sku,
+                Name = request.Name.Trim(),
+                Slug = request.Slug.Trim(),
+                CreatedAt = now,
+                UpdatedAt = now,
+                CategoryId = request.CategoryId,
+                ProductType = productType,
+                StockQuantity = productType == ProductType.Simple ? request.StockQuantity : 0,
+            };
+            ApplyProductFields(product, request);
+
+            foreach (var variantRequest in request.Variants)
+            {
+                product.Variants.Add(NewVariant(variantRequest, now));
+            }
+
+            dbContext.Products.Add(product);
+
+            try
+            {
+                await dbContext.SaveChangesAsync(cancellationToken);
+            }
+            catch (DbUpdateException) when (autoGenerateSku && attempt < MaxSkuGenerationAttempts)
+            {
+                dbContext.ChangeTracker.Clear();
+                if (!await dbContext.Products.AnyAsync(p => p.Sku == sku, cancellationToken))
+                {
+                    throw; // Some other failure - not the SKU race this retry exists for.
+                }
+                continue;
+            }
+
+            var openingMovements = new List<StockMovement>();
+            if (product.ProductType == ProductType.Simple && product.StockQuantity > 0)
+            {
+                openingMovements.Add(Movement(actor, product.Id, null, product.StockQuantity, "Opening stock"));
+            }
+            foreach (var variant in product.Variants.Where(v => v.StockQuantity > 0))
+            {
+                openingMovements.Add(Movement(actor, product.Id, variant.Id, variant.StockQuantity, "Opening stock"));
+            }
+            dbContext.StockMovements.AddRange(openingMovements);
+            await dbContext.SaveChangesAsync(cancellationToken);
+
+            await auditLog.RecordAsync(actor, "product.create", "Product", product.Id.ToString(), $"Created {product.Sku} {product.Name}", cancellationToken);
+            return await GetProductAsync(product.Id, cancellationToken);
+        }
+    }
+
+    public async Task<NextSkuDto> PreviewNextSkuAsync(long categoryId, CancellationToken cancellationToken = default)
+    {
+        var category = await dbContext.Categories.AsNoTracking().FirstOrDefaultAsync(c => c.Id == categoryId, cancellationToken)
+            ?? throw NotFound();
+        return new NextSkuDto { Sku = await ComputeNextSkuAsync(category, cancellationToken) };
+    }
+
+    // Looks at every existing SKU for this category's prefix and takes the highest number found,
+    // not the row count - so a gap (e.g. ...-001 then ...-005, if 002-004 were deleted or
+    // reassigned) still produces ...-006, never a reused or duplicate number.
+    private async Task<string> ComputeNextSkuAsync(Category category, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(category.Code))
+        {
+            throw new ApplicationFailure(FailureKind.Validation,
+                $"'{category.Name}' has no SKU code configured yet. Set one on the category, or enter a SKU manually.");
         }
 
-        dbContext.Products.Add(product);
-        await dbContext.SaveChangesAsync(cancellationToken);
+        var prefix = $"{SkuPrefix}-{category.Code}-";
+        var existingSkus = await dbContext.Products.AsNoTracking()
+            .Where(p => p.Sku.StartsWith(prefix))
+            .Select(p => p.Sku)
+            .ToListAsync(cancellationToken);
 
-        var openingMovements = new List<StockMovement>();
-        if (product.ProductType == ProductType.Simple && product.StockQuantity > 0)
+        var maxNumber = 0;
+        foreach (var sku in existingSkus)
         {
-            openingMovements.Add(Movement(actor, product.Id, null, product.StockQuantity, "Opening stock"));
+            var suffix = sku[prefix.Length..];
+            if (int.TryParse(suffix, out var number) && number > maxNumber)
+            {
+                maxNumber = number;
+            }
         }
-        foreach (var variant in product.Variants.Where(v => v.StockQuantity > 0))
-        {
-            openingMovements.Add(Movement(actor, product.Id, variant.Id, variant.StockQuantity, "Opening stock"));
-        }
-        dbContext.StockMovements.AddRange(openingMovements);
-        await dbContext.SaveChangesAsync(cancellationToken);
 
-        await auditLog.RecordAsync(actor, "product.create", "Product", product.Id.ToString(), $"Created {product.Sku} {product.Name}", cancellationToken);
-        return await GetProductAsync(product.Id, cancellationToken);
+        return $"{prefix}{(maxNumber + 1).ToString().PadLeft(3, '0')}";
     }
 
     public async Task<AdminProductDto> UpdateProductAsync(AdminActor actor, long productId, AdminProductRequest request, CancellationToken cancellationToken = default)
@@ -137,6 +204,12 @@ public class AdminCatalogService(EleganceDbContext dbContext, IAuditLogService a
 
         var productType = ParseProductType(request.ProductType);
         ValidateVariants(productType, request.Variants);
+        // Auto-generation only applies to new products (CreateProductAsync) - an existing
+        // product already has a real SKU, so editing it still requires one explicitly.
+        if (string.IsNullOrWhiteSpace(request.Sku))
+        {
+            throw new ApplicationFailure(FailureKind.Validation, "SKU is required.");
+        }
         await EnsureProductKeysFreeAsync(request.Sku, request.Slug, excludeProductId: productId, cancellationToken);
         await EnsureCategoryExistsAsync(request.CategoryId, cancellationToken);
         await EnsureVariantSkusFreeAsync(request.Variants.Select(v => v.Sku), excludeProductId: productId, cancellationToken);
@@ -231,6 +304,7 @@ public class AdminCatalogService(EleganceDbContext dbContext, IAuditLogService a
                 SortOrder = c.SortOrder,
                 IsActive = c.IsActive,
                 ProductCount = c.Products.Count(),
+                Code = c.Code,
             })
             .ToListAsync(cancellationToken);
         return categories;
@@ -240,6 +314,7 @@ public class AdminCatalogService(EleganceDbContext dbContext, IAuditLogService a
     {
         await EnsureCategoryKeyFreeAsync(request.Slug, excludeCategoryId: null, cancellationToken);
         await EnsureParentValidAsync(request.ParentCategoryId, selfId: null, cancellationToken);
+        var code = await NormalizeAndValidateCodeAsync(request.Code, excludeCategoryId: null, cancellationToken);
 
         var now = DateTime.UtcNow;
         var category = new Category
@@ -250,6 +325,7 @@ public class AdminCatalogService(EleganceDbContext dbContext, IAuditLogService a
             ParentCategoryId = request.ParentCategoryId,
             SortOrder = request.SortOrder,
             IsActive = request.IsActive,
+            Code = code,
             CreatedAt = now,
             UpdatedAt = now,
         };
@@ -266,6 +342,7 @@ public class AdminCatalogService(EleganceDbContext dbContext, IAuditLogService a
             ?? throw NotFound();
         await EnsureCategoryKeyFreeAsync(request.Slug, excludeCategoryId: categoryId, cancellationToken);
         await EnsureParentValidAsync(request.ParentCategoryId, selfId: categoryId, cancellationToken);
+        var code = await NormalizeAndValidateCodeAsync(request.Code, excludeCategoryId: categoryId, cancellationToken);
 
         category.Name = request.Name.Trim();
         category.Slug = request.Slug.Trim();
@@ -273,6 +350,7 @@ public class AdminCatalogService(EleganceDbContext dbContext, IAuditLogService a
         category.ParentCategoryId = request.ParentCategoryId;
         category.SortOrder = request.SortOrder;
         category.IsActive = request.IsActive;
+        category.Code = code;
         category.UpdatedAt = DateTime.UtcNow;
         await dbContext.SaveChangesAsync(cancellationToken);
 
@@ -461,6 +539,34 @@ public class AdminCatalogService(EleganceDbContext dbContext, IAuditLogService a
         {
             throw new ApplicationFailure(FailureKind.Conflict, "Another category already uses this slug.");
         }
+    }
+
+    // Normalizes to uppercase, validates the shape (2-10 letters/digits, matching the SKU
+    // examples like NSET/RING), and ensures no other category already uses it - since two
+    // categories sharing a code would make their generated SKUs collide. Blank/null is allowed
+    // (the category simply has no SKU code configured yet).
+    private async Task<string?> NormalizeAndValidateCodeAsync(string? code, long? excludeCategoryId, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(code))
+        {
+            return null;
+        }
+
+        var normalized = code.Trim().ToUpperInvariant();
+        if (normalized.Length is < 2 or > 10 || !normalized.All(char.IsLetterOrDigit))
+        {
+            throw new ApplicationFailure(FailureKind.Validation, "Category code must be 2-10 letters or digits.");
+        }
+
+        var taken = await dbContext.Categories.AnyAsync(
+            c => c.Code == normalized && (excludeCategoryId == null || c.Id != excludeCategoryId),
+            cancellationToken);
+        if (taken)
+        {
+            throw new ApplicationFailure(FailureKind.Conflict, "Another category already uses this code.");
+        }
+
+        return normalized;
     }
 
     private async Task EnsureParentValidAsync(long? parentId, long? selfId, CancellationToken cancellationToken)

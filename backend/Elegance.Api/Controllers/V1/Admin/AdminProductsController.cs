@@ -23,6 +23,13 @@ public class AdminProductsController(IAdminCatalogService catalogService) : Cont
         return Ok(await catalogService.GetProductAsync(productId, cancellationToken));
     }
 
+    // "next-sku" never collides with the {productId:long} route above - it isn't a valid long.
+    [HttpGet("next-sku")]
+    public async Task<ActionResult<NextSkuDto>> NextSku([FromQuery] long categoryId, CancellationToken cancellationToken)
+    {
+        return Ok(await catalogService.PreviewNextSkuAsync(categoryId, cancellationToken));
+    }
+
     [HttpPost]
     public async Task<ActionResult<AdminProductDto>> Create([FromBody] AdminProductRequest request, CancellationToken cancellationToken)
     {

@@ -4,11 +4,13 @@ import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import Link from "next/link";
 import Image from "next/image";
-import QuickView from "@/components/common/QuickView";
+import ProductQuickActions from "@/components/common/ProductQuickActions";
 import { Navigation, Pagination } from "swiper/modules";
 import { formatPrice } from "@/lib/format/price";
+import useSavedProducts from "@/hooks/useSavedProducts";
 export default function Products2({ products }) {
   const source = products?.length ? products : products5;
+  const { wishlistMap, compareMap, toggleWishlist, toggleCompare } = useSavedProducts();
   return (
     <section className="flat-spacing-6 pt-0">
       <div className="container">
@@ -86,10 +88,14 @@ export default function Products2({ products }) {
 
                     {!product.outOfStock && (
                       <ul className="list-product-btn">
-                                                                  <li>
-                        <QuickView product={product} />
-                      </li>
-                                          </ul>
+                        <ProductQuickActions
+                          product={product}
+                          isSaved={wishlistMap.has(product.id)}
+                          isCompared={compareMap.has(product.id)}
+                          onToggleWishlist={toggleWishlist}
+                          onToggleCompare={toggleCompare}
+                        />
+                      </ul>
                     )}
 
                     {product.badge && (

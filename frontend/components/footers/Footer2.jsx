@@ -40,13 +40,15 @@ export default function Footer2() {
             <div className="footer-infor">
               <div className="box-title">
                 <Link href={`/home-2`} className="logo-site d-inline-block">
-                  <Image
-                    alt="E."
-                    src="/images/logo/logo-transparent.png"
-                    width={495}
-                    height={383}
-                    style={{ width: "64px", height: "auto" }}
-                  />
+                  <span className="logo-shine d-inline-block">
+                    <Image
+                      alt="E."
+                      src="/images/logo/logo-transparent.png"
+                      width={495}
+                      height={383}
+                      style={{ width: "64px", height: "auto" }}
+                    />
+                  </span>
                 </Link>
                 <p className="text-main-5 lt-sp-nor">
                   <span className="text-white">Explore</span> our curated
