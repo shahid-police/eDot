@@ -17,7 +17,21 @@ export default function Header2() {
                 <span />
               </a>
             </div>
-            <div className="col-xl-3 col-md-4 col-6">
+            <div className="col-xl-3 d-none d-xl-flex align-items-center">
+              <Link
+                href={`/`}
+                className="font-2 fst-italic"
+                style={{
+                  fontSize: "24px",
+                  letterSpacing: "0.04em",
+                  color: "#7a6530",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                E.
+              </Link>
+            </div>
+            <div className="col-xl-6 col-md-4 col-6 d-flex justify-content-center">
               <Link href={`/`} className="logo-site">
                 <span className="logo-shine d-inline-block">
                   <Image
@@ -40,19 +54,6 @@ export default function Header2() {
                   />
                 </span>
               </Link>
-            </div>
-            <div className="col-xl-6 d-none d-xl-flex align-items-center justify-content-center">
-              <span
-                className="font-2 fst-italic text-center"
-                style={{
-                  fontSize: "26px",
-                  letterSpacing: "0.04em",
-                  color: "#7a6530",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                The Choice of Elegant Women, Every Day
-              </span>
             </div>
             <div className="col-xl-3 col-md-4 col-3">
               <ul className="nav-icon">

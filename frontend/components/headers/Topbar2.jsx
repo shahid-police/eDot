@@ -2,7 +2,7 @@ import React from "react";
 
 export default function Topbar2() {
   return (
-    <div className="tf-topbar bg-main px-0">
+    <div className="tf-topbar topbar-silver-glitter px-0">
       <div className="infiniteslide_wrap" style={{ overflow: "hidden" }}>
         <div className="infiniteSlide infiniteSlider topbar-inner type-sp-2">
           {/* 1 */}
@@ -10,39 +10,36 @@ export default function Topbar2() {
             className="infiniteItem"
             style={{ flex: "0 0 auto", display: "block" }}
           >
-            <p className="text-white text-caption-3 text-uppercase fw-medium">
-              Free Shipping on All Orders Over $200
+            <p className="text-primary text-caption-3 fst-italic font-2" style={{ textTransform: "none" }}>
+              The Choice of Elegant Women, Every Day
             </p>
           </div>
           <span
-            className="br-line w-24 bg-white"
+            className="br-line w-24 bg-primary"
             style={{ flex: "0 0 auto", display: "block" }}
           />
           <div
             className="infiniteItem"
             style={{ flex: "0 0 auto", display: "block" }}
           >
-            <p className="text-white text-caption-3 text-uppercase fw-medium">
-              VIP Members Get Extra Discounts –
-              <a href="#" className="link text-white text-decoration-underline">
-                Join Today!
-              </a>
+            <p className="text-primary text-caption-3 fst-italic font-2" style={{ textTransform: "none" }}>
+              The Choice of Elegant Women, Every Day
             </p>
           </div>
           <span
-            className="br-line w-24 bg-white"
+            className="br-line w-24 bg-primary"
             style={{ flex: "0 0 auto", display: "block" }}
           />
           <div
             className="infiniteItem"
             style={{ flex: "0 0 auto", display: "block" }}
           >
-            <p className="text-white text-caption-3 text-uppercase fw-medium">
-              Hassle-Free Returns on All Orders
+            <p className="text-primary text-caption-3 fst-italic font-2" style={{ textTransform: "none" }}>
+              The Choice of Elegant Women, Every Day
             </p>
           </div>
           <span
-            className="br-line w-24 bg-white"
+            className="br-line w-24 bg-primary"
             style={{ flex: "0 0 auto", display: "block" }}
           />
           {/* 2 */}
@@ -50,195 +47,180 @@ export default function Topbar2() {
             className="infiniteItem"
             style={{ flex: "0 0 auto", display: "block" }}
           >
-            <p className="text-white text-caption-3 text-uppercase fw-medium">
-              Free Shipping on All Orders Over $200
+            <p className="text-primary text-caption-3 fst-italic font-2" style={{ textTransform: "none" }}>
+              The Choice of Elegant Women, Every Day
             </p>
           </div>
           <span
-            className="br-line w-24 bg-white"
+            className="br-line w-24 bg-primary"
             style={{ flex: "0 0 auto", display: "block" }}
           />
           <div
             className="infiniteItem"
             style={{ flex: "0 0 auto", display: "block" }}
           >
-            <p className="text-white text-caption-3 text-uppercase fw-medium">
-              VIP Members Get Extra Discounts –
-              <a href="#" className="link text-white text-decoration-underline">
-                Join Today!
-              </a>
+            <p className="text-primary text-caption-3 fst-italic font-2" style={{ textTransform: "none" }}>
+              The Choice of Elegant Women, Every Day
             </p>
           </div>
           <span
-            className="br-line w-24 bg-white"
+            className="br-line w-24 bg-primary"
             style={{ flex: "0 0 auto", display: "block" }}
           />
           <div
             className="infiniteItem"
             style={{ flex: "0 0 auto", display: "block" }}
           >
-            <p className="text-white text-caption-3 text-uppercase fw-medium">
-              Hassle-Free Returns on All Orders
+            <p className="text-primary text-caption-3 fst-italic font-2" style={{ textTransform: "none" }}>
+              The Choice of Elegant Women, Every Day
             </p>
           </div>
           <span
-            className="br-line w-24 bg-white"
+            className="br-line w-24 bg-primary"
             style={{ flex: "0 0 auto", display: "block" }}
           />
           <div
             className="infiniteItem infiniteslide_clone"
             style={{ flex: "0 0 auto", display: "block" }}
           >
-            <p className="text-white text-caption-3 text-uppercase fw-medium">
-              Free Shipping on All Orders Over $200
+            <p className="text-primary text-caption-3 fst-italic font-2" style={{ textTransform: "none" }}>
+              The Choice of Elegant Women, Every Day
             </p>
           </div>
           <span
-            className="br-line w-24 bg-white infiniteslide_clone"
+            className="br-line w-24 bg-primary infiniteslide_clone"
             style={{ flex: "0 0 auto", display: "block" }}
           />
           <div
             className="infiniteItem infiniteslide_clone"
             style={{ flex: "0 0 auto", display: "block" }}
           >
-            <p className="text-white text-caption-3 text-uppercase fw-medium">
-              VIP Members Get Extra Discounts –
-              <a href="#" className="link text-white text-decoration-underline">
-                Join Today!
-              </a>
+            <p className="text-primary text-caption-3 fst-italic font-2" style={{ textTransform: "none" }}>
+              The Choice of Elegant Women, Every Day
             </p>
           </div>
           <span
-            className="br-line w-24 bg-white infiniteslide_clone"
+            className="br-line w-24 bg-primary infiniteslide_clone"
             style={{ flex: "0 0 auto", display: "block" }}
           />
           <div
             className="infiniteItem infiniteslide_clone"
             style={{ flex: "0 0 auto", display: "block" }}
           >
-            <p className="text-white text-caption-3 text-uppercase fw-medium">
-              Hassle-Free Returns on All Orders
+            <p className="text-primary text-caption-3 fst-italic font-2" style={{ textTransform: "none" }}>
+              The Choice of Elegant Women, Every Day
             </p>
           </div>
           <span
-            className="br-line w-24 bg-white infiniteslide_clone"
+            className="br-line w-24 bg-primary infiniteslide_clone"
             style={{ flex: "0 0 auto", display: "block" }}
           />
           <div
             className="infiniteItem infiniteslide_clone"
             style={{ flex: "0 0 auto", display: "block" }}
           >
-            <p className="text-white text-caption-3 text-uppercase fw-medium">
-              Free Shipping on All Orders Over $200
+            <p className="text-primary text-caption-3 fst-italic font-2" style={{ textTransform: "none" }}>
+              The Choice of Elegant Women, Every Day
             </p>
           </div>
           <span
-            className="br-line w-24 bg-white infiniteslide_clone"
+            className="br-line w-24 bg-primary infiniteslide_clone"
             style={{ flex: "0 0 auto", display: "block" }}
           />
           <div
             className="infiniteItem infiniteslide_clone"
             style={{ flex: "0 0 auto", display: "block" }}
           >
-            <p className="text-white text-caption-3 text-uppercase fw-medium">
-              VIP Members Get Extra Discounts –
-              <a href="#" className="link text-white text-decoration-underline">
-                Join Today!
-              </a>
+            <p className="text-primary text-caption-3 fst-italic font-2" style={{ textTransform: "none" }}>
+              The Choice of Elegant Women, Every Day
             </p>
           </div>
           <span
-            className="br-line w-24 bg-white infiniteslide_clone"
+            className="br-line w-24 bg-primary infiniteslide_clone"
             style={{ flex: "0 0 auto", display: "block" }}
           />
           <div
             className="infiniteItem infiniteslide_clone"
             style={{ flex: "0 0 auto", display: "block" }}
           >
-            <p className="text-white text-caption-3 text-uppercase fw-medium">
-              Hassle-Free Returns on All Orders
+            <p className="text-primary text-caption-3 fst-italic font-2" style={{ textTransform: "none" }}>
+              The Choice of Elegant Women, Every Day
             </p>
           </div>
           <span
-            className="br-line w-24 bg-white infiniteslide_clone"
+            className="br-line w-24 bg-primary infiniteslide_clone"
             style={{ flex: "0 0 auto", display: "block" }}
           />
           <div
             className="infiniteItem infiniteslide_clone"
             style={{ flex: "0 0 auto", display: "block" }}
           >
-            <p className="text-white text-caption-3 text-uppercase fw-medium">
-              Free Shipping on All Orders Over $200
+            <p className="text-primary text-caption-3 fst-italic font-2" style={{ textTransform: "none" }}>
+              The Choice of Elegant Women, Every Day
             </p>
           </div>
           <span
-            className="br-line w-24 bg-white infiniteslide_clone"
+            className="br-line w-24 bg-primary infiniteslide_clone"
             style={{ flex: "0 0 auto", display: "block" }}
           />
           <div
             className="infiniteItem infiniteslide_clone"
             style={{ flex: "0 0 auto", display: "block" }}
           >
-            <p className="text-white text-caption-3 text-uppercase fw-medium">
-              VIP Members Get Extra Discounts –
-              <a href="#" className="link text-white text-decoration-underline">
-                Join Today!
-              </a>
+            <p className="text-primary text-caption-3 fst-italic font-2" style={{ textTransform: "none" }}>
+              The Choice of Elegant Women, Every Day
             </p>
           </div>
           <span
-            className="br-line w-24 bg-white infiniteslide_clone"
+            className="br-line w-24 bg-primary infiniteslide_clone"
             style={{ flex: "0 0 auto", display: "block" }}
           />
           <div
             className="infiniteItem infiniteslide_clone"
             style={{ flex: "0 0 auto", display: "block" }}
           >
-            <p className="text-white text-caption-3 text-uppercase fw-medium">
-              Hassle-Free Returns on All Orders
+            <p className="text-primary text-caption-3 fst-italic font-2" style={{ textTransform: "none" }}>
+              The Choice of Elegant Women, Every Day
             </p>
           </div>
           <span
-            className="br-line w-24 bg-white infiniteslide_clone"
+            className="br-line w-24 bg-primary infiniteslide_clone"
             style={{ flex: "0 0 auto", display: "block" }}
           />
           <div
             className="infiniteItem infiniteslide_clone"
             style={{ flex: "0 0 auto", display: "block" }}
           >
-            <p className="text-white text-caption-3 text-uppercase fw-medium">
-              Free Shipping on All Orders Over $200
+            <p className="text-primary text-caption-3 fst-italic font-2" style={{ textTransform: "none" }}>
+              The Choice of Elegant Women, Every Day
             </p>
           </div>
           <span
-            className="br-line w-24 bg-white infiniteslide_clone"
+            className="br-line w-24 bg-primary infiniteslide_clone"
             style={{ flex: "0 0 auto", display: "block" }}
           />
           <div
             className="infiniteItem infiniteslide_clone"
             style={{ flex: "0 0 auto", display: "block" }}
           >
-            <p className="text-white text-caption-3 text-uppercase fw-medium">
-              VIP Members Get Extra Discounts –
-              <a href="#" className="link text-white text-decoration-underline">
-                Join Today!
-              </a>
+            <p className="text-primary text-caption-3 fst-italic font-2" style={{ textTransform: "none" }}>
+              The Choice of Elegant Women, Every Day
             </p>
           </div>
           <span
-            className="br-line w-24 bg-white infiniteslide_clone"
+            className="br-line w-24 bg-primary infiniteslide_clone"
             style={{ flex: "0 0 auto", display: "block" }}
           />
           <div
             className="infiniteItem infiniteslide_clone"
             style={{ flex: "0 0 auto", display: "block" }}
           >
-            <p className="text-white text-caption-3 text-uppercase fw-medium">
-              Hassle-Free Returns on All Orders
+            <p className="text-primary text-caption-3 fst-italic font-2" style={{ textTransform: "none" }}>
+              The Choice of Elegant Women, Every Day
             </p>
           </div>
           <span
-            className="br-line w-24 bg-white infiniteslide_clone"
+            className="br-line w-24 bg-primary infiniteslide_clone"
             style={{ flex: "0 0 auto", display: "block" }}
           />
         </div>

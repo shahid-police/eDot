@@ -143,3 +143,33 @@ picture.jarallax-img img {
     filter: drop-shadow(0 0 6px rgba(212, 175, 102, 0.6));
   }
 }
+
+// A brushed-silver strip with a scattered sparkle texture and a slow diagonal shine pass
+// (reuses logo-shine-sweep) - see components/headers/Topbar2.jsx.
+.topbar-silver-glitter {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle, rgba(255, 255, 255, 0.95) 0, rgba(255, 255, 255, 0) 1.4px) 10% 30%/90px 34px repeat,
+    radial-gradient(circle, rgba(255, 255, 255, 0.85) 0, rgba(255, 255, 255, 0) 1.1px) 55% 60%/110px 34px repeat,
+    radial-gradient(circle, rgba(255, 255, 255, 0.9) 0, rgba(255, 255, 255, 0) 1.3px) 80% 15%/95px 34px repeat,
+    radial-gradient(circle, rgba(255, 255, 255, 0.75) 0, rgba(255, 255, 255, 0) 1px) 30% 80%/120px 34px repeat,
+    linear-gradient(120deg, #d6d8dc 0%, #f6f7f9 20%, #c4c7cc 42%, #eef0f2 65%, #d0d2d7 85%, #f2f3f5 100%);
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      100deg,
+      rgba(255, 255, 255, 0) 35%,
+      rgba(255, 255, 255, 0.8) 50%,
+      rgba(255, 255, 255, 0) 65%
+    );
+    background-size: 220% 100%;
+    background-position: -160% 0;
+    mix-blend-mode: overlay;
+    animation: logo-shine-sweep 4.5s ease-in-out infinite;
+    pointer-events: none;
+  }
+}
