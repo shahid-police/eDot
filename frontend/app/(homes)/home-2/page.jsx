@@ -15,7 +15,7 @@ import React from "react";
 import { getProducts, toTemplateCardProduct } from "@/lib/api/products";
 
 export const metadata = {
-  title: "Home 02 || E.",
+  title: "Elegence.pk || E.",
   description: "The Choice of Elegant Women, Every Day",
 };
 
@@ -50,14 +50,14 @@ export default async function page() {
       <Topbar2 />
       <Header2 />
       <Hero />
-      <Categories />
+      <Products2 products={trendyCollection} />
+      
       <Products1 products={bestSellers} />
       <Collections />
-      <Products2 products={trendyCollection} />
+      <Categories />
       <Banner />
       <Features />
-      <Testimonials />
-      <Blogs />
+      
       <Cta />
       <Footer2 />
     </>
