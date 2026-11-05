@@ -20,6 +20,8 @@ using Elegance.Infrastructure.Customers;
 using Elegance.Infrastructure.Wishlists;
 using Elegance.Application.Wishlists;
 using Elegance.Infrastructure.Persistence;
+using Elegance.Infrastructure.Search;
+using Elegance.Application.Search;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -46,6 +48,15 @@ public static class DependencyInjection
 
         services.AddScoped<IProductService, ProductService>();
         services.AddScoped<ICategoryService, CategoryService>();
+
+        services.AddOptions<AiSearchOptions>()
+            .Bind(configuration.GetSection(AiSearchOptions.SectionName));
+        services.AddHttpClient<ISearchIntentService, AnthropicSearchIntentService>((sp, client) =>
+        {
+            var aiOptions = sp.GetRequiredService<IOptions<AiSearchOptions>>().Value;
+            client.BaseAddress = new Uri(aiOptions.BaseUrl);
+            client.Timeout = TimeSpan.FromSeconds(aiOptions.TimeoutSeconds + 5);
+        });
 
         services.AddOptions<JwtOptions>()
             .Bind(configuration.GetSection(JwtOptions.SectionName))

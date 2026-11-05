@@ -13,6 +13,7 @@ import Products2 from "@/components/homes/home-2/Products2";
 import Testimonials from "@/components/homes/home-2/Testimonials";
 import React from "react";
 import { getProducts, toTemplateCardProduct } from "@/lib/api/products";
+import { loadTopLevelCategories } from "@/lib/api/categories";
 
 export const metadata = {
   title: "Elegence.pk || E.",
@@ -40,9 +41,10 @@ async function loadTrendyCollection() {
 }
 
 export default async function page() {
-  const [bestSellers, trendyCollection] = await Promise.all([
+  const [bestSellers, trendyCollection, topLevelCategories] = await Promise.all([
     loadBestSellers(),
     loadTrendyCollection(),
+    loadTopLevelCategories(),
   ]);
 
   return (
@@ -51,10 +53,10 @@ export default async function page() {
       <Header2 />
       <Hero />
       <Products2 products={trendyCollection} />
-      
+
       <Products1 products={bestSellers} />
       <Collections />
-      <Categories />
+      <Categories categories={topLevelCategories} />
       <Banner />
       <Features />
       

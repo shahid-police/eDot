@@ -20,9 +20,9 @@ export default function Header2() {
             <div className="col-xl-3 d-none d-xl-flex align-items-center">
               <Link
                 href={`/`}
-                className="font-2 fst-italic"
+                className="header-e-mark font-2 fst-italic"
                 style={{
-                  fontSize: "24px",
+                  fontSize: "32px",
                   letterSpacing: "0.04em",
                   color: "#7a6530",
                   whiteSpace: "nowrap",

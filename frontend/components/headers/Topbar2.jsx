@@ -9,14 +9,15 @@ export default function Topbar2() {
           style={{
             textTransform: "none",
             color: "#b8860b",
-            fontSize: "15px",
+            fontSize: "18px",
             fontStyle: "normal",
-            fontWeight: 600,
-            letterSpacing: "0.02em",
-            fontFamily: "'Playfair Display', serif",
+            fontWeight: 700,
+            letterSpacing: "0.04em",
+            fontFamily: "'Cinzel Decorative', 'Playfair Display', serif",
+            textShadow: "0 1px 1px rgba(0,0,0,0.12)",
           }}
         >
-          The Choice of Elegant Women. A Touch of Luxury, Every Day
+          Discover Yourself, Unveil the Empress Within!
         </p>
       </div>
     </div>

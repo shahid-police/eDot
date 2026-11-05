@@ -2,7 +2,7 @@
 /* main.scss */
 
 /* Import font styles */
-@import url("https://fonts.googleapis.com/css2?family=Allura&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Allura&family=Cinzel+Decorative:wght@400;700;900&display=swap");
 @import "/fonts/fonts.css";
 @import "/icon/icomoon/style.css";
 
@@ -145,6 +145,75 @@ picture.jarallax-img img {
   }
 }
 
+@keyframes logo-shine-zoom {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+// The small italic "E." text mark on the left of the header (see Header2.jsx) - pulses in/out
+// smoothly while shining, independent of the centered image logo's own shine effect.
+.header-e-mark {
+  position: relative;
+  display: inline-block;
+  transform-origin: center;
+  animation:
+    logo-shine-glow 3.6s ease-in-out infinite,
+    logo-shine-zoom 3.6s ease-in-out infinite;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      100deg,
+      rgba(255, 255, 255, 0) 35%,
+      rgba(255, 255, 255, 0.95) 50%,
+      rgba(255, 255, 255, 0) 65%
+    );
+    background-size: 220% 100%;
+    background-position: -160% 0;
+    mix-blend-mode: overlay;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: logo-shine-sweep 3.6s ease-in-out infinite;
+    pointer-events: none;
+  }
+}
+
+// Same light-sweep + glow as .logo-shine, but for live text (e.g. the "E." hero mark) -
+// no PNG mask, since there's no artwork silhouette to clip to.
+.text-shine {
+  position: relative;
+  display: inline-block;
+  animation: logo-shine-glow 3.6s ease-in-out infinite;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      100deg,
+      rgba(255, 255, 255, 0) 35%,
+      rgba(255, 255, 255, 0.95) 50%,
+      rgba(255, 255, 255, 0) 65%
+    );
+    background-size: 220% 100%;
+    background-position: -160% 0;
+    mix-blend-mode: overlay;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: logo-shine-sweep 3.6s ease-in-out infinite;
+    pointer-events: none;
+  }
+}
+
 // A brushed-silver strip with a scattered sparkle texture and a slow diagonal shine pass
 // (reuses logo-shine-sweep) - see components/headers/Topbar2.jsx.
 .topbar-silver-glitter {
@@ -157,4 +226,124 @@ picture.jarallax-img img {
     radial-gradient(circle, rgba(255, 255, 255, 0.9) 0, rgba(255, 255, 255, 0) 1.3px) 80% 15%/95px 34px repeat,
     radial-gradient(circle, rgba(255, 255, 255, 0.75) 0, rgba(255, 255, 255, 0) 1px) 30% 80%/120px 34px repeat;
 
+}
+
+// Natural-language product search box on the shop page (see components/shop/NaturalSearchBox.jsx).
+.ai-search-box {
+  margin-bottom: 32px;
+  padding: 20px 24px;
+  background: #faf7f2;
+  border: 1px solid #e8dfd0;
+  border-radius: 12px;
+
+  .ai-search-form {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+
+    input[type="text"] {
+      flex: 1 1 320px;
+      padding: 12px 16px;
+      border: 1px solid #d8c9ae;
+      border-radius: 8px;
+      font-size: 15px;
+      color: #3c2414;
+      background: #fff;
+
+      &:focus {
+        outline: none;
+        border-color: #b8860b;
+      }
+    }
+
+    button[type="submit"] {
+      padding: 12px 24px;
+      background: #3c2414;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s ease;
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      &:hover:not(:disabled) {
+        background: #b8860b;
+      }
+    }
+
+    .ai-search-clear {
+      padding: 12px 18px;
+      background: transparent;
+      color: #3c2414;
+      border: 1px solid #d8c9ae;
+      border-radius: 8px;
+      cursor: pointer;
+
+      &:hover {
+        border-color: #3c2414;
+      }
+    }
+  }
+
+  .ai-search-examples {
+    margin-top: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #8a7a68;
+
+    button {
+      padding: 6px 12px;
+      background: #fff;
+      border: 1px solid #e8dfd0;
+      border-radius: 999px;
+      color: #3c2414;
+      cursor: pointer;
+      font-size: 13px;
+      transition: border-color 0.2s ease, color 0.2s ease;
+
+      &:hover {
+        border-color: #b8860b;
+        color: #b8860b;
+      }
+    }
+  }
+
+  .ai-search-error {
+    margin-top: 12px;
+    color: #a13d3d;
+    font-size: 14px;
+  }
+
+  .ai-search-applied {
+    margin-top: 14px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #3c2414;
+
+    .ai-search-chip {
+      padding: 5px 12px;
+      background: #3c2414;
+      color: #fff;
+      border-radius: 999px;
+      text-transform: capitalize;
+    }
+
+    .ai-search-count {
+      margin-left: auto;
+      color: #8a7a68;
+      font-style: italic;
+    }
+  }
 }

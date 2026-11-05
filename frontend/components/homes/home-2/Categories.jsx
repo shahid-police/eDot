@@ -1,11 +1,12 @@
 "use client";
-import { categories } from "@/data/categories";
+import { categories as templateCategories } from "@/data/categories";
 import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import Link from "next/link";
 import Image from "next/image";
 import { Pagination } from "swiper/modules";
-export default function Categories() {
+export default function Categories({ categories }) {
+  const items = categories ?? templateCategories;
   return (
     <section className="flat-spacing-3">
       <div className="container">
@@ -44,10 +45,10 @@ export default function Categories() {
             el: ".spd4",
           }}
         >
-          {categories.map((item, index) => (
+          {items.map((item, index) => (
             <SwiperSlide className="swiper-slide" key={index}>
               <Link
-                href={`/shop-default`}
+                href={item.slug ? `/shop-default?category=${item.slug}` : `/shop-default`}
                 className="box_collection--V01 style_2 hover-img"
               >
                 <div className="image img-style">
