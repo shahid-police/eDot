@@ -214,6 +214,37 @@ picture.jarallax-img img {
   }
 }
 
+// The large "E." mark at the bottom of the footer (see components/footers/Footer2.jsx) - solid
+// gold text with a glow pulse plus a shine sweep clipped to the glyph itself. The sweep layer
+// duplicates the "E." as its own content (rather than an empty ::after) because background-clip:
+// text has nothing to clip to on an empty pseudo-element - it would otherwise never render.
+.footer-e-mark {
+  position: relative;
+  display: inline-block;
+  color: #d4af66;
+  animation: logo-shine-glow 3.6s ease-in-out infinite;
+
+  &::after {
+    content: "E.";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      100deg,
+      rgba(255, 255, 255, 0) 35%,
+      rgba(255, 248, 220, 0.95) 50%,
+      rgba(255, 255, 255, 0) 65%
+    );
+    background-size: 220% 100%;
+    background-position: -160% 0;
+    mix-blend-mode: overlay;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: logo-shine-sweep 3.6s ease-in-out infinite;
+    pointer-events: none;
+  }
+}
+
 // A brushed-silver strip with a scattered sparkle texture and a slow diagonal shine pass
 // (reuses logo-shine-sweep) - see components/headers/Topbar2.jsx.
 .topbar-silver-glitter {
@@ -346,4 +377,105 @@ picture.jarallax-img img {
       font-style: italic;
     }
   }
+}
+
+// No Shop - entertainment/engagement page (see app/(otherPages)/no-shop and
+// components/no-shop/*). Reuses the theme's .article-blog card markup, with its own play-button
+// overlay and a lightweight custom modal (not Bootstrap's modal JS, so the page doesn't need
+// another always-mounted global modal registered in the root layout).
+.no-shop-play-icon {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(60, 36, 20, 0.75);
+  pointer-events: none;
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 54%;
+    transform: translate(-50%, -50%);
+    border-style: solid;
+    border-width: 10px 0 10px 16px;
+    border-color: transparent transparent transparent #fff;
+  }
+
+  &.no-shop-play-icon-lg {
+    width: 76px;
+    height: 76px;
+
+    &::after {
+      border-width: 14px 0 14px 22px;
+    }
+  }
+}
+
+.no-shop-video-card,
+.no-shop-featured {
+  cursor: pointer;
+
+  .entry_image {
+    position: relative;
+  }
+}
+
+.no-shop-category-filter {
+  .no-shop-filter-pill {
+    padding: 8px 16px;
+    background: #fff;
+    border: 1px solid #e8dfd0;
+    border-radius: 999px;
+    color: #3c2414;
+    font-size: 13px;
+    cursor: pointer;
+    transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+
+    &:hover {
+      border-color: #b8860b;
+      color: #b8860b;
+    }
+
+    &.active {
+      background: #3c2414;
+      border-color: #3c2414;
+      color: #fff;
+    }
+  }
+}
+
+// The [slug] detail page's own player, click-to-reveal just like the grid/modal so the YouTube
+// iframe never loads until the visitor actually asks to play it.
+.no-shop-detail-player-thumb {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.no-shop-related-item {
+  color: inherit;
+
+  &:hover {
+    color: #b8860b;
+  }
+}
+
+// The modal is rendered conditionally (not Bootstrap-JS-controlled), so .show/.d-block are set
+// directly in the component rather than toggled by data-bs-toggle.
+.modal.modalCentered.show {
+  background: transparent;
 }

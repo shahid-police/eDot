@@ -110,14 +110,14 @@ export default function Footer3() {
                     JOIN THE <span className="text-primary">#E.</span> TRIBE
                   </h6>
                   <p className="notice font-2">
-                    <span className="fst-italic">Shiny Things</span> Await - 10%
+                    <span className="fst-italic">A LITTLE EXTRA SPARKLE</span> - 10%
                     Off Inside!
                   </p>
                 </div>
                 <div className="box-email">
                   <p className="text-body text-main-3">
-                    Get early access to new products, exclusive deals &amp;
-                    more.
+                   Be the first to discover new arrivals, enjoy exclusive offers, and receive 10% OFF your first purchase.
+                  <strong>Sign Up. Shine Brighter..</strong>
                   </p>
                   <div
                     className={`tfSubscribeMsg  footer-sub-element ${

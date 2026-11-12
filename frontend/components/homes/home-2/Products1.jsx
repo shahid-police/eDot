@@ -21,10 +21,12 @@ export default function Products1({ products }) {
             SHOP OUR BEST <span className="fst-italic">SELLERS</span>
           </h2>
           <p className="s-sub-title text-white">
-            Discover the pieces our customers adore – from timeless everyday
-            jewelry to bold statement designs that shine. These are the
+            <strong>Loved by Many. Chosen for You.</strong>
             <br className="d-none d-xl-block" />
-            tried-and-true favorites you’ll want in your collection."
+            Explore the jewellery everyone adores, from effortlessly elegant
+            everyday essentials to statement pieces that steal the spotlight.
+            Discover our most-loved designs and find the treasures that make
+            every moment unforgettable.
           </p>
         </div>
         <div className="tf-btn-swiper-item wow fadeInUp">

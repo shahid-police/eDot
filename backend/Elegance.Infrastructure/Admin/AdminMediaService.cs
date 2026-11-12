@@ -188,6 +188,70 @@ public class AdminMediaService(EleganceDbContext dbContext, IFileStorage fileSto
         await auditLog.RecordAsync(actor, "product.variant.image.remove", "ProductVariant", variantId.ToString(), $"Removed photo for {variant.Sku}", cancellationToken);
     }
 
+    public async Task<string> UploadNoShopVideoThumbnailAsync(
+        AdminActor actor, long videoId, Stream content, string contentType, long contentLength, CancellationToken cancellationToken = default)
+    {
+        var video = await dbContext.NoShopVideos
+            .Include(v => v.CustomThumbnailMediaFile)
+            .FirstOrDefaultAsync(v => v.Id == videoId, cancellationToken)
+            ?? throw NotFound();
+
+        var processed = await ReadAndProcessAsync(content, contentType, contentLength, cancellationToken);
+
+        var previousMediaFile = video.CustomThumbnailMediaFile;
+
+        var now = DateTime.UtcNow;
+        var key = $"noshop/videos/{videoId}/{Guid.NewGuid():N}.{processed.Extension}";
+        var stored = await fileStorage.PutAsync(new MemoryStream(processed.Bytes), key, contentType, cancellationToken);
+
+        var mediaFile = new MediaFile
+        {
+            StorageKey = stored.StorageKey,
+            Url = stored.Url,
+            MimeType = contentType,
+            Width = processed.Width,
+            Height = processed.Height,
+            FileSizeBytes = processed.Bytes.Length,
+            CreatedAt = now,
+        };
+        dbContext.MediaFiles.Add(mediaFile);
+        video.CustomThumbnailMediaFile = mediaFile;
+        video.UpdatedAt = now;
+        video.UpdatedByAdminUserId = actor.Id;
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        if (previousMediaFile is not null)
+        {
+            await DeleteMediaFileAsync(previousMediaFile, cancellationToken);
+        }
+
+        await auditLog.RecordAsync(actor, "noshop.video.thumbnail.add", "NoShopVideo", videoId.ToString(), $"Set custom thumbnail for {video.Title}", cancellationToken);
+        return mediaFile.Url;
+    }
+
+    public async Task RemoveNoShopVideoThumbnailAsync(AdminActor actor, long videoId, CancellationToken cancellationToken = default)
+    {
+        var video = await dbContext.NoShopVideos
+            .Include(v => v.CustomThumbnailMediaFile)
+            .FirstOrDefaultAsync(v => v.Id == videoId, cancellationToken)
+            ?? throw NotFound();
+
+        var mediaFile = video.CustomThumbnailMediaFile;
+        if (mediaFile is null)
+        {
+            return;
+        }
+
+        video.CustomThumbnailMediaFile = null;
+        video.CustomThumbnailMediaFileId = null;
+        video.UpdatedAt = DateTime.UtcNow;
+        video.UpdatedByAdminUserId = actor.Id;
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        await DeleteMediaFileAsync(mediaFile, cancellationToken);
+        await auditLog.RecordAsync(actor, "noshop.video.thumbnail.remove", "NoShopVideo", videoId.ToString(), $"Removed custom thumbnail for {video.Title}", cancellationToken);
+    }
+
     private async Task<int> MaxSortOrderAsync(long productId, ProductImageType type, CancellationToken cancellationToken)
     {
         var orders = await dbContext.ProductImages

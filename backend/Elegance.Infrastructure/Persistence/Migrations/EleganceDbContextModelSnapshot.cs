@@ -601,6 +601,152 @@ namespace Elegance.Infrastructure.Persistence.Migrations
                     b.ToTable("compare_lists", (string)null);
                 });
 
+            modelBuilder.Entity("Elegance.Domain.Content.NoShopCategory", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<long?>("ImageMediaFileId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasMaxLength(220)
+                        .HasColumnType("varchar(220)");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ImageMediaFileId");
+
+                    b.HasIndex("IsActive");
+
+                    b.HasIndex("Slug")
+                        .IsUnique();
+
+                    b.ToTable("no_shop_categories", (string)null);
+                });
+
+            modelBuilder.Entity("Elegance.Domain.Content.NoShopVideo", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("CategoryId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<long?>("CreatedByAdminUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("CustomThumbnailMediaFileId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)");
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsFeatured")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<DateTime?>("PublishedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("SeoDescription")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<string>("SeoTitle")
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasMaxLength(320)
+                        .HasColumnType("varchar(320)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("varchar(300)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<long?>("UpdatedByAdminUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("VideoType")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<string>("YouTubeUrl")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<string>("YouTubeVideoId")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("CustomThumbnailMediaFileId");
+
+                    b.HasIndex("DisplayOrder");
+
+                    b.HasIndex("IsFeatured");
+
+                    b.HasIndex("PublishedAt");
+
+                    b.HasIndex("Slug")
+                        .IsUnique();
+
+                    b.HasIndex("Status");
+
+                    b.ToTable("no_shop_videos", (string)null);
+                });
+
             modelBuilder.Entity("Elegance.Domain.Customers.Customer", b =>
                 {
                     b.Property<long>("Id")
@@ -1354,6 +1500,34 @@ namespace Elegance.Infrastructure.Persistence.Migrations
                     b.Navigation("Customer");
                 });
 
+            modelBuilder.Entity("Elegance.Domain.Content.NoShopCategory", b =>
+                {
+                    b.HasOne("Elegance.Domain.Media.MediaFile", "ImageMediaFile")
+                        .WithMany()
+                        .HasForeignKey("ImageMediaFileId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("ImageMediaFile");
+                });
+
+            modelBuilder.Entity("Elegance.Domain.Content.NoShopVideo", b =>
+                {
+                    b.HasOne("Elegance.Domain.Content.NoShopCategory", "Category")
+                        .WithMany("Videos")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Elegance.Domain.Media.MediaFile", "CustomThumbnailMediaFile")
+                        .WithMany()
+                        .HasForeignKey("CustomThumbnailMediaFileId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Category");
+
+                    b.Navigation("CustomThumbnailMediaFile");
+                });
+
             modelBuilder.Entity("Elegance.Domain.Customers.CustomerAddress", b =>
                 {
                     b.HasOne("Elegance.Domain.Customers.Customer", "Customer")
@@ -1517,6 +1691,11 @@ namespace Elegance.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("Elegance.Domain.Compare.CompareList", b =>
                 {
                     b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("Elegance.Domain.Content.NoShopCategory", b =>
+                {
+                    b.Navigation("Videos");
                 });
 
             modelBuilder.Entity("Elegance.Domain.Customers.Customer", b =>

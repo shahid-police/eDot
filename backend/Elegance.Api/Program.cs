@@ -121,6 +121,7 @@ if (app.Environment.IsDevelopment())
     await DevelopmentSeeder.SeedAsync(dbContext);
     await DevelopmentAdminSeeder.SeedAsync(dbContext, app.Configuration["Seed:AdminEmail"], app.Configuration["Seed:AdminPassword"]);
     await CatalogDemoSeeder.SeedAsync(dbContext, app.Configuration.GetValue("Seed:LoadDemoCatalog", false));
+    await NoShopCategorySeeder.SeedAsync(dbContext);
 }
 
 app.UseExceptionHandler();

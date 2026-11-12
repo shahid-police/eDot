@@ -15,10 +15,12 @@ export default function Categories({ categories }) {
             <span className="fst-italic">Our</span> Categories
           </h2>
           <p className="s-sub-title">
-            Explore our collection of sophisticated, modern designs that make a
-            statement without saying a word.
+            <strong>A World of Elegance, Just for You.</strong>
             <br className="d-none d-xl-block" />
-            Find your signature look today.
+            From delicate everyday essentials to exquisite statement pieces,
+            discover jewellery designed to complement your style, celebrate
+            your individuality, and make every moment special. Find the
+            pieces that speak your style.
           </p>
         </div>
         <Swiper

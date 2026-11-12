@@ -19,10 +19,12 @@ export default function Products2({ products }) {
             <span className="fst-italic">Trendy</span> COLLECTION
           </h2>
           <p className="s-sub-title">
-            Discover the pieces our customers love most – from everyday
-            essentials to statement styles that stand out. These are the
+            <strong>Your Style. Your Statement. Your Elegance.</strong>
             <br className="d-none d-xl-block" />
-            tried-and-true picks you’ll want in your wardrobe."
+            Discover the styles everyone’s falling in love with. From
+            everyday elegance to show-stopping statement pieces, explore our
+            trendsetting collection and find the perfect pieces to make
+            every moment shine.
           </p>
         </div>
         <div className="tf-btn-swiper-item wow fadeInUp">

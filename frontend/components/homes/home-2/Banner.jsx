@@ -7,14 +7,20 @@ export default function Banner() {
     <div className="banner_countdown">
       <div className="bn_content">
         <div className="heading wow fadeInUp">
-          <h6 className="text-top">DON’T MISS OUT!</h6>
+          <h6 className="text-top">A LITTLE LUXURY, A LOT TO LOVE!</h6>
           <h2 className="title font-2">
-            <span className="fst-italic">Limited</span> Time Deal
+            <span className="fst-italic">EXCLUSIVE</span> LIMITED-TIME OFFERS
           </h2>
           <p className="sub-title">
-            Score exclusive discounts on our top styles! Hurry – these offers
+            {/* Score exclusive discounts on our top styles! Hurry – these offers
             won’t last long. <br className="d-none d-xxl-block" />
             Shop now and elevate your wardrobe at unbeatable prices.
+          */}
+        
+
+              Treat yourself to something beautiful! Enjoy special savings on our most-loved jewellery designs. Don't wait too long – your favourite pieces are just a click away, and these irresistible offers won't last forever.
+<strong>Sign Up. Shine Brighter..</strong>
+
           </p>
         </div>
         <div className="countdown-V04 wow fadeInUp">

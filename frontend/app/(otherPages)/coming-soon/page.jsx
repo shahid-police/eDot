@@ -1,4 +1,4 @@
-import Header1 from "@/components/headers/Header1";
+import Header2 from "@/components/headers/Header2";
 import Topbar1 from "@/components/headers/Topbar1";
 import React from "react";
 import Link from "next/link";
@@ -13,7 +13,7 @@ export default function page() {
   return (
     <>
       <Topbar1 />
-      <Header1 parentClass="tf-header" />
+      <Header2 parentClass="tf-header style-2" />
       <div className="wg-coming">
         <div className="image">
           <Image

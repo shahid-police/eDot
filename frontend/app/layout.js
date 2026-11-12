@@ -1,4 +1,5 @@
 import LayoutWrapper from "@/components/common/LayoutWrapper";
+import { SITE_URL } from "@/lib/siteUrl";
 
 import "../public/scss/main.scss";
 import "photoswipe/dist/photoswipe.css";
@@ -21,6 +22,13 @@ import Engrave from "@/components/modals/Engrave";
 import Pickup from "@/components/modals/Pickup";
 import ProductDes from "@/components/modals/ProductDes";
 import UnavailableModal from "@/components/modals/UnavailableModal";
+
+// Lets every page's `metadata`/`generateMetadata` use relative image/URL values (e.g. a video
+// thumbnail path) and have Next.js resolve them to absolute URLs for Open Graph/Twitter tags and
+// canonical links, instead of each page needing to build an absolute URL itself.
+export const metadata = {
+  metadataBase: new URL(SITE_URL),
+};
 
 export default function RootLayout({ children }) {
   return (

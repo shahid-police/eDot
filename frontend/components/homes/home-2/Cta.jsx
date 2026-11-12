@@ -16,12 +16,13 @@ export default function Cta() {
       <div className="bn-content bg-light-peach">
         <h6 className="caption wow fadeInUp">JOIN THE #E. TRIBE</h6>
         <h2 className="title font-2 fw-normal wow fadeInUp">
-          <span className="fst-italic">Shiny Things</span> Await -
+          <span className="fst-italic">A LITTLE EXTRA SPARKLE </span> 
           <br className="d-none d-lg-block" />
           10% Off Inside!
-        </h2>
+        </h2> 
         <p className="sub-title text-main-3 wow fadeInUp">
-          Get early access to new products, exclusive deals &amp; more.
+Be the first to discover new arrivals, enjoy exclusive offers, and receive 10% OFF your first purchase.
+<strong>Sign Up. Shine Brighter...</strong>
         </p>
         <form
           className="form-email wow fadeInUp"

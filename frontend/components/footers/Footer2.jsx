@@ -2,7 +2,6 @@
 import React, { useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import CurrencySelect from "../common/CurrencySelect";
 export default function Footer2() {
   useEffect(() => {
     const headings = document.querySelectorAll(".footer-heading-mobile");
@@ -252,125 +251,11 @@ export default function Footer2() {
           </div>
         </div>
       </div>
-      <div className="footer-bottom">
-        <div className="container">
-          <div className="footer-bottom-wrap">
-            <p className="text-nocopy text-white">
-              All Rights Reserved 2025 E.
-            </p>
-            <div className="tf-currencies">
-              <CurrencySelect light />
-            </div>
-            <ul className="paymend-method-list">
-              <li>
-                <a href="#">
-                  <Image
-                    alt="Paymend Method"
-                    src="/images/payment/am-ex.svg"
-                    width={40}
-                    height={25}
-                  />
-                </a>
-              </li>
-              <li>
-                <a href="#">
-                  <Image
-                    alt="Paymend Method"
-                    src="/images/payment/apple-pay.svg"
-                    width={40}
-                    height={25}
-                  />
-                </a>
-              </li>
-              <li>
-                <a href="#">
-                  <Image
-                    alt="Paymend Method"
-                    src="/images/payment/dinner.svg"
-                    width={40}
-                    height={25}
-                  />
-                </a>
-              </li>
-              <li>
-                <a href="#">
-                  <Image
-                    alt="Paymend Method"
-                    src="/images/payment/discover.svg"
-                    width={40}
-                    height={25}
-                  />
-                </a>
-              </li>
-              <li>
-                <a href="#">
-                  <Image
-                    alt="Paymend Method"
-                    src="/images/payment/gg-pay.svg"
-                    width={38}
-                    height={24}
-                  />
-                </a>
-              </li>
-              <li>
-                <a href="#">
-                  <Image
-                    alt="Paymend Method"
-                    src="/images/payment/master-2.svg"
-                    width={40}
-                    height={25}
-                  />
-                </a>
-              </li>
-              <li>
-                <a href="#">
-                  <Image
-                    alt="Paymend Method"
-                    src="/images/payment/master.svg"
-                    width={40}
-                    height={25}
-                  />
-                </a>
-              </li>
-              <li>
-                <a href="#">
-                  <Image
-                    alt="Paymend Method"
-                    src="/images/payment/shop-pay.svg"
-                    width={40}
-                    height={25}
-                  />
-                </a>
-              </li>
-              <li>
-                <a href="#">
-                  <Image
-                    alt="Paymend Method"
-                    src="/images/payment/unicon-pay.svg"
-                    width={40}
-                    height={25}
-                  />
-                </a>
-              </li>
-              <li>
-                <a href="#">
-                  <Image
-                    alt="Paymend Method"
-                    src="/images/payment/visa.svg"
-                    width={40}
-                    height={25}
-                  />
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
       <div className="logo-bottom wow fadeInUp" data-wow-delay="0.1s">
         <div className="container">
           <div className="d-flex justify-content-center">
             <span
-              className="font-2 fst-italic text-white"
+              className="footer-e-mark font-2 fst-italic"
               style={{ fontSize: "clamp(60px, 11vw, 160px)", lineHeight: 1 }}
             >
               E.

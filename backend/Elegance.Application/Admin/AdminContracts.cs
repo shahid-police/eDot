@@ -349,6 +349,13 @@ public interface IAdminMediaService
         AdminActor actor, long productId, long variantId, Stream content, string contentType, long contentLength, CancellationToken cancellationToken = default);
 
     Task RemoveVariantImageAsync(AdminActor actor, long productId, long variantId, CancellationToken cancellationToken = default);
+
+    // Custom thumbnail override for a No Shop video - optional, falls back to YouTube's own
+    // thumbnail when never set (or after RemoveNoShopVideoThumbnailAsync is called).
+    Task<string> UploadNoShopVideoThumbnailAsync(
+        AdminActor actor, long videoId, Stream content, string contentType, long contentLength, CancellationToken cancellationToken = default);
+
+    Task RemoveNoShopVideoThumbnailAsync(AdminActor actor, long videoId, CancellationToken cancellationToken = default);
 }
 
 public class AdminOrderQuery
@@ -508,4 +515,135 @@ public interface IAuditLogService
 {
     Task RecordAsync(AdminActor actor, string action, string entityType, string? entityId, string summary, CancellationToken cancellationToken = default);
     Task<PagedResult<AuditLogDto>> ListAsync(int page, int pageSize, CancellationToken cancellationToken = default);
+}
+
+public class AdminNoShopVideoQuery
+{
+    public string? Search { get; init; }
+    public string? Status { get; init; }
+    public long? CategoryId { get; init; }
+    public string? VideoType { get; init; }
+    public int Page { get; init; } = 1;
+    public int PageSize { get; init; } = 25;
+}
+
+public class AdminNoShopVideoSummaryDto
+{
+    public required long Id { get; init; }
+    public required string Title { get; init; }
+    public required string Slug { get; init; }
+    public required string ThumbnailUrl { get; init; }
+    public required string CategoryName { get; init; }
+    public required string VideoType { get; init; }
+    public required bool IsFeatured { get; init; }
+    public required string Status { get; init; }
+    public required int DisplayOrder { get; init; }
+    public required DateTime CreatedAt { get; init; }
+}
+
+public class AdminNoShopVideoDto
+{
+    public required long Id { get; init; }
+    public required string Title { get; init; }
+    public required string Slug { get; init; }
+    public string? Description { get; init; }
+    public required string YouTubeUrl { get; init; }
+    public required string YouTubeVideoId { get; init; }
+    public required string ThumbnailUrl { get; init; }
+    public required long CategoryId { get; init; }
+    public required string CategoryName { get; init; }
+    public required string VideoType { get; init; }
+    public required bool IsFeatured { get; init; }
+    public required int DisplayOrder { get; init; }
+    public required string Status { get; init; }
+    public DateTime? PublishedAt { get; init; }
+    public string? SeoTitle { get; init; }
+    public string? SeoDescription { get; init; }
+    public required DateTime CreatedAt { get; init; }
+    public required DateTime UpdatedAt { get; init; }
+}
+
+public class AdminNoShopVideoRequest
+{
+    [Required, StringLength(300)]
+    public string Title { get; init; } = string.Empty;
+
+    [Required, StringLength(320)]
+    public string Slug { get; init; } = string.Empty;
+
+    [StringLength(1000)]
+    public string? Description { get; init; }
+
+    // Accepts a full YouTube URL (watch/shorts/youtu.be/embed) or a bare 11-character video ID -
+    // see Elegance.Infrastructure.Content.YouTubeUrlParser for what is extracted from it.
+    [Required, StringLength(500)]
+    public string YouTubeUrl { get; init; } = string.Empty;
+
+    [Range(1, long.MaxValue)]
+    public long CategoryId { get; init; }
+
+    [Required, StringLength(20)]
+    public string VideoType { get; init; } = "Entertainment";
+
+    public bool IsFeatured { get; init; }
+    public int DisplayOrder { get; init; }
+
+    [Required, StringLength(20)]
+    public string Status { get; init; } = "Draft";
+
+    // Leave blank while publishing to publish immediately; set a future date/time to schedule.
+    public DateTime? PublishedAt { get; init; }
+
+    [StringLength(200)]
+    public string? SeoTitle { get; init; }
+
+    [StringLength(500)]
+    public string? SeoDescription { get; init; }
+}
+
+public class AdminNoShopVideoStatusRequest
+{
+    [Required, StringLength(20)]
+    public string Status { get; init; } = string.Empty;
+}
+
+public class AdminNoShopCategoryDto
+{
+    public required long Id { get; init; }
+    public required string Name { get; init; }
+    public required string Slug { get; init; }
+    public string? Description { get; init; }
+    public string? ImageUrl { get; init; }
+    public required int SortOrder { get; init; }
+    public required bool IsActive { get; init; }
+    public required int VideoCount { get; init; }
+}
+
+public class AdminNoShopCategoryRequest
+{
+    [Required, StringLength(200)]
+    public string Name { get; init; } = string.Empty;
+
+    [Required, StringLength(220)]
+    public string Slug { get; init; } = string.Empty;
+
+    [StringLength(500)]
+    public string? Description { get; init; }
+
+    public int SortOrder { get; init; }
+    public bool IsActive { get; init; } = true;
+}
+
+public interface IAdminNoShopService
+{
+    Task<PagedResult<AdminNoShopVideoSummaryDto>> ListVideosAsync(AdminNoShopVideoQuery query, CancellationToken cancellationToken = default);
+    Task<AdminNoShopVideoDto> GetVideoAsync(long videoId, CancellationToken cancellationToken = default);
+    Task<AdminNoShopVideoDto> CreateVideoAsync(AdminActor actor, AdminNoShopVideoRequest request, CancellationToken cancellationToken = default);
+    Task<AdminNoShopVideoDto> UpdateVideoAsync(AdminActor actor, long videoId, AdminNoShopVideoRequest request, CancellationToken cancellationToken = default);
+    Task<AdminNoShopVideoDto> SetVideoStatusAsync(AdminActor actor, long videoId, string status, CancellationToken cancellationToken = default);
+    Task DeleteVideoAsync(AdminActor actor, long videoId, CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<AdminNoShopCategoryDto>> ListCategoriesAsync(CancellationToken cancellationToken = default);
+    Task<AdminNoShopCategoryDto> CreateCategoryAsync(AdminActor actor, AdminNoShopCategoryRequest request, CancellationToken cancellationToken = default);
+    Task<AdminNoShopCategoryDto> UpdateCategoryAsync(AdminActor actor, long categoryId, AdminNoShopCategoryRequest request, CancellationToken cancellationToken = default);
 }

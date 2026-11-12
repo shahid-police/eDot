@@ -7,6 +7,7 @@ using Elegance.Application.Checkout;
 using Elegance.Application.Payments;
 using Elegance.Application.Compare;
 using Elegance.Application.Categories;
+using Elegance.Application.Content;
 using Elegance.Application.Customers;
 using Elegance.Application.Products;
 using Elegance.Infrastructure.Auth;
@@ -16,6 +17,7 @@ using Elegance.Infrastructure.Orders;
 using Elegance.Infrastructure.Payments;
 using Elegance.Infrastructure.Compare;
 using Elegance.Infrastructure.Catalog;
+using Elegance.Infrastructure.Content;
 using Elegance.Infrastructure.Customers;
 using Elegance.Infrastructure.Wishlists;
 using Elegance.Application.Wishlists;
@@ -48,6 +50,8 @@ public static class DependencyInjection
 
         services.AddScoped<IProductService, ProductService>();
         services.AddScoped<ICategoryService, CategoryService>();
+        services.AddScoped<INoShopCategoryService, NoShopCategoryService>();
+        services.AddScoped<INoShopVideoService, NoShopVideoService>();
 
         services.AddOptions<AiSearchOptions>()
             .Bind(configuration.GetSection(AiSearchOptions.SectionName));
@@ -82,6 +86,7 @@ public static class DependencyInjection
         services.AddScoped<IAdminAuthService, AdminAuthService>();
         services.AddScoped<IAdminTwoFactorService, AdminTwoFactorService>();
         services.AddScoped<IAdminCatalogService, AdminCatalogService>();
+        services.AddScoped<IAdminNoShopService, AdminNoShopService>();
         services.AddScoped<IAdminOrderService, AdminOrderService>();
         services.AddScoped<IAdminInventoryService, AdminInventoryService>();
         services.AddScoped<IAdminCustomerService, AdminCustomerService>();

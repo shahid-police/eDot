@@ -50,7 +50,7 @@ export default async function page() {
   return (
     <>
       <Topbar2 />
-      <Header2 />
+      <Header2 transparent />
       <Hero />
       <Products2 products={trendyCollection} />
 

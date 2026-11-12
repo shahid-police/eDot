@@ -3,6 +3,7 @@ using Elegance.Domain.Audit;
 using Elegance.Domain.Carts;
 using Elegance.Domain.Catalog;
 using Elegance.Domain.Compare;
+using Elegance.Domain.Content;
 using Elegance.Domain.Customers;
 using Elegance.Domain.Inventory;
 using Elegance.Domain.Media;
@@ -43,6 +44,8 @@ public class EleganceDbContext : DbContext
     public DbSet<AdminTwoFactorCredential> AdminTwoFactorCredentials => Set<AdminTwoFactorCredential>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
     public DbSet<StockMovement> StockMovements => Set<StockMovement>();
+    public DbSet<NoShopCategory> NoShopCategories => Set<NoShopCategory>();
+    public DbSet<NoShopVideo> NoShopVideos => Set<NoShopVideo>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
