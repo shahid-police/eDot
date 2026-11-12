@@ -21,8 +21,11 @@ public class OrderDetailDto
     public required string Email { get; init; }
     public required string Phone { get; init; }
     public required decimal Subtotal { get; init; }
+    public required decimal ProductDiscountTotal { get; init; }
     public required decimal ShippingTotal { get; init; }
     public required decimal TaxTotal { get; init; }
+    public string? AppliedPromoCode { get; init; }
+    public required decimal PromoCodeDiscountAmount { get; init; }
     public required decimal GrandTotal { get; init; }
     public required string Currency { get; init; }
     public string? Notes { get; init; }
@@ -40,6 +43,7 @@ public class OrderItemDto
     public required string Sku { get; init; }
     public required string ProductName { get; init; }
     public string? VariantName { get; init; }
+    public required decimal OriginalUnitPrice { get; init; }
     public required decimal UnitPrice { get; init; }
     public required int Quantity { get; init; }
     public required decimal LineTotal { get; init; }

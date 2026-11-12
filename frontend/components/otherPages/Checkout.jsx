@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { getCart } from "@/lib/api/cart";
-import { getCheckoutSummary, placeOrder } from "@/lib/api/checkout";
+import { applyPromoCode, getCheckoutSummary, placeOrder, removePromoCode } from "@/lib/api/checkout";
 import { getAddresses } from "@/lib/api/customers";
 import { useSession } from "@/lib/auth/session";
 import { formatPrice } from "@/lib/format/price";
@@ -34,6 +34,9 @@ export default function Checkout() {
   const [notes, setNotes] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [promoInput, setPromoInput] = useState("");
+  const [promoError, setPromoError] = useState("");
+  const [promoBusy, setPromoBusy] = useState(false);
 
   useEffect(() => {
     Promise.all([getCart(), getCheckoutSummary()])
@@ -61,6 +64,33 @@ export default function Checkout() {
 
   const updateAddress = (field) => (event) =>
     setAddress((current) => ({ ...current, [field]: event.target.value }));
+
+  const submitPromoCode = async (event) => {
+    event.preventDefault();
+    setPromoError("");
+    setPromoBusy(true);
+    try {
+      const updated = await applyPromoCode(promoInput.trim());
+      setSummary(updated);
+      setPromoInput("");
+    } catch (err) {
+      setPromoError(err.message || "That promo code couldn't be applied.");
+    } finally {
+      setPromoBusy(false);
+    }
+  };
+
+  const clearPromoCode = async () => {
+    setPromoError("");
+    setPromoBusy(true);
+    try {
+      setSummary(await removePromoCode());
+    } catch (err) {
+      setPromoError(err.message || "Could not remove the promo code.");
+    } finally {
+      setPromoBusy(false);
+    }
+  };
 
   const submit = async (event) => {
     event.preventDefault();
@@ -232,6 +262,36 @@ export default function Checkout() {
                 ))}
               </ul>
               <span className="br-line" />
+
+              <div className="mb-3">
+                <p className="mb-2 fw-medium">Have a Promo Code?</p>
+                {summary?.appliedPromoCode ? (
+                  <div className="d-flex align-items-center justify-content-between">
+                    <span>
+                      Code <strong>{summary.appliedPromoCode}</strong> applied
+                    </span>
+                    <button type="button" className="tf-btn btn-sm" onClick={clearPromoCode} disabled={promoBusy}>
+                      Remove
+                    </button>
+                  </div>
+                ) : (
+                  <form onSubmit={submitPromoCode} className="d-flex gap-2">
+                    <input
+                      className="form-control"
+                      placeholder="Enter your 6-digit code"
+                      maxLength={6}
+                      value={promoInput}
+                      onChange={(e) => setPromoInput(e.target.value)}
+                    />
+                    <button type="submit" className="tf-btn btn-fill animate-btn" disabled={promoBusy || promoInput.trim().length !== 6}>
+                      Apply Code
+                    </button>
+                  </form>
+                )}
+                {promoError && <p className="text-danger mt-1 mb-0">{promoError}</p>}
+              </div>
+
+              <span className="br-line" />
               <ul className="list-total">
                 <li className="total-item">
                   <span>SUBTOTAL:</span>
@@ -247,6 +307,12 @@ export default function Checkout() {
                   <span>TAX:</span>
                   <span>{money(summary?.taxTotal ?? 0)}</span>
                 </li>
+                {summary?.promoCodeDiscountAmount > 0 && (
+                  <li className="total-item">
+                    <span>PROMO DISCOUNT:</span>
+                    <span>-{money(summary.promoCodeDiscountAmount)}</span>
+                  </li>
+                )}
               </ul>
               <span className="br-line" />
               <h4 className="last-total d-flex justify-content-between">

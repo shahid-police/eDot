@@ -19,6 +19,10 @@ public class OrderItem
     public required string ProductName { get; set; }
     public string? VariantName { get; set; }
 
+    // The product/variant's own price before any ProductDiscount - equal to UnitPrice when none
+    // was active at checkout. Lets order history show "was X, now Y" per line.
+    public decimal OriginalUnitPrice { get; set; }
+
     public decimal UnitPrice { get; set; }
     public int Quantity { get; set; }
     public decimal LineTotal { get; set; }

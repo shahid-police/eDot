@@ -21,3 +21,6 @@ backend/Elegance.Api/wwwroot/uploads/*
 .DS_Store
 Thumbs.db
 keys.md
+
+# Database dumps (contains real data/password hashes - never commit)
+dbBackup/

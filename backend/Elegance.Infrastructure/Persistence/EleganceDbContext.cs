@@ -5,7 +5,9 @@ using Elegance.Domain.Catalog;
 using Elegance.Domain.Compare;
 using Elegance.Domain.Content;
 using Elegance.Domain.Customers;
+using Elegance.Domain.Discounts;
 using Elegance.Domain.Inventory;
+using Elegance.Domain.Marketing;
 using Elegance.Domain.Media;
 using Elegance.Domain.Notifications;
 using Elegance.Domain.Orders;
@@ -25,6 +27,7 @@ public class EleganceDbContext : DbContext
     public DbSet<Product> Products => Set<Product>();
     public DbSet<ProductVariant> ProductVariants => Set<ProductVariant>();
     public DbSet<ProductImage> ProductImages => Set<ProductImage>();
+    public DbSet<ProductDiscount> ProductDiscounts => Set<ProductDiscount>();
     public DbSet<MediaFile> MediaFiles => Set<MediaFile>();
     public DbSet<Customer> Customers => Set<Customer>();
     public DbSet<CustomerAddress> CustomerAddresses => Set<CustomerAddress>();
@@ -50,6 +53,14 @@ public class EleganceDbContext : DbContext
     public DbSet<NoShopVideo> NoShopVideos => Set<NoShopVideo>();
     public DbSet<BackInStockSubscription> BackInStockSubscriptions => Set<BackInStockSubscription>();
     public DbSet<WhatsAppNotification> WhatsAppNotifications => Set<WhatsAppNotification>();
+    public DbSet<Promoter> Promoters => Set<Promoter>();
+    public DbSet<PromoCode> PromoCodes => Set<PromoCode>();
+    public DbSet<PromoCodeProduct> PromoCodeProducts => Set<PromoCodeProduct>();
+    public DbSet<PromoCodeCategory> PromoCodeCategories => Set<PromoCodeCategory>();
+    public DbSet<PromoCodeUsage> PromoCodeUsages => Set<PromoCodeUsage>();
+    public DbSet<PromoterCommission> PromoterCommissions => Set<PromoterCommission>();
+    public DbSet<PromoterPayment> PromoterPayments => Set<PromoterPayment>();
+    public DbSet<PromoterPaymentAllocation> PromoterPaymentAllocations => Set<PromoterPaymentAllocation>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

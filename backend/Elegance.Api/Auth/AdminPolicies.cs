@@ -14,6 +14,7 @@ public static class AdminPolicies
     public const string Inventory = "Admin.Inventory";
     public const string Customers = "Admin.Customers";
     public const string Audit = "Admin.Audit";
+    public const string Marketing = "Admin.Marketing";
 
     public static void AddAdminPolicies(this AuthorizationOptions options)
     {
@@ -23,6 +24,9 @@ public static class AdminPolicies
         options.AddPolicy(Inventory, policy => RequireAdmin(policy, AdminRole.SuperAdmin, AdminRole.Admin, AdminRole.InventoryManager));
         options.AddPolicy(Customers, policy => RequireAdmin(policy, AdminRole.SuperAdmin, AdminRole.Admin, AdminRole.OrderManager));
         options.AddPolicy(Audit, policy => RequireAdmin(policy, AdminRole.SuperAdmin, AdminRole.Admin));
+        // Handles real money (commissions, payments) - deliberately narrower than Catalog/Inventory
+        // etc., which CatalogManager/InventoryManager/etc. can also reach.
+        options.AddPolicy(Marketing, policy => RequireAdmin(policy, AdminRole.SuperAdmin, AdminRole.Admin));
     }
 
     private static void RequireAdmin(AuthorizationPolicyBuilder policy, params AdminRole[] roles) =>

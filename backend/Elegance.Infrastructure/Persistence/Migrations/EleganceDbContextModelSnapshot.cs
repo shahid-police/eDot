@@ -167,6 +167,9 @@ namespace Elegance.Infrastructure.Persistence.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
 
+                    b.Property<long?>("AppliedPromoCodeId")
+                        .HasColumnType("bigint");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
 
@@ -181,6 +184,8 @@ namespace Elegance.Infrastructure.Persistence.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AppliedPromoCodeId");
 
                     b.HasIndex("CustomerId")
                         .IsUnique();
@@ -910,6 +915,65 @@ namespace Elegance.Infrastructure.Persistence.Migrations
                     b.ToTable("refresh_tokens", (string)null);
                 });
 
+            modelBuilder.Entity("Elegance.Domain.Discounts.ProductDiscount", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<long>("CreatedByAdminUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<decimal>("DiscountAmount")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("DiscountPercentage")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<decimal>("FinalPriceSnapshot")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("OriginalPriceSnapshot")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<long>("ProductId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("ProductVariantId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductVariantId");
+
+                    b.HasIndex("StartDate", "EndDate");
+
+                    b.HasIndex("ProductId", "ProductVariantId", "Status");
+
+                    b.ToTable("product_discounts", (string)null);
+                });
+
             modelBuilder.Entity("Elegance.Domain.Inventory.RestockEvent", b =>
                 {
                     b.Property<long>("Id")
@@ -991,6 +1055,369 @@ namespace Elegance.Infrastructure.Persistence.Migrations
                     b.HasIndex("ProductId");
 
                     b.ToTable("stock_movements", (string)null);
+                });
+
+            modelBuilder.Entity("Elegance.Domain.Marketing.PromoCode", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(6)
+                        .HasColumnType("char(6)")
+                        .IsFixedLength();
+
+                    b.Property<decimal?>("CommissionPercentageOverride")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<decimal>("CustomerDiscountPercentage")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<DateTime?>("ExpiryDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("GrantsCommission")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("GrantsCustomerDiscount")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<decimal?>("MaximumDiscountAmount")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<int?>("MaximumTotalUses")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("MaximumUsesPerCustomer")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("MinimumOrderAmount")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<long>("PromoterId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("UsedCount")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
+
+                    b.HasIndex("PromoterId");
+
+                    b.HasIndex("Status");
+
+                    b.ToTable("promo_codes", (string)null);
+                });
+
+            modelBuilder.Entity("Elegance.Domain.Marketing.PromoCodeCategory", b =>
+                {
+                    b.Property<long>("PromoCodeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("CategoryId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("PromoCodeId", "CategoryId");
+
+                    b.HasIndex("CategoryId");
+
+                    b.ToTable("promo_code_categories", (string)null);
+                });
+
+            modelBuilder.Entity("Elegance.Domain.Marketing.PromoCodeProduct", b =>
+                {
+                    b.Property<long>("PromoCodeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("ProductId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("PromoCodeId", "ProductId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("promo_code_products", (string)null);
+                });
+
+            modelBuilder.Entity("Elegance.Domain.Marketing.PromoCodeUsage", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long?>("CustomerId")
+                        .HasColumnType("bigint");
+
+                    b.Property<decimal>("DiscountAmount")
+                        .HasPrecision(12, 2)
+                        .HasColumnType("decimal(12,2)");
+
+                    b.Property<long>("OrderId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("PromoCodeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("PromoterId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("UsedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("OrderId")
+                        .IsUnique();
+
+                    b.HasIndex("PromoCodeId");
+
+                    b.HasIndex("PromoterId");
+
+                    b.HasIndex("PromoCodeId", "CustomerId");
+
+                    b.ToTable("promo_code_usages", (string)null);
+                });
+
+            modelBuilder.Entity("Elegance.Domain.Marketing.Promoter", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Address")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<decimal>("CommissionPercentage")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(254)
+                        .HasColumnType("varchar(254)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("PromoterType")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("WhatsAppNumber")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar(32)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Status");
+
+                    b.ToTable("promoters", (string)null);
+                });
+
+            modelBuilder.Entity("Elegance.Domain.Marketing.PromoterCommission", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime?>("ApprovedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<decimal>("CommissionAmount")
+                        .HasPrecision(12, 2)
+                        .HasColumnType("decimal(12,2)");
+
+                    b.Property<decimal>("CommissionPercentageSnapshot")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("varchar(3)");
+
+                    b.Property<decimal>("EligibleSaleAmount")
+                        .HasPrecision(12, 2)
+                        .HasColumnType("decimal(12,2)");
+
+                    b.Property<long>("OrderId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("PaidAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime?>("PayableAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<long>("PromoCodeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("PromoterId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Remarks")
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)");
+
+                    b.Property<DateTime?>("ReversedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId")
+                        .IsUnique();
+
+                    b.HasIndex("PromoCodeId");
+
+                    b.HasIndex("PromoterId");
+
+                    b.HasIndex("Status");
+
+                    b.ToTable("promoter_commissions", (string)null);
+                });
+
+            modelBuilder.Entity("Elegance.Domain.Marketing.PromoterPayment", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<long>("CreatedByAdminUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("PaymentDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("PaymentMethod")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("PaymentReference")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)");
+
+                    b.Property<long>("PromoterId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Remarks")
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("TotalPaymentAmount")
+                        .HasPrecision(12, 2)
+                        .HasColumnType("decimal(12,2)");
+
+                    b.Property<string>("TransactionReference")
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PaymentReference")
+                        .IsUnique();
+
+                    b.HasIndex("PromoterId");
+
+                    b.HasIndex("Status");
+
+                    b.ToTable("promoter_payments", (string)null);
+                });
+
+            modelBuilder.Entity("Elegance.Domain.Marketing.PromoterPaymentAllocation", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<decimal>("AllocatedAmount")
+                        .HasPrecision(12, 2)
+                        .HasColumnType("decimal(12,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<long>("PromoterCommissionId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("PromoterPaymentId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PromoterCommissionId");
+
+                    b.HasIndex("PromoterPaymentId");
+
+                    b.ToTable("promoter_payment_allocations", (string)null);
                 });
 
             modelBuilder.Entity("Elegance.Domain.Media.MediaFile", b =>
@@ -1195,6 +1622,14 @@ namespace Elegance.Infrastructure.Persistence.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
 
+                    b.Property<decimal?>("CommissionEligibleAmount")
+                        .HasPrecision(12, 2)
+                        .HasColumnType("decimal(12,2)");
+
+                    b.Property<decimal?>("CommissionPercentageSnapshot")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
 
@@ -1233,6 +1668,24 @@ namespace Elegance.Infrastructure.Persistence.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("varchar(20)");
 
+                    b.Property<decimal>("ProductDiscountTotal")
+                        .HasPrecision(12, 2)
+                        .HasColumnType("decimal(12,2)");
+
+                    b.Property<decimal>("PromoCodeDiscountAmount")
+                        .HasPrecision(12, 2)
+                        .HasColumnType("decimal(12,2)");
+
+                    b.Property<decimal?>("PromoCodeDiscountPercentageSnapshot")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<long?>("PromoCodeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("PromoterId")
+                        .HasColumnType("bigint");
+
                     b.Property<decimal>("ShippingTotal")
                         .HasPrecision(12, 2)
                         .HasColumnType("decimal(12,2)");
@@ -1263,6 +1716,10 @@ namespace Elegance.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("OrderNumber")
                         .IsUnique();
+
+                    b.HasIndex("PromoCodeId");
+
+                    b.HasIndex("PromoterId");
 
                     b.HasIndex("Status");
 
@@ -1344,6 +1801,10 @@ namespace Elegance.Infrastructure.Persistence.Migrations
 
                     b.Property<long>("OrderId")
                         .HasColumnType("bigint");
+
+                    b.Property<decimal>("OriginalUnitPrice")
+                        .HasPrecision(12, 2)
+                        .HasColumnType("decimal(12,2)");
 
                     b.Property<long>("ProductId")
                         .HasColumnType("bigint");
@@ -1544,10 +2005,17 @@ namespace Elegance.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Elegance.Domain.Carts.Cart", b =>
                 {
+                    b.HasOne("Elegance.Domain.Marketing.PromoCode", "AppliedPromoCode")
+                        .WithMany()
+                        .HasForeignKey("AppliedPromoCodeId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Elegance.Domain.Customers.Customer", "Customer")
                         .WithMany()
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("AppliedPromoCode");
 
                     b.Navigation("Customer");
                 });
@@ -1729,6 +2197,24 @@ namespace Elegance.Infrastructure.Persistence.Migrations
                     b.Navigation("Customer");
                 });
 
+            modelBuilder.Entity("Elegance.Domain.Discounts.ProductDiscount", b =>
+                {
+                    b.HasOne("Elegance.Domain.Catalog.Product", "Product")
+                        .WithMany("Discounts")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Elegance.Domain.Catalog.ProductVariant", "ProductVariant")
+                        .WithMany("Discounts")
+                        .HasForeignKey("ProductVariantId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Product");
+
+                    b.Navigation("ProductVariant");
+                });
+
             modelBuilder.Entity("Elegance.Domain.Inventory.StockMovement", b =>
                 {
                     b.HasOne("Elegance.Domain.Catalog.Product", null)
@@ -1736,6 +2222,146 @@ namespace Elegance.Infrastructure.Persistence.Migrations
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Elegance.Domain.Marketing.PromoCode", b =>
+                {
+                    b.HasOne("Elegance.Domain.Marketing.Promoter", "Promoter")
+                        .WithMany("PromoCodes")
+                        .HasForeignKey("PromoterId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Promoter");
+                });
+
+            modelBuilder.Entity("Elegance.Domain.Marketing.PromoCodeCategory", b =>
+                {
+                    b.HasOne("Elegance.Domain.Catalog.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Elegance.Domain.Marketing.PromoCode", "PromoCode")
+                        .WithMany("Categories")
+                        .HasForeignKey("PromoCodeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("PromoCode");
+                });
+
+            modelBuilder.Entity("Elegance.Domain.Marketing.PromoCodeProduct", b =>
+                {
+                    b.HasOne("Elegance.Domain.Catalog.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Elegance.Domain.Marketing.PromoCode", "PromoCode")
+                        .WithMany("Products")
+                        .HasForeignKey("PromoCodeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("PromoCode");
+                });
+
+            modelBuilder.Entity("Elegance.Domain.Marketing.PromoCodeUsage", b =>
+                {
+                    b.HasOne("Elegance.Domain.Customers.Customer", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Elegance.Domain.Orders.Order", "Order")
+                        .WithMany()
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Elegance.Domain.Marketing.PromoCode", "PromoCode")
+                        .WithMany()
+                        .HasForeignKey("PromoCodeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Elegance.Domain.Marketing.Promoter", "Promoter")
+                        .WithMany()
+                        .HasForeignKey("PromoterId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Order");
+
+                    b.Navigation("PromoCode");
+
+                    b.Navigation("Promoter");
+                });
+
+            modelBuilder.Entity("Elegance.Domain.Marketing.PromoterCommission", b =>
+                {
+                    b.HasOne("Elegance.Domain.Orders.Order", "Order")
+                        .WithMany()
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Elegance.Domain.Marketing.PromoCode", "PromoCode")
+                        .WithMany()
+                        .HasForeignKey("PromoCodeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Elegance.Domain.Marketing.Promoter", "Promoter")
+                        .WithMany()
+                        .HasForeignKey("PromoterId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+
+                    b.Navigation("PromoCode");
+
+                    b.Navigation("Promoter");
+                });
+
+            modelBuilder.Entity("Elegance.Domain.Marketing.PromoterPayment", b =>
+                {
+                    b.HasOne("Elegance.Domain.Marketing.Promoter", "Promoter")
+                        .WithMany()
+                        .HasForeignKey("PromoterId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Promoter");
+                });
+
+            modelBuilder.Entity("Elegance.Domain.Marketing.PromoterPaymentAllocation", b =>
+                {
+                    b.HasOne("Elegance.Domain.Marketing.PromoterCommission", "PromoterCommission")
+                        .WithMany()
+                        .HasForeignKey("PromoterCommissionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Elegance.Domain.Marketing.PromoterPayment", "PromoterPayment")
+                        .WithMany("Allocations")
+                        .HasForeignKey("PromoterPaymentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PromoterCommission");
+
+                    b.Navigation("PromoterPayment");
                 });
 
             modelBuilder.Entity("Elegance.Domain.Notifications.BackInStockSubscription", b =>
@@ -1790,7 +2416,21 @@ namespace Elegance.Infrastructure.Persistence.Migrations
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("Elegance.Domain.Marketing.PromoCode", "PromoCode")
+                        .WithMany()
+                        .HasForeignKey("PromoCodeId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Elegance.Domain.Marketing.Promoter", "Promoter")
+                        .WithMany()
+                        .HasForeignKey("PromoterId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Customer");
+
+                    b.Navigation("PromoCode");
+
+                    b.Navigation("Promoter");
                 });
 
             modelBuilder.Entity("Elegance.Domain.Orders.OrderAddress", b =>
@@ -1907,9 +2547,16 @@ namespace Elegance.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Elegance.Domain.Catalog.Product", b =>
                 {
+                    b.Navigation("Discounts");
+
                     b.Navigation("Images");
 
                     b.Navigation("Variants");
+                });
+
+            modelBuilder.Entity("Elegance.Domain.Catalog.ProductVariant", b =>
+                {
+                    b.Navigation("Discounts");
                 });
 
             modelBuilder.Entity("Elegance.Domain.Compare.CompareList", b =>
@@ -1927,6 +2574,23 @@ namespace Elegance.Infrastructure.Persistence.Migrations
                     b.Navigation("Addresses");
 
                     b.Navigation("RefreshTokens");
+                });
+
+            modelBuilder.Entity("Elegance.Domain.Marketing.PromoCode", b =>
+                {
+                    b.Navigation("Categories");
+
+                    b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("Elegance.Domain.Marketing.Promoter", b =>
+                {
+                    b.Navigation("PromoCodes");
+                });
+
+            modelBuilder.Entity("Elegance.Domain.Marketing.PromoterPayment", b =>
+                {
+                    b.Navigation("Allocations");
                 });
 
             modelBuilder.Entity("Elegance.Domain.Orders.Order", b =>

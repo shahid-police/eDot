@@ -17,6 +17,7 @@ public class OrderDetailBuilder(EleganceDbContext dbContext, IEnumerable<IPaymen
             .Include(o => o.Addresses)
             .Include(o => o.StatusHistory)
             .Include(o => o.Payments)
+            .Include(o => o.PromoCode)
             .FirstAsync(o => o.Id == orderId, cancellationToken);
 
         var address = order.Addresses.First(a => a.Type == AddressType.Shipping);
@@ -30,8 +31,11 @@ public class OrderDetailBuilder(EleganceDbContext dbContext, IEnumerable<IPaymen
             Email = order.Email,
             Phone = order.Phone,
             Subtotal = order.Subtotal,
+            ProductDiscountTotal = order.ProductDiscountTotal,
             ShippingTotal = order.ShippingTotal,
             TaxTotal = order.TaxTotal,
+            AppliedPromoCode = order.PromoCode?.Code,
+            PromoCodeDiscountAmount = order.PromoCodeDiscountAmount,
             GrandTotal = order.GrandTotal,
             Currency = order.Currency,
             Notes = order.Notes,
@@ -54,6 +58,7 @@ public class OrderDetailBuilder(EleganceDbContext dbContext, IEnumerable<IPaymen
                 Sku = i.Sku,
                 ProductName = i.ProductName,
                 VariantName = i.VariantName,
+                OriginalUnitPrice = i.OriginalUnitPrice,
                 UnitPrice = i.UnitPrice,
                 Quantity = i.Quantity,
                 LineTotal = i.LineTotal,

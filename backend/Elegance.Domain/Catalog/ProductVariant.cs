@@ -1,3 +1,4 @@
+using Elegance.Domain.Discounts;
 using Elegance.Domain.Media;
 
 namespace Elegance.Domain.Catalog;
@@ -26,4 +27,6 @@ public class ProductVariant
 
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
+
+    public ICollection<ProductDiscount> Discounts { get; set; } = [];
 }

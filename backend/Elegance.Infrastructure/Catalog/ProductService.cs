@@ -1,6 +1,7 @@
 using Elegance.Application.Common;
 using Elegance.Application.Products;
 using Elegance.Domain.Catalog.Enums;
+using Elegance.Domain.Discounts.Enums;
 using Elegance.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,6 +13,7 @@ public class ProductService(EleganceDbContext dbContext) : IProductService
     {
         var page = Math.Max(1, query.Page);
         var pageSize = Math.Clamp(query.PageSize, 1, 100);
+        var now = DateTime.UtcNow;
 
         var products = dbContext.Products
             .AsNoTracking()
@@ -48,12 +50,18 @@ public class ProductService(EleganceDbContext dbContext) : IProductService
 
         if (query.MinPrice.HasValue)
         {
-            products = products.Where(p => (p.SalePrice ?? p.Price) >= query.MinPrice.Value);
+            products = products.Where(p =>
+                (p.Discounts.Where(d => d.Status == ProductDiscountStatus.Active && d.StartDate <= now && d.EndDate >= now)
+                    .OrderByDescending(d => d.Id).Select(d => (decimal?)d.FinalPriceSnapshot).FirstOrDefault() ?? p.SalePrice ?? p.Price)
+                >= query.MinPrice.Value);
         }
 
         if (query.MaxPrice.HasValue)
         {
-            products = products.Where(p => (p.SalePrice ?? p.Price) <= query.MaxPrice.Value);
+            products = products.Where(p =>
+                (p.Discounts.Where(d => d.Status == ProductDiscountStatus.Active && d.StartDate <= now && d.EndDate >= now)
+                    .OrderByDescending(d => d.Id).Select(d => (decimal?)d.FinalPriceSnapshot).FirstOrDefault() ?? p.SalePrice ?? p.Price)
+                <= query.MaxPrice.Value);
         }
 
         if (!string.IsNullOrWhiteSpace(query.Material))
@@ -104,7 +112,8 @@ public class ProductService(EleganceDbContext dbContext) : IProductService
                 Name = p.Name,
                 Slug = p.Slug,
                 Price = p.Price,
-                SalePrice = p.SalePrice,
+                SalePrice = p.Discounts.Where(d => d.Status == ProductDiscountStatus.Active && d.StartDate <= now && d.EndDate >= now)
+                    .OrderByDescending(d => d.Id).Select(d => (decimal?)d.FinalPriceSnapshot).FirstOrDefault() ?? p.SalePrice,
                 Currency = p.Currency,
                 ImageUrl = p.Images
                     .Where(i => i.ImageType == ProductImageType.Primary)
@@ -139,6 +148,7 @@ public class ProductService(EleganceDbContext dbContext) : IProductService
 
     public async Task<ProductDetailDto?> GetProductBySlugAsync(string slug, CancellationToken cancellationToken = default)
     {
+        var now = DateTime.UtcNow;
         return await dbContext.Products
             .AsNoTracking()
             .Where(p => p.IsActive && p.Slug == slug)
@@ -151,7 +161,8 @@ public class ProductService(EleganceDbContext dbContext) : IProductService
                 ShortDescription = p.ShortDescription,
                 Description = p.Description,
                 Price = p.Price,
-                SalePrice = p.SalePrice,
+                SalePrice = p.Discounts.Where(d => d.Status == ProductDiscountStatus.Active && d.StartDate <= now && d.EndDate >= now)
+                    .OrderByDescending(d => d.Id).Select(d => (decimal?)d.FinalPriceSnapshot).FirstOrDefault() ?? p.SalePrice,
                 Currency = p.Currency,
                 CategorySlug = p.Category.Slug,
                 CategoryName = p.Category.Name,
@@ -183,7 +194,8 @@ public class ProductService(EleganceDbContext dbContext) : IProductService
                         Sku = v.Sku,
                         VariantName = v.VariantName,
                         Price = v.Price ?? p.Price,
-                        SalePrice = v.SalePrice,
+                        SalePrice = v.Discounts.Where(d => d.Status == ProductDiscountStatus.Active && d.StartDate <= now && d.EndDate >= now)
+                            .OrderByDescending(d => d.Id).Select(d => (decimal?)d.FinalPriceSnapshot).FirstOrDefault() ?? v.SalePrice,
                         InStock = v.StockQuantity > 0,
                         Size = v.Size,
                         Color = v.Color,

@@ -2,6 +2,7 @@ using Elegance.Application.Admin;
 using Elegance.Application.Common;
 using Elegance.Application.Orders;
 using Elegance.Domain.Inventory;
+using Elegance.Domain.Marketing.Enums;
 using Elegance.Domain.Orders;
 using Elegance.Domain.Orders.Enums;
 using Elegance.Infrastructure.Orders;
@@ -131,6 +132,25 @@ public class AdminOrderService(EleganceDbContext dbContext, OrderDetailBuilder d
             await dbContext.Payments
                 .Where(p => p.OrderId == orderId && p.Status == PaymentStatus.Captured)
                 .ExecuteUpdateAsync(s => s.SetProperty(p => p.Status, PaymentStatus.Refunded).SetProperty(p => p.UpdatedAt, now), cancellationToken);
+        }
+
+        // A cancelled, returned, or refunded order means the sale it was commission-eligible for
+        // didn't actually stick - reverse any commission for this order that hasn't already been
+        // paid out. Cancelled is reachable directly from Pending/Confirmed/Processing, before an
+        // order ever reaches Delivered/Returned, and a commission already exists from the moment
+        // the order was placed - so this has to cover all three, not just Returned/Refunded.
+        // (No partial-refund amount tracking exists anywhere in this codebase yet, so this is a
+        // full reversal only - proportional adjustment for a partial refund isn't implemented.)
+        if (target is OrderStatus.Cancelled or OrderStatus.Returned or OrderStatus.Refunded)
+        {
+            await dbContext.PromoterCommissions
+                .Where(c => c.OrderId == orderId && c.Status != CommissionStatus.Paid
+                    && c.Status != CommissionStatus.Reversed && c.Status != CommissionStatus.Cancelled)
+                .ExecuteUpdateAsync(s => s
+                    .SetProperty(c => c.Status, CommissionStatus.Reversed)
+                    .SetProperty(c => c.ReversedAt, now)
+                    .SetProperty(c => c.Remarks, $"Order {order.OrderNumber} moved to {target}.")
+                    .SetProperty(c => c.UpdatedAt, now), cancellationToken);
         }
 
         dbContext.OrderStatusHistory.Add(new OrderStatusHistory

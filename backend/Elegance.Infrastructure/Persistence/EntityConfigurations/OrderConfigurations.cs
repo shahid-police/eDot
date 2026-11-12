@@ -17,8 +17,13 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
         builder.Property(o => o.Email).HasMaxLength(254).IsRequired();
         builder.Property(o => o.Phone).HasMaxLength(20).IsRequired();
         builder.Property(o => o.Subtotal).HasPrecision(12, 2);
+        builder.Property(o => o.ProductDiscountTotal).HasPrecision(12, 2);
         builder.Property(o => o.ShippingTotal).HasPrecision(12, 2);
         builder.Property(o => o.TaxTotal).HasPrecision(12, 2);
+        builder.Property(o => o.PromoCodeDiscountPercentageSnapshot).HasPrecision(5, 2);
+        builder.Property(o => o.PromoCodeDiscountAmount).HasPrecision(12, 2);
+        builder.Property(o => o.CommissionPercentageSnapshot).HasPrecision(5, 2);
+        builder.Property(o => o.CommissionEligibleAmount).HasPrecision(12, 2);
         builder.Property(o => o.GrandTotal).HasPrecision(12, 2);
         builder.Property(o => o.Currency).HasMaxLength(3).IsRequired();
         builder.Property(o => o.Status).HasConversion<string>().HasMaxLength(30);
@@ -29,11 +34,23 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
             .HasForeignKey(o => o.CustomerId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        builder.HasOne(o => o.PromoCode)
+            .WithMany()
+            .HasForeignKey(o => o.PromoCodeId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(o => o.Promoter)
+            .WithMany()
+            .HasForeignKey(o => o.PromoterId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         builder.Property(o => o.GuestTokenHash).HasMaxLength(128);
         builder.HasIndex(o => o.GuestTokenHash);
         builder.HasIndex(o => o.CustomerId);
         builder.HasIndex(o => o.Status);
         builder.HasIndex(o => o.CreatedAt);
+        builder.HasIndex(o => o.PromoCodeId);
+        builder.HasIndex(o => o.PromoterId);
     }
 }
 
@@ -47,6 +64,7 @@ public class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
         builder.Property(i => i.Sku).HasMaxLength(64).IsRequired();
         builder.Property(i => i.ProductName).HasMaxLength(300).IsRequired();
         builder.Property(i => i.VariantName).HasMaxLength(200);
+        builder.Property(i => i.OriginalUnitPrice).HasPrecision(12, 2);
         builder.Property(i => i.UnitPrice).HasPrecision(12, 2);
         builder.Property(i => i.LineTotal).HasPrecision(12, 2);
 

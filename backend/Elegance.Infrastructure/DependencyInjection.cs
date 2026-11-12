@@ -22,6 +22,7 @@ using Elegance.Infrastructure.Catalog;
 using Elegance.Infrastructure.Content;
 using Elegance.Infrastructure.Customers;
 using Elegance.Infrastructure.Inventory;
+using Elegance.Infrastructure.Marketing;
 using Elegance.Infrastructure.Notifications;
 using Elegance.Infrastructure.Wishlists;
 using Elegance.Application.Wishlists;
@@ -115,6 +116,16 @@ public static class DependencyInjection
         services.AddScoped<IAdminAuthService, AdminAuthService>();
         services.AddScoped<IAdminTwoFactorService, AdminTwoFactorService>();
         services.AddScoped<IAdminCatalogService, AdminCatalogService>();
+        services.AddScoped<IAdminProductDiscountService, AdminProductDiscountService>();
+        services.AddScoped<IAdminPromoterService, AdminPromoterService>();
+        services.AddScoped<IAdminPromoCodeService, AdminPromoCodeService>();
+        services.AddScoped<IAdminCommissionService, AdminCommissionService>();
+        services.AddScoped<IAdminPromoterPaymentService, AdminPromoterPaymentService>();
+        services.AddScoped<IAdminMarketingReportService, AdminMarketingReportService>();
+
+        services.AddOptions<CommissionOptions>()
+            .Bind(configuration.GetSection(CommissionOptions.SectionName));
+        services.AddHostedService<PromoterCommissionWorker>();
         services.AddScoped<IAdminNoShopService, AdminNoShopService>();
         services.AddScoped<IAdminOrderService, AdminOrderService>();
         services.AddScoped<IAdminInventoryService, AdminInventoryService>();

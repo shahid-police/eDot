@@ -111,6 +111,41 @@ export async function adminUpload(path, formData) {
   return data;
 }
 
+// CSV exports are files, not JSON - the admin token lives in sessionStorage (not a cookie), so a
+// plain <a href> link can't carry the Authorization header. Fetch as a blob instead and trigger
+// the save via a throwaway object URL.
+export async function adminDownload(path, { query, filename } = {}) {
+  const url = new URL(`/api/v1/admin${path}`, API_BASE_URL);
+  if (query) {
+    for (const [key, value] of Object.entries(query)) {
+      if (value !== undefined && value !== null && value !== "") {
+        url.searchParams.set(key, String(value));
+      }
+    }
+  }
+
+  const headers = {};
+  const token = getAdminToken();
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
+  const response = await fetch(url, { headers, cache: "no-store" });
+  if (!response.ok) {
+    throw new ApiError(response.status, path, "Could not download the export.");
+  }
+
+  const blob = await response.blob();
+  const objectUrl = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = objectUrl;
+  link.download = filename ?? "export.csv";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(objectUrl);
+}
+
 export const ORDER_STATUSES = [
   "Pending",
   "Confirmed",

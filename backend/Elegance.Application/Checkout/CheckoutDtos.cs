@@ -10,6 +10,13 @@ public class CheckoutSummaryDto
     public required decimal Subtotal { get; init; }
     public required decimal ShippingTotal { get; init; }
     public required decimal TaxTotal { get; init; }
+
+    // Set only while a promo code is currently applied to this cart (AppliedPromoCode) with its
+    // resulting discount at the cart's CURRENT contents - both are recalculated from scratch at
+    // order placement, never trusted from this preview.
+    public string? AppliedPromoCode { get; init; }
+    public required decimal PromoCodeDiscountAmount { get; init; }
+
     public required decimal GrandTotal { get; init; }
     public required string Currency { get; init; }
     public required decimal FreeShippingThreshold { get; init; }
@@ -29,4 +36,10 @@ public class CheckoutRequest
 
     [StringLength(1000)]
     public string? Notes { get; init; }
+}
+
+public class ApplyPromoCodeRequest
+{
+    [Required, StringLength(6, MinimumLength = 6)]
+    public string Code { get; init; } = string.Empty;
 }

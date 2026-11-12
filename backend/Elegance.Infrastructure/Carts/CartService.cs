@@ -3,6 +3,7 @@ using Elegance.Application.Common;
 using Elegance.Domain.Carts;
 using Elegance.Domain.Catalog;
 using Elegance.Domain.Catalog.Enums;
+using Elegance.Domain.Discounts.Enums;
 using Elegance.Infrastructure.Auth;
 using Elegance.Infrastructure.Catalog;
 using Elegance.Infrastructure.Persistence;
@@ -226,13 +227,16 @@ public class CartService(EleganceDbContext dbContext) : ICartService
 
     private async Task<CartDto> BuildDtoAsync(long cartId, CancellationToken cancellationToken)
     {
+        var now = DateTime.UtcNow;
         var items = await dbContext.CartItems
             .AsNoTracking()
             .Where(i => i.CartId == cartId)
             .OrderBy(i => i.AddedAt)
             .ThenBy(i => i.Id)
             .Include(i => i.Product).ThenInclude(p => p.Images).ThenInclude(img => img.MediaFile)
+            .Include(i => i.Product).ThenInclude(p => p.Discounts.Where(d => d.Status == ProductDiscountStatus.Active && d.StartDate <= now && d.EndDate >= now))
             .Include(i => i.Variant).ThenInclude(v => v!.ImageMediaFile)
+            .Include(i => i.Variant).ThenInclude(v => v!.Discounts.Where(d => d.Status == ProductDiscountStatus.Active && d.StartDate <= now && d.EndDate >= now))
             .ToListAsync(cancellationToken);
 
         var lines = items.Select(ToLine).ToList();

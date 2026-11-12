@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { adminRequest, adminUpload } from "@/lib/admin/api";
+import ProductDiscountSection from "./ProductDiscountSection";
 
 const EMPTY_VARIANT = { id: null, sku: "", variantName: "", price: "", salePrice: "", stockQuantity: 0, size: "", color: "", isActive: true, imageUrl: null };
 
@@ -468,6 +469,10 @@ export default function ProductForm({ productId = null, initial = null }) {
         </section>
       ) : (
         <div className="alert alert-info py-2 mb-0">Save the product first, then come back here to add photos.</div>
+      )}
+
+      {!isNew && (
+        <ProductDiscountSection productId={productId} productType={form.productType} variants={form.variants} />
       )}
 
       <section className="row g-3">

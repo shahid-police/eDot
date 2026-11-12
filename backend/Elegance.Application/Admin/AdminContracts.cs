@@ -323,6 +323,496 @@ public class NextSkuDto
     public required string Sku { get; init; }
 }
 
+public class AdminProductDiscountRequest
+{
+    // Null applies the discount to the simple product itself. Set it to one of the product's
+    // own variant IDs for a Variant-type product - the service rejects a variant that doesn't
+    // belong to the product being discounted.
+    public long? ProductVariantId { get; init; }
+
+    [Range(0.01, 100)]
+    public decimal DiscountPercentage { get; init; }
+
+    [Required]
+    public DateTime StartDate { get; init; }
+
+    [Required]
+    public DateTime EndDate { get; init; }
+}
+
+public class AdminProductDiscountDto
+{
+    public required long Id { get; init; }
+    public required long ProductId { get; init; }
+    public long? ProductVariantId { get; init; }
+    public string? VariantName { get; init; }
+    public required decimal OriginalPriceSnapshot { get; init; }
+    public required decimal DiscountPercentage { get; init; }
+    public required decimal DiscountAmount { get; init; }
+    public required decimal FinalPriceSnapshot { get; init; }
+    public required DateTime StartDate { get; init; }
+    public required DateTime EndDate { get; init; }
+
+    // Persisted admin-controlled state: "Active" or "Cancelled".
+    public required string Status { get; init; }
+
+    // Derived from Status plus StartDate/EndDate against the current time: "Scheduled", "Active",
+    // "Expired", or "Cancelled" - what the admin UI and reports should actually display/filter on.
+    public required string EffectiveStatus { get; init; }
+
+    public string? CreatedByEmail { get; init; }
+    public required DateTime CreatedAt { get; init; }
+}
+
+public interface IAdminProductDiscountService
+{
+    Task<IReadOnlyList<AdminProductDiscountDto>> ListProductDiscountsAsync(long productId, CancellationToken cancellationToken = default);
+    Task<AdminProductDiscountDto> CreateProductDiscountAsync(AdminActor actor, long productId, AdminProductDiscountRequest request, CancellationToken cancellationToken = default);
+    Task CancelProductDiscountAsync(AdminActor actor, long productId, long discountId, CancellationToken cancellationToken = default);
+}
+
+public class AdminPromoterQuery
+{
+    public string? Search { get; init; }
+    public string? Status { get; init; }
+    public int Page { get; init; } = 1;
+    public int PageSize { get; init; } = 25;
+}
+
+public class AdminPromoterRequest
+{
+    [Required, StringLength(200)]
+    public string Name { get; init; } = string.Empty;
+
+    // Validated server-side and normalized to E.164 - see PhoneNumberNormalizer.
+    [Required, StringLength(32)]
+    public string WhatsAppNumber { get; init; } = string.Empty;
+
+    [EmailAddress, StringLength(254)]
+    public string? Email { get; init; }
+
+    [StringLength(500)]
+    public string? Address { get; init; }
+
+    [Required, StringLength(30)]
+    public string PromoterType { get; init; } = "Individual";
+
+    [Range(0, 100)]
+    public decimal CommissionPercentage { get; init; }
+
+    [StringLength(1000)]
+    public string? Notes { get; init; }
+}
+
+public class AdminPromoterStatusRequest
+{
+    [Required, StringLength(20)]
+    public string Status { get; init; } = string.Empty;
+}
+
+public class AdminPromoterDto
+{
+    public required long Id { get; init; }
+    public required string Name { get; init; }
+    public required string WhatsAppNumber { get; init; }
+    public string? Email { get; init; }
+    public string? Address { get; init; }
+    public required string PromoterType { get; init; }
+    public required decimal CommissionPercentage { get; init; }
+    public required string Status { get; init; }
+    public string? Notes { get; init; }
+    public required int PromoCodeCount { get; init; }
+    public required DateTime CreatedAt { get; init; }
+}
+
+public interface IAdminPromoterService
+{
+    Task<PagedResult<AdminPromoterDto>> ListPromotersAsync(AdminPromoterQuery query, CancellationToken cancellationToken = default);
+    Task<AdminPromoterDto> GetPromoterAsync(long promoterId, CancellationToken cancellationToken = default);
+    Task<AdminPromoterDto> CreatePromoterAsync(AdminActor actor, AdminPromoterRequest request, CancellationToken cancellationToken = default);
+    Task<AdminPromoterDto> UpdatePromoterAsync(AdminActor actor, long promoterId, AdminPromoterRequest request, CancellationToken cancellationToken = default);
+    Task<AdminPromoterDto> SetPromoterStatusAsync(AdminActor actor, long promoterId, string status, CancellationToken cancellationToken = default);
+}
+
+public class AdminPromoCodeQuery
+{
+    public string? Search { get; init; }
+    public long? PromoterId { get; init; }
+    public string? Status { get; init; }
+    public int Page { get; init; } = 1;
+    public int PageSize { get; init; } = 25;
+}
+
+public class AdminPromoCodeRequest
+{
+    [Range(1, long.MaxValue)]
+    public long PromoterId { get; init; }
+
+    public bool GrantsCustomerDiscount { get; init; }
+
+    [Range(0, 100)]
+    public decimal CustomerDiscountPercentage { get; init; }
+
+    public bool GrantsCommission { get; init; } = true;
+
+    [Range(0, 100)]
+    public decimal? CommissionPercentageOverride { get; init; }
+
+    [Range(0, 1000000)]
+    public decimal? MinimumOrderAmount { get; init; }
+
+    [Range(0, 1000000)]
+    public decimal? MaximumDiscountAmount { get; init; }
+
+    [Range(1, int.MaxValue)]
+    public int? MaximumTotalUses { get; init; }
+
+    [Range(1, int.MaxValue)]
+    public int? MaximumUsesPerCustomer { get; init; }
+
+    [Required]
+    public DateTime StartDate { get; init; }
+
+    public DateTime? ExpiryDate { get; init; }
+
+    public List<long> ProductIds { get; init; } = [];
+    public List<long> CategoryIds { get; init; } = [];
+}
+
+public class AdminPromoCodeStatusRequest
+{
+    [Required, StringLength(20)]
+    public string Status { get; init; } = string.Empty;
+}
+
+public class AdminPromoCodeDto
+{
+    public required long Id { get; init; }
+    public required string Code { get; init; }
+    public required long PromoterId { get; init; }
+    public required string PromoterName { get; init; }
+    public required bool GrantsCustomerDiscount { get; init; }
+    public required decimal CustomerDiscountPercentage { get; init; }
+    public required bool GrantsCommission { get; init; }
+    public decimal? CommissionPercentageOverride { get; init; }
+    public decimal? MinimumOrderAmount { get; init; }
+    public decimal? MaximumDiscountAmount { get; init; }
+    public int? MaximumTotalUses { get; init; }
+    public int? MaximumUsesPerCustomer { get; init; }
+    public required int UsedCount { get; init; }
+    public required DateTime StartDate { get; init; }
+    public DateTime? ExpiryDate { get; init; }
+
+    // Persisted admin-controlled state: "Active" or "Inactive".
+    public required string Status { get; init; }
+
+    // Derived from Status plus StartDate/ExpiryDate against the current time: "Scheduled",
+    // "Active", "Expired", or "Inactive".
+    public required string EffectiveStatus { get; init; }
+
+    public required IReadOnlyList<long> ProductIds { get; init; }
+    public required IReadOnlyList<long> CategoryIds { get; init; }
+    public required DateTime CreatedAt { get; init; }
+}
+
+public interface IAdminPromoCodeService
+{
+    Task<PagedResult<AdminPromoCodeDto>> ListPromoCodesAsync(AdminPromoCodeQuery query, CancellationToken cancellationToken = default);
+    Task<AdminPromoCodeDto> GetPromoCodeAsync(long promoCodeId, CancellationToken cancellationToken = default);
+    Task<AdminPromoCodeDto> CreatePromoCodeAsync(AdminActor actor, AdminPromoCodeRequest request, CancellationToken cancellationToken = default);
+    Task<AdminPromoCodeDto> UpdatePromoCodeAsync(AdminActor actor, long promoCodeId, AdminPromoCodeRequest request, CancellationToken cancellationToken = default);
+    Task<AdminPromoCodeDto> SetPromoCodeStatusAsync(AdminActor actor, long promoCodeId, string status, CancellationToken cancellationToken = default);
+    Task<AdminPromoCodeDto> RegeneratePromoCodeAsync(AdminActor actor, long promoCodeId, CancellationToken cancellationToken = default);
+}
+
+public class AdminCommissionQuery
+{
+    public long? PromoterId { get; init; }
+    public string? Status { get; init; }
+    public int Page { get; init; } = 1;
+    public int PageSize { get; init; } = 25;
+}
+
+public class AdminCommissionDto
+{
+    public required long Id { get; init; }
+    public required long PromoterId { get; init; }
+    public required string PromoterName { get; init; }
+    public required long PromoCodeId { get; init; }
+    public required string PromoCode { get; init; }
+    public required long OrderId { get; init; }
+    public required string OrderNumber { get; init; }
+    public required string OrderStatus { get; init; }
+    public required decimal CommissionPercentageSnapshot { get; init; }
+    public required decimal EligibleSaleAmount { get; init; }
+    public required decimal CommissionAmount { get; init; }
+    public required string Currency { get; init; }
+    public required string Status { get; init; }
+    public string? Remarks { get; init; }
+    public required DateTime CreatedAt { get; init; }
+    public DateTime? ApprovedAt { get; init; }
+    public DateTime? PayableAt { get; init; }
+    public DateTime? PaidAt { get; init; }
+    public DateTime? ReversedAt { get; init; }
+}
+
+public class AdminCommissionRemarksRequest
+{
+    [Required, StringLength(1000)]
+    public string Remarks { get; init; } = string.Empty;
+}
+
+public class AdminCommissionSummaryDto
+{
+    public required int PendingCount { get; init; }
+    public required int ApprovedCount { get; init; }
+    public required int PayableCount { get; init; }
+    public required int PaidCount { get; init; }
+    public required int ReversedCount { get; init; }
+    public required int CancelledCount { get; init; }
+    public required decimal PendingAmount { get; init; }
+    public required decimal PayableAmount { get; init; }
+    public required decimal PaidAmount { get; init; }
+}
+
+public interface IAdminCommissionService
+{
+    Task<AdminCommissionSummaryDto> GetSummaryAsync(CancellationToken cancellationToken = default);
+    Task<PagedResult<AdminCommissionDto>> ListCommissionsAsync(AdminCommissionQuery query, CancellationToken cancellationToken = default);
+    Task<AdminCommissionDto> ApproveCommissionAsync(AdminActor actor, long commissionId, CancellationToken cancellationToken = default);
+    Task<AdminCommissionDto> MarkPayableAsync(AdminActor actor, long commissionId, CancellationToken cancellationToken = default);
+    Task<AdminCommissionDto> ReverseCommissionAsync(AdminActor actor, long commissionId, AdminCommissionRemarksRequest request, CancellationToken cancellationToken = default);
+    Task<AdminCommissionDto> CancelCommissionAsync(AdminActor actor, long commissionId, AdminCommissionRemarksRequest request, CancellationToken cancellationToken = default);
+}
+
+public class AdminPayableCommissionDto
+{
+    public required long CommissionId { get; init; }
+    public required long OrderId { get; init; }
+    public required string OrderNumber { get; init; }
+    public required decimal CommissionAmount { get; init; }
+    public required decimal AllocatedAmount { get; init; }
+    public required decimal RemainingAmount { get; init; }
+    public required string Status { get; init; }
+}
+
+public class AdminPromoterBalanceDto
+{
+    public required long PromoterId { get; init; }
+    public required string PromoterName { get; init; }
+    public required decimal OutstandingBalance { get; init; }
+    public required IReadOnlyList<AdminPayableCommissionDto> PayableCommissions { get; init; }
+}
+
+public class AdminPromoterPaymentAllocationRequest
+{
+    [Range(1, long.MaxValue)]
+    public long CommissionId { get; init; }
+
+    [Range(0.01, double.MaxValue)]
+    public decimal Amount { get; init; }
+}
+
+public class AdminPromoterPaymentRequest
+{
+    [Range(1, long.MaxValue)]
+    public long PromoterId { get; init; }
+
+    [Required]
+    public DateTime PaymentDate { get; init; }
+
+    [Required, StringLength(50)]
+    public string PaymentMethod { get; init; } = string.Empty;
+
+    [StringLength(100)]
+    public string? TransactionReference { get; init; }
+
+    [StringLength(1000)]
+    public string? Remarks { get; init; }
+
+    public List<AdminPromoterPaymentAllocationRequest> Allocations { get; init; } = [];
+}
+
+public class AdminPromoterPaymentAllocationDto
+{
+    public required long CommissionId { get; init; }
+    public required long OrderId { get; init; }
+    public required string OrderNumber { get; init; }
+    public required decimal Amount { get; init; }
+}
+
+public class AdminPromoterPaymentDto
+{
+    public required long Id { get; init; }
+    public required string PaymentReference { get; init; }
+    public required long PromoterId { get; init; }
+    public required string PromoterName { get; init; }
+    public required decimal TotalPaymentAmount { get; init; }
+    public required DateTime PaymentDate { get; init; }
+    public required string PaymentMethod { get; init; }
+    public string? TransactionReference { get; init; }
+    public required string Status { get; init; }
+    public string? Remarks { get; init; }
+    public required IReadOnlyList<AdminPromoterPaymentAllocationDto> Allocations { get; init; }
+    public required DateTime CreatedAt { get; init; }
+}
+
+public class AdminPromoterPaymentQuery
+{
+    public long? PromoterId { get; init; }
+    public int Page { get; init; } = 1;
+    public int PageSize { get; init; } = 25;
+}
+
+public class AdminVoidPaymentRequest
+{
+    [Required, StringLength(1000)]
+    public string Remarks { get; init; } = string.Empty;
+}
+
+public interface IAdminPromoterPaymentService
+{
+    Task<AdminPromoterBalanceDto> GetPromoterBalanceAsync(long promoterId, CancellationToken cancellationToken = default);
+    Task<PagedResult<AdminPromoterPaymentDto>> ListPaymentsAsync(AdminPromoterPaymentQuery query, CancellationToken cancellationToken = default);
+    Task<AdminPromoterPaymentDto> GetPaymentAsync(long paymentId, CancellationToken cancellationToken = default);
+    Task<AdminPromoterPaymentDto> CreatePaymentAsync(AdminActor actor, AdminPromoterPaymentRequest request, CancellationToken cancellationToken = default);
+    Task<AdminPromoterPaymentDto> VoidPaymentAsync(AdminActor actor, long paymentId, AdminVoidPaymentRequest request, CancellationToken cancellationToken = default);
+}
+
+public class AdminMarketingDashboardDto
+{
+    public required int ActiveDiscountCount { get; init; }
+    public required int ScheduledDiscountCount { get; init; }
+    public required int ExpiredDiscountCount { get; init; }
+    public required int TotalPromoCodes { get; init; }
+    public required int ActivePromoCodes { get; init; }
+    public required int TotalPromoCodeUses { get; init; }
+    public required decimal TotalCustomerDiscountGiven { get; init; }
+    public required int TotalPromoters { get; init; }
+    public required int ActivePromoters { get; init; }
+    public required int AttributedOrders { get; init; }
+    public required decimal TotalEligibleSales { get; init; }
+    public required decimal PendingCommissionAmount { get; init; }
+    public required decimal ApprovedCommissionAmount { get; init; }
+    public required decimal PayableCommissionAmount { get; init; }
+    public required decimal PaidCommissionAmount { get; init; }
+    public required decimal ReversedCommissionAmount { get; init; }
+    public required int TotalPayments { get; init; }
+    public required decimal TotalPaymentsAmount { get; init; }
+    public required decimal OutstandingPayableBalance { get; init; }
+}
+
+// Date filters apply to the row-level, period-bound figures (what happened in that window).
+// Current-state counts (how many discounts are Active right now, etc.) are never date-filtered,
+// since "how many are Active today" wouldn't mean anything scoped to a past window.
+public class AdminMarketingReportQuery
+{
+    public DateTime? StartDate { get; init; }
+    public DateTime? EndDate { get; init; }
+    public long? PromoterId { get; init; }
+    public long? ProductId { get; init; }
+    public long? CategoryId { get; init; }
+}
+
+public class AdminDiscountReportRowDto
+{
+    public required long ProductId { get; init; }
+    public required string ProductName { get; init; }
+    public required string CategoryName { get; init; }
+    public required int OrderCount { get; init; }
+    public required int UnitsSold { get; init; }
+    public required decimal DiscountValueGiven { get; init; }
+}
+
+public class AdminDiscountReportDto
+{
+    public required int ActiveCount { get; init; }
+    public required int ScheduledCount { get; init; }
+    public required int ExpiredCount { get; init; }
+    public required int CancelledCount { get; init; }
+    public required decimal TotalDiscountValueGiven { get; init; }
+    public required IReadOnlyList<AdminDiscountReportRowDto> Rows { get; init; }
+}
+
+public class AdminPromoCodeReportRowDto
+{
+    public required long PromoCodeId { get; init; }
+    public required string Code { get; init; }
+    public required long PromoterId { get; init; }
+    public required string PromoterName { get; init; }
+    public required string EffectiveStatus { get; init; }
+    public required int TotalUsesAllTime { get; init; }
+    public required int UsesInRange { get; init; }
+    public required decimal DiscountGivenInRange { get; init; }
+    public DateTime? ExpiryDate { get; init; }
+}
+
+public class AdminPromoCodeReportDto
+{
+    public required int TotalCodes { get; init; }
+    public required int ActiveCodes { get; init; }
+    public required int InactiveCodes { get; init; }
+    public required int ExpiredCodes { get; init; }
+    public required int TotalUsesAllTime { get; init; }
+    public required decimal TotalDiscountGivenInRange { get; init; }
+    public required IReadOnlyList<AdminPromoCodeReportRowDto> MostUsed { get; init; }
+    public required IReadOnlyList<AdminPromoCodeReportRowDto> ExpiringSoon { get; init; }
+}
+
+public class AdminCommissionReportRowDto
+{
+    public required long PromoterId { get; init; }
+    public required string PromoterName { get; init; }
+    public required int AttributedOrders { get; init; }
+    public required decimal TotalEligibleSales { get; init; }
+    public required decimal PendingAmount { get; init; }
+    public required decimal ApprovedAmount { get; init; }
+    public required decimal PayableAmount { get; init; }
+    public required decimal PaidAmount { get; init; }
+    public required decimal ReversedAmount { get; init; }
+}
+
+public class AdminCommissionReportDto
+{
+    public required int TotalPromoters { get; init; }
+    public required int ActivePromoters { get; init; }
+    public required int TotalAttributedOrders { get; init; }
+    public required decimal TotalEligibleSales { get; init; }
+    public required decimal PendingAmount { get; init; }
+    public required decimal ApprovedAmount { get; init; }
+    public required decimal PayableAmount { get; init; }
+    public required decimal PaidAmount { get; init; }
+    public required decimal ReversedAmount { get; init; }
+    public required IReadOnlyList<AdminCommissionReportRowDto> ByPromoter { get; init; }
+}
+
+public class AdminPaymentReportRowDto
+{
+    public required long PromoterId { get; init; }
+    public required string PromoterName { get; init; }
+    public required int PaymentCount { get; init; }
+    public required decimal TotalPaid { get; init; }
+    public required decimal OutstandingBalance { get; init; }
+}
+
+public class AdminPaymentReportDto
+{
+    public required int TotalPayments { get; init; }
+    public required decimal TotalPaidAmount { get; init; }
+    public required decimal TotalOutstandingBalance { get; init; }
+    public required int PartialSettlementCount { get; init; }
+    public required IReadOnlyList<AdminPaymentReportRowDto> ByPromoter { get; init; }
+}
+
+public interface IAdminMarketingReportService
+{
+    Task<AdminMarketingDashboardDto> GetDashboardAsync(CancellationToken cancellationToken = default);
+    Task<AdminDiscountReportDto> GetDiscountReportAsync(AdminMarketingReportQuery query, CancellationToken cancellationToken = default);
+    Task<AdminPromoCodeReportDto> GetPromoCodeReportAsync(AdminMarketingReportQuery query, CancellationToken cancellationToken = default);
+    Task<AdminCommissionReportDto> GetCommissionReportAsync(AdminMarketingReportQuery query, CancellationToken cancellationToken = default);
+    Task<AdminPaymentReportDto> GetPaymentReportAsync(AdminMarketingReportQuery query, CancellationToken cancellationToken = default);
+}
+
 public interface IAdminCatalogService
 {
     Task<PagedResult<AdminProductSummaryDto>> ListProductsAsync(AdminProductQuery query, CancellationToken cancellationToken = default);

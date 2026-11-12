@@ -93,7 +93,13 @@ export default function AdminOrderDetailPage() {
             </tbody>
             <tfoot>
               <tr><td colSpan={3} className="text-end">Subtotal</td><td className="text-end">{formatPrice(order.subtotal)}</td></tr>
+              {order.productDiscountTotal > 0 && (
+                <tr><td colSpan={3} className="text-end">Product discounts</td><td className="text-end">-{formatPrice(order.productDiscountTotal)}</td></tr>
+              )}
               <tr><td colSpan={3} className="text-end">Shipping</td><td className="text-end">{formatPrice(order.shippingTotal)}</td></tr>
+              {order.promoCodeDiscountAmount > 0 && (
+                <tr><td colSpan={3} className="text-end">Promo discount ({order.appliedPromoCode})</td><td className="text-end">-{formatPrice(order.promoCodeDiscountAmount)}</td></tr>
+              )}
               <tr><th colSpan={3} className="text-end">Total</th><th className="text-end">{formatPrice(order.grandTotal)}</th></tr>
             </tfoot>
           </table>

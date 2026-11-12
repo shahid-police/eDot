@@ -20,5 +20,10 @@ public class CartConfiguration : IEntityTypeConfiguration<Cart>
 
         builder.Property(c => c.GuestTokenHash).HasMaxLength(128);
         builder.HasIndex(c => c.GuestTokenHash).IsUnique();
+
+        builder.HasOne(c => c.AppliedPromoCode)
+            .WithMany()
+            .HasForeignKey(c => c.AppliedPromoCodeId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

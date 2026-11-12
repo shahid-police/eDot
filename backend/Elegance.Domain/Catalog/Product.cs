@@ -1,4 +1,5 @@
 using Elegance.Domain.Catalog.Enums;
+using Elegance.Domain.Discounts;
 
 namespace Elegance.Domain.Catalog;
 
@@ -49,4 +50,5 @@ public class Product
 
     public ICollection<ProductVariant> Variants { get; set; } = [];
     public ICollection<ProductImage> Images { get; set; } = [];
+    public ICollection<ProductDiscount> Discounts { get; set; } = [];
 }
