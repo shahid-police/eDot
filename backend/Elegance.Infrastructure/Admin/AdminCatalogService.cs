@@ -1,5 +1,6 @@
 using Elegance.Application.Admin;
 using Elegance.Application.Common;
+using Elegance.Application.Inventory;
 using Elegance.Domain.Catalog;
 using Elegance.Domain.Catalog.Enums;
 using Elegance.Domain.Inventory;
@@ -8,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Elegance.Infrastructure.Admin;
 
-public class AdminCatalogService(EleganceDbContext dbContext, IAuditLogService auditLog) : IAdminCatalogService
+public class AdminCatalogService(EleganceDbContext dbContext, IAuditLogService auditLog, IRestockDetectionService restockDetection) : IAdminCatalogService
 {
     // JEW-{CategoryCode}-{number, zero-padded to at least 3 digits}.
     private const string SkuPrefix = "JEW";
@@ -230,6 +231,7 @@ public class AdminCatalogService(EleganceDbContext dbContext, IAuditLogService a
         if (product.StockQuantity != stockBefore)
         {
             pendingMovements.Add((null, product.StockQuantity - stockBefore, "Stock set from product edit"));
+            restockDetection.RecordStockChange(product.Id, null, stockBefore, product.StockQuantity);
         }
 
         var kept = new HashSet<long>();
@@ -239,11 +241,13 @@ public class AdminCatalogService(EleganceDbContext dbContext, IAuditLogService a
             {
                 var variant = product.Variants.FirstOrDefault(v => v.Id == variantId)
                     ?? throw new ApplicationFailure(FailureKind.Validation, "One of the options does not belong to this product.");
+                var variantStockBefore = variant.StockQuantity;
                 var delta = variantRequest.StockQuantity - variant.StockQuantity;
                 ApplyVariantFields(variant, variantRequest, now);
                 if (delta != 0)
                 {
                     pendingMovements.Add((variant, delta, "Stock set from product edit"));
+                    restockDetection.RecordStockChange(product.Id, variant.Id, variantStockBefore, variant.StockQuantity);
                 }
                 kept.Add(variantId);
             }

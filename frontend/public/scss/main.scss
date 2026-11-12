@@ -423,6 +423,29 @@ picture.jarallax-img img {
   }
 }
 
+// .article-blog is a flex column with align-items: flex-start, which shrinks the image to its
+// own natural (thumbnail) size unless told otherwise - fine for a grid card, wrong for a banner
+// that should span the page.
+.no-shop-featured {
+  align-items: stretch;
+  width: 100%;
+
+  .entry_image,
+  .image {
+    width: 100%;
+  }
+
+  .image img {
+    width: 100%;
+    aspect-ratio: 21 / 7;
+    object-fit: cover;
+
+    @media (max-width: 767px) {
+      aspect-ratio: 16 / 9;
+    }
+  }
+}
+
 .no-shop-category-filter {
   .no-shop-filter-pill {
     padding: 8px 16px;

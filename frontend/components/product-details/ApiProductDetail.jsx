@@ -8,12 +8,14 @@ import { addWishlistItem, getWishlist, removeWishlistItem } from "@/lib/api/wish
 import { addCompareItem, getCompare, removeCompareItem } from "@/lib/api/compare";
 import { useSession } from "@/lib/auth/session";
 import { formatPrice } from "@/lib/format/price";
+import { useContextElement } from "@/context/Context";
 
 const GALLERY_KEY = "api";
 
 export default function ApiProductDetail({ product }) {
   const router = useRouter();
   const session = useSession();
+  const { setNotifyItem } = useContextElement();
   const initialVariant =
     product.variants.find((variant) => variant.inStock) ?? product.variants[0] ?? null;
   const [selectedVariantId, setSelectedVariantId] = useState(initialVariant?.id ?? null);
@@ -187,6 +189,16 @@ export default function ApiProductDetail({ product }) {
                       {adding ? "adding..." : inStock ? "add to bag" : "currently unavailable"}
                     </button>
                     {cartError && <p className="text-danger mt-2 mb-0">{cartError}</p>}
+                    {!inStock && (
+                      <a
+                        href="#unavailable"
+                        data-bs-toggle="modal"
+                        className="tf-btn style-2 w-100 mt-2 fw-medium"
+                        onClick={() => setNotifyItem({ id: product.id, variantId })}
+                      >
+                        notify me when available
+                      </a>
+                    )}
                     <button
                       type="button"
                       className="tf-btn style-2 w-100 mt-2 fw-medium"

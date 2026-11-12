@@ -1,6 +1,7 @@
 "use client";
 import { allProducts } from "@/data/products";
 // import { openCartModal } from "@/utlis/openCartModal";
+import { apiGet } from "@/lib/api/client";
 
 import React, { useEffect } from "react";
 import { useContext, useState } from "react";
@@ -12,7 +13,21 @@ export const useContextElement = () => {
 export default function Context({ children }) {
   const [cartProducts, setCartProducts] = useState([]);
   const [quickViewItem, setQuickViewItem] = useState(allProducts[0]);
+  // The product (and optional variant) the "Notify me when available" trigger was clicked for -
+  // null until a trigger sets it, so UnavailableModal knows what it's subscribing the customer to.
+  const [notifyItem, setNotifyItem] = useState(null);
+  // The store's own WhatsApp number (backend-configured, admin can change it without a frontend
+  // deploy) - fetched once here rather than per product card, since every card in a grid needs it.
+  const [storeWhatsAppNumber, setStoreWhatsAppNumber] = useState("");
   const [totalPrice, setTotalPrice] = useState(0);
+
+  useEffect(() => {
+    apiGet("/api/v1/store-info", { revalidate: 3600 })
+      .then((data) => data?.whatsAppNumber && setStoreWhatsAppNumber(data.whatsAppNumber))
+      .catch(() => {
+        // No manual WhatsApp link without a number - the product-card action simply hides itself.
+      });
+  }, []);
   useEffect(() => {
     const subtotal = cartProducts.reduce((accumulator, product) => {
       return accumulator + product.quantity * product.price;
@@ -63,6 +78,9 @@ export default function Context({ children }) {
     isAddedToCartProducts,
     quickViewItem,
     setQuickViewItem,
+    notifyItem,
+    setNotifyItem,
+    storeWhatsAppNumber,
     updateQuantity,
   };
   return (

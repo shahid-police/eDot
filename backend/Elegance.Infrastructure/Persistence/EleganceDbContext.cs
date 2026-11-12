@@ -7,6 +7,7 @@ using Elegance.Domain.Content;
 using Elegance.Domain.Customers;
 using Elegance.Domain.Inventory;
 using Elegance.Domain.Media;
+using Elegance.Domain.Notifications;
 using Elegance.Domain.Orders;
 using Elegance.Domain.Wishlists;
 using Microsoft.EntityFrameworkCore;
@@ -44,8 +45,11 @@ public class EleganceDbContext : DbContext
     public DbSet<AdminTwoFactorCredential> AdminTwoFactorCredentials => Set<AdminTwoFactorCredential>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
     public DbSet<StockMovement> StockMovements => Set<StockMovement>();
+    public DbSet<RestockEvent> RestockEvents => Set<RestockEvent>();
     public DbSet<NoShopCategory> NoShopCategories => Set<NoShopCategory>();
     public DbSet<NoShopVideo> NoShopVideos => Set<NoShopVideo>();
+    public DbSet<BackInStockSubscription> BackInStockSubscriptions => Set<BackInStockSubscription>();
+    public DbSet<WhatsAppNotification> WhatsAppNotifications => Set<WhatsAppNotification>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

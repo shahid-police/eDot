@@ -11,9 +11,11 @@ import Link from "next/link";
 import Pagination from "../common/Pagination";
 import { formatPrice } from "@/lib/format/price";
 import useSavedProducts from "@/hooks/useSavedProducts";
+import { useContextElement } from "@/context/Context";
 export default function Products1({ defaultLayout = 4, products }) {
   const source = products ?? products15;
   const { wishlistMap, compareMap, toggleWishlist, toggleCompare } = useSavedProducts();
+  const { setNotifyItem } = useContextElement();
   const [activeLayout, setActiveLayout] = useState(defaultLayout);
   const [state, dispatch] = useReducer(reducer, source, (items) => ({
     ...initialState,
@@ -183,14 +185,14 @@ export default function Products1({ defaultLayout = 4, products }) {
         <div className="container">
           <div className="tf-shop-control">
             <div className="tf-control-filter">
-              <a
+              {/* <a
                 href="#filterShop"
                 data-bs-toggle="offcanvas"
                 className="tf-btn-filter h4 link"
               >
                 <span className="icon icon-filter" />
                 <span className="text">FILTER</span>
-              </a>
+              </a> */}
               <div className="meta-filter-shop">
                 <div id="applied-filters">
                   {allProps.availability !== "All" && (
@@ -390,6 +392,7 @@ export default function Products1({ defaultLayout = 4, products }) {
                             href="#unavailable"
                             data-bs-toggle="modal"
                             className={`variant-box stock bg-main link ${product.textColor}`}
+                            onClick={() => setNotifyItem({ id: product.id, variantId: null })}
                           >
                             <p className="text-center d-none d-md-block">
                               {product.variantText}
@@ -533,6 +536,7 @@ export default function Products1({ defaultLayout = 4, products }) {
                             href="#unavailable"
                             data-bs-toggle="modal"
                             className={`variant-box stock bg-main link ${product.textColor}`}
+                            onClick={() => setNotifyItem({ id: product.id, variantId: null })}
                           >
                             <p className="text-center d-none d-md-block">
                               {product.variantText}

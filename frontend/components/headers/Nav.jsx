@@ -27,6 +27,13 @@ export default function Nav({ megaMarginRight = true }) {
         </Link>
       </li>
       <li
+        className={`menu-item ${pathname.split("/")[1] === "no-shop" ? "active" : ""}`}
+      >
+        <Link href="/no-shop" className="item-link">
+          No Shop
+        </Link>
+      </li>
+      <li
         className={`sub-menu mega-menu mega-menu-page container-layout-right${
           megaMarginRight ? "-3" : ""
         } mega-menu-style-2`}

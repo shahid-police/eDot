@@ -9,6 +9,8 @@ using Elegance.Application.Compare;
 using Elegance.Application.Categories;
 using Elegance.Application.Content;
 using Elegance.Application.Customers;
+using Elegance.Application.Inventory;
+using Elegance.Application.Notifications;
 using Elegance.Application.Products;
 using Elegance.Infrastructure.Auth;
 using Elegance.Infrastructure.Carts;
@@ -19,6 +21,8 @@ using Elegance.Infrastructure.Compare;
 using Elegance.Infrastructure.Catalog;
 using Elegance.Infrastructure.Content;
 using Elegance.Infrastructure.Customers;
+using Elegance.Infrastructure.Inventory;
+using Elegance.Infrastructure.Notifications;
 using Elegance.Infrastructure.Wishlists;
 using Elegance.Application.Wishlists;
 using Elegance.Infrastructure.Persistence;
@@ -52,6 +56,31 @@ public static class DependencyInjection
         services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<INoShopCategoryService, NoShopCategoryService>();
         services.AddScoped<INoShopVideoService, NoShopVideoService>();
+        services.AddScoped<IBackInStockService, BackInStockService>();
+        services.AddScoped<IRestockDetectionService, RestockDetectionService>();
+
+        services.AddOptions<WhatsAppOptions>()
+            .Bind(configuration.GetSection(WhatsAppOptions.SectionName));
+        services.AddScoped<MockWhatsAppNotificationService>();
+        services.AddHttpClient<WhatsAppCloudApiService>((sp, client) =>
+        {
+            var whatsAppOptions = sp.GetRequiredService<IOptions<WhatsAppOptions>>().Value;
+            client.BaseAddress = new Uri("https://graph.facebook.com");
+            client.Timeout = TimeSpan.FromSeconds(15);
+        });
+        // Mock is the safe default everywhere until WhatsApp:Provider is explicitly set to
+        // "CloudApi" with real Meta credentials and an approved message template - resolved per
+        // request (not once at startup) so a config change takes effect on the next request
+        // without needing a full app restart to re-run this registration.
+        services.AddScoped<IWhatsAppNotificationService>(sp =>
+        {
+            var whatsAppOptions = sp.GetRequiredService<IOptions<WhatsAppOptions>>().Value;
+            return whatsAppOptions.Provider.Equals("CloudApi", StringComparison.OrdinalIgnoreCase)
+                ? sp.GetRequiredService<WhatsAppCloudApiService>()
+                : sp.GetRequiredService<MockWhatsAppNotificationService>();
+        });
+        services.AddScoped<IWhatsAppWebhookService, WhatsAppWebhookService>();
+        services.AddHostedService<BackInStockNotificationWorker>();
 
         services.AddOptions<AiSearchOptions>()
             .Bind(configuration.GetSection(AiSearchOptions.SectionName));
@@ -89,6 +118,7 @@ public static class DependencyInjection
         services.AddScoped<IAdminNoShopService, AdminNoShopService>();
         services.AddScoped<IAdminOrderService, AdminOrderService>();
         services.AddScoped<IAdminInventoryService, AdminInventoryService>();
+        services.AddScoped<IAdminBackInStockService, AdminBackInStockService>();
         services.AddScoped<IAdminCustomerService, AdminCustomerService>();
         services.AddScoped<IAdminDashboardService, AdminDashboardService>();
 

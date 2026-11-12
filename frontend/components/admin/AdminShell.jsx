@@ -12,6 +12,7 @@ const NAV = [
   { href: "/admin/noshop-videos", label: "No Shop videos" },
   { href: "/admin/noshop-categories", label: "No Shop categories" },
   { href: "/admin/inventory", label: "Inventory" },
+  { href: "/admin/back-in-stock", label: "Back in Stock" },
   { href: "/admin/customers", label: "Customers" },
   { href: "/admin/audit", label: "Audit log" },
   { href: "/admin/security", label: "Security" },

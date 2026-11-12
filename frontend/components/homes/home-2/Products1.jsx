@@ -10,9 +10,11 @@ import CountdownTimer from "@/components/common/Countdown";
 import Link from "next/link";
 import { formatPrice } from "@/lib/format/price";
 import useSavedProducts from "@/hooks/useSavedProducts";
+import { useContextElement } from "@/context/Context";
 export default function Products1({ products }) {
   const source = products?.length ? products : products4;
   const { wishlistMap, compareMap, toggleWishlist, toggleCompare } = useSavedProducts();
+  const { setNotifyItem } = useContextElement();
   return (
     <section className="flat-spacing-6 bg-dark-brown">
       <div className="container">
@@ -144,6 +146,7 @@ export default function Products1({ products }) {
                         href="#unavailable"
                         data-bs-toggle="modal"
                         className="variant-box stock bg-main link text-white"
+                        onClick={() => setNotifyItem({ id: product.id, variantId: null })}
                       >
                         <p className="text-center d-none d-md-block">
                           {product.variantText ?? "Notify me when available"}

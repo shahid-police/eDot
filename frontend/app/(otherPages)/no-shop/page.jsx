@@ -1,7 +1,6 @@
 import Footer1 from "@/components/footers/Footer1";
 import Header2 from "@/components/headers/Header2";
 import Topbar1 from "@/components/headers/Topbar1";
-import Link from "next/link";
 import NoShopPageClient from "@/components/no-shop/NoShopPageClient";
 import { loadFeaturedNoShopVideos, loadNoShopCategories, loadNoShopVideos } from "@/lib/api/noshop";
 
@@ -39,28 +38,17 @@ export default async function NoShopPage() {
     <>
       <Topbar1 parentClass="tf-topbar bg-dark-olive" />
       <Header2 parentClass="tf-header style-2" />
-      <section className="flat-spacing-2 pb-0">
+      <section className="flat-spacing-6 pt-0 pb-0">
         <div className="container">
-          <div className="page-title">
-            <div className="breadcrumbs">
-              <ul className="bread-wrap">
-                <li>
-                  <Link href={`/`} className="text-main-4 link-secondary">
-                    Home
-                  </Link>
-                </li>
-                <li className="br-line w-12 bg-main" />
-                <li>No Shop</li>
-              </ul>
-              <h1 className="heading fw-normal text-uppercase">No Shop</h1>
-            </div>
-            <div className="box-text">
-              <p className="text-main-4">
-                Because life isn&apos;t always about shopping. No pressure to buy anything here -
-                <br className="d-none d-xl-block" />
-                just a place to smile, laugh, and discover the lighter side of E.
-              </p>
-            </div>
+          <div className="sect-top center text-center wow fadeInUp mb-4">
+            <h1 className="s-title font-2">
+              <span className="fst-italic">No</span> SHOP
+            </h1>
+            <p className="s-sub-title">
+              Because life isn&apos;t always about shopping. No pressure to buy anything here -
+              <br className="d-none d-xl-block" />
+              just a place to smile, laugh, and discover the lighter side of E.
+            </p>
           </div>
         </div>
       </section>

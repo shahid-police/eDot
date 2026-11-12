@@ -647,3 +647,71 @@ public interface IAdminNoShopService
     Task<AdminNoShopCategoryDto> CreateCategoryAsync(AdminActor actor, AdminNoShopCategoryRequest request, CancellationToken cancellationToken = default);
     Task<AdminNoShopCategoryDto> UpdateCategoryAsync(AdminActor actor, long categoryId, AdminNoShopCategoryRequest request, CancellationToken cancellationToken = default);
 }
+
+public class AdminBackInStockSummaryDto
+{
+    public required int ActiveSubscriptions { get; init; }
+    public required int NotifiedSubscriptions { get; init; }
+    public required int UnsubscribedSubscriptions { get; init; }
+    public required int PendingNotifications { get; init; }
+    public required int QueuedNotifications { get; init; }
+    public required int SentNotifications { get; init; }
+    public required int DeliveredNotifications { get; init; }
+    public required int ReadNotifications { get; init; }
+    public required int FailedNotifications { get; init; }
+}
+
+public class AdminBackInStockSubscriptionQuery
+{
+    public string? Search { get; init; }
+    public string? Status { get; init; }
+    public int Page { get; init; } = 1;
+    public int PageSize { get; init; } = 25;
+}
+
+public class AdminBackInStockSubscriptionDto
+{
+    public required long Id { get; init; }
+    public required long ProductId { get; init; }
+    public required string ProductName { get; init; }
+    public long? ProductVariantId { get; init; }
+    public string? VariantName { get; init; }
+    public required string CustomerName { get; init; }
+    public required string WhatsAppNumber { get; init; }
+    public required string Status { get; init; }
+    public required DateTime SubscribedAt { get; init; }
+    public DateTime? NotifiedAt { get; init; }
+
+    // A wa.me "click to chat" link pre-filled with the approved back-in-stock message text, for an
+    // admin to send manually from their own WhatsApp while real Cloud API credentials aren't set up.
+    public required string WhatsAppChatUrl { get; init; }
+}
+
+public class AdminWhatsAppNotificationQuery
+{
+    public string? Status { get; init; }
+    public long? ProductId { get; init; }
+    public int Page { get; init; } = 1;
+    public int PageSize { get; init; } = 25;
+}
+
+public class AdminWhatsAppNotificationDto
+{
+    public required long Id { get; init; }
+    public required long ProductId { get; init; }
+    public required string ProductName { get; init; }
+    public required string WhatsAppNumber { get; init; }
+    public required string Status { get; init; }
+    public required int RetryCount { get; init; }
+    public string? FailureReason { get; init; }
+    public DateTime? SentAt { get; init; }
+    public DateTime? DeliveredAt { get; init; }
+    public required DateTime CreatedAt { get; init; }
+}
+
+public interface IAdminBackInStockService
+{
+    Task<AdminBackInStockSummaryDto> GetSummaryAsync(CancellationToken cancellationToken = default);
+    Task<PagedResult<AdminBackInStockSubscriptionDto>> ListSubscriptionsAsync(AdminBackInStockSubscriptionQuery query, CancellationToken cancellationToken = default);
+    Task<PagedResult<AdminWhatsAppNotificationDto>> ListNotificationsAsync(AdminWhatsAppNotificationQuery query, CancellationToken cancellationToken = default);
+}

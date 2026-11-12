@@ -4,7 +4,7 @@ export default function FeaturedVideo({ video, onPlay }) {
   if (!video) return null;
 
   return (
-    <section className="flat-spacing-2 pb-0">
+    <section className="flat-spacing-2 pt-0 pb-0">
       <div className="container">
         <div
           className="article-blog hover-img no-shop-featured"

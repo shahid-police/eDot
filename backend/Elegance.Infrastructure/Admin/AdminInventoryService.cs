@@ -1,5 +1,6 @@
 using Elegance.Application.Admin;
 using Elegance.Application.Common;
+using Elegance.Application.Inventory;
 using Elegance.Domain.Catalog.Enums;
 using Elegance.Domain.Inventory;
 using Elegance.Infrastructure.Persistence;
@@ -7,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Elegance.Infrastructure.Admin;
 
-public class AdminInventoryService(EleganceDbContext dbContext, IAuditLogService auditLog) : IAdminInventoryService
+public class AdminInventoryService(EleganceDbContext dbContext, IAuditLogService auditLog, IRestockDetectionService restockDetection) : IAdminInventoryService
 {
     // Used when a product has no LowStockThreshold of its own.
     public const int DefaultLowStockThreshold = 5;
@@ -55,21 +56,26 @@ public class AdminInventoryService(EleganceDbContext dbContext, IAuditLogService
             throw new ApplicationFailure(FailureKind.Validation, "Enter a quantity other than zero.");
         }
 
-        var productType = await dbContext.Products
+        var product = await dbContext.Products
             .AsNoTracking()
             .Where(p => p.Id == request.ProductId)
-            .Select(p => (ProductType?)p.ProductType)
+            .Select(p => new { p.ProductType, p.StockQuantity })
             .FirstOrDefaultAsync(cancellationToken)
             ?? throw NotFound();
 
+        int previousStock;
         if (request.VariantId is { } variantId)
         {
-            var belongs = await dbContext.ProductVariants.AnyAsync(
-                v => v.Id == variantId && v.ProductId == request.ProductId, cancellationToken);
-            if (!belongs)
+            var variant = await dbContext.ProductVariants
+                .AsNoTracking()
+                .Where(v => v.Id == variantId && v.ProductId == request.ProductId)
+                .Select(v => new { v.StockQuantity })
+                .FirstOrDefaultAsync(cancellationToken);
+            if (variant is null)
             {
                 throw NotFound();
             }
+            previousStock = variant.StockQuantity;
 
             var taken = await dbContext.ProductVariants
                 .Where(v => v.Id == variantId && (delta > 0 || v.StockQuantity >= -delta))
@@ -78,16 +84,23 @@ public class AdminInventoryService(EleganceDbContext dbContext, IAuditLogService
         }
         else
         {
-            if (productType == ProductType.Variant)
+            if (product.ProductType == ProductType.Variant)
             {
                 throw new ApplicationFailure(FailureKind.Validation, "This product has options. Adjust stock on the option instead.");
             }
+            previousStock = product.StockQuantity;
 
             var taken = await dbContext.Products
                 .Where(p => p.Id == request.ProductId && (delta > 0 || p.StockQuantity >= -delta))
                 .ExecuteUpdateAsync(s => s.SetProperty(p => p.StockQuantity, p => p.StockQuantity + delta), cancellationToken);
             EnsureTaken(taken);
         }
+
+        // Staged alongside the StockMovement below and committed by the same SaveChangesAsync -
+        // the ExecuteUpdateAsync calls above already committed the stock number itself (they run
+        // as their own statement, outside the change tracker), so this is the best atomicity
+        // available without wrapping the whole method in an explicit transaction.
+        restockDetection.RecordStockChange(request.ProductId, request.VariantId, previousStock, previousStock + delta);
 
         var movement = new StockMovement
         {
