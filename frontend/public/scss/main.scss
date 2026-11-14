@@ -602,3 +602,12 @@ picture.jarallax-img img {
 .sld-content .sub-title-sld {
   color: var(--primary);
 }
+
+// On phone, the subtitle wraps across the slide's full width and spills into the bright half of
+// these split dark/bright slide images. Constrain it to roughly the dark half's share of the
+// screen there; tablet/desktop are unaffected.
+@media (max-width: 767px) {
+  .sld-content .sub-title-sld {
+    max-width: 50%;
+  }
+}

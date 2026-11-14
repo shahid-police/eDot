@@ -1,4 +1,4 @@
-import Footer3 from "@/components/footers/Footer3";
+import Footer2 from "@/components/footers/Footer2";
 import Header2 from "@/components/headers/Header2";
 import Cta from "@/components/common/Cta";
 import Link from "next/link";
@@ -57,7 +57,7 @@ export default function page() {
       <Collections />
       <Testimonials />
       <Cta />
-      <Footer3 />
+      <Footer2 />
     </>
   );
 }

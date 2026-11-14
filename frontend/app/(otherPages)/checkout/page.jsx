@@ -1,4 +1,4 @@
-import Footer1 from "@/components/footers/Footer1";
+import Footer2 from "@/components/footers/Footer2";
 import Header2 from "@/components/headers/Header2";
 import Checkout from "@/components/otherPages/Checkout";
 import React from "react";
@@ -30,7 +30,7 @@ export default function page() {
         </div>
       </section>
       <Checkout />
-      <Footer1 />
+      <Footer2 />
     </>
   );
 }

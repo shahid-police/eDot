@@ -1,4 +1,4 @@
-import Footer3 from "@/components/footers/Footer3";
+import Footer2 from "@/components/footers/Footer2";
 import Header2 from "@/components/headers/Header2";
 import Contact from "@/components/otherPages/Contact";
 import React from "react";
@@ -41,7 +41,7 @@ export default function page() {
         </div>
       </section>
       <Contact />
-      <Footer3 />
+      <Footer2 />
     </>
   );
 }

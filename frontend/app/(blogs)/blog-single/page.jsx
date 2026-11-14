@@ -1,5 +1,5 @@
 import BlogSingle from "@/components/blogs/BlogSingle";
-import Footer1 from "@/components/footers/Footer1";
+import Footer2 from "@/components/footers/Footer2";
 import Header2 from "@/components/headers/Header2";
 import React from "react";
 import Link from "next/link";
@@ -47,7 +47,7 @@ export default function page() {
         </div>
       </section>
       <BlogSingle />
-      <Footer1 />
+      <Footer2 />
     </>
   );
 }

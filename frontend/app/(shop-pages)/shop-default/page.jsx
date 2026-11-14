@@ -1,5 +1,5 @@
 import Features from "@/components/common/Features";
-import Footer1 from "@/components/footers/Footer1";
+import Footer2 from "@/components/footers/Footer2";
 import Header2 from "@/components/headers/Header2";
 
 import ShopSearchResults from "@/components/shop/ShopSearchResults";
@@ -32,7 +32,7 @@ export default async function page({ searchParams }) {
         parentClass="flat-spacing-8 bg-main"
         iconColorClass="text-primary"
       />
-      <Footer1 />
+      <Footer2 />
     </>
   );
 }

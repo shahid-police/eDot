@@ -46,10 +46,10 @@ export default function Hero() {
                           <br />
                           {slide.titleRest}
                         </p>
-                        <p className="sub-title-sld fade-item fade-item-2">
+                        <p className="sub-title-sld">
                           {slide.subtitle}
                         </p>
-                        <div className="fade-item fade-item-3">
+                        <div>
                           <Link
                             href={`/shop-default`}
                             className="tf-btn btn-fill-white animate-btn animate-dark fw-medium"

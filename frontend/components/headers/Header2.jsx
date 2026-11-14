@@ -43,7 +43,7 @@ export default function Header2({ parentClass = "tf-header style-2", transparent
                 <li className="br-line d-none d-xl-flex" />
                 <li className="d-inline-flex">
                   <Link
-                    href="/shop-default"
+                    href="/no-shop"
                     className="nav-icon-item text-primary link"
                   >
                     <span className="icon-crossed">

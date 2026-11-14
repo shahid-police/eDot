@@ -13,14 +13,14 @@ export default function Toolbar() {
         </Link>
       </div>
       <div className="toolbar-item">
-        <a href="#search" data-bs-toggle="offcanvas">
+        <Link href={`/no-shop`}>
           <span className="toolbar-icon">
             <span className="icon-crossed">
               <i className="icon icon-shop-cart" />
             </span>
           </span>
-          <span className="toolbar-label">Search</span>
-        </a>
+          <span className="toolbar-label">No Shop</span>
+        </Link>
       </div>
       <div className="toolbar-item toolbar-item-logo">
         <Link href={`/`}>

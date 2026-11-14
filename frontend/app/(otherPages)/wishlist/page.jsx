@@ -1,4 +1,4 @@
-import Footer1 from "@/components/footers/Footer1";
+import Footer2 from "@/components/footers/Footer2";
 import Header2 from "@/components/headers/Header2";
 import Wishlist from "@/components/otherPages/Wishlist";
 import Link from "next/link";
@@ -33,7 +33,7 @@ export default function page() {
       </section>
 
       <Wishlist />
-      <Footer1 />
+      <Footer2 />
     </>
   );
 }

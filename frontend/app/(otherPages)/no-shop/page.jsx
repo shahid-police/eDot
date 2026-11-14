@@ -1,4 +1,4 @@
-import Footer1 from "@/components/footers/Footer1";
+import Footer2 from "@/components/footers/Footer2";
 import Header2 from "@/components/headers/Header2";
 import NoShopPageClient from "@/components/no-shop/NoShopPageClient";
 import { loadFeaturedNoShopVideos, loadNoShopCategories, loadNoShopVideos } from "@/lib/api/noshop";
@@ -58,7 +58,7 @@ export default async function NoShopPage() {
         categories={categories}
       />
 
-      <Footer1 />
+      <Footer2 />
     </>
   );
 }
