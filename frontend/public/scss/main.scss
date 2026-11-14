@@ -611,3 +611,26 @@ picture.jarallax-img img {
     max-width: 50%;
   }
 }
+
+// The product card's hover action stack (wishlist/cart/WhatsApp/quick-view) shares one .icon
+// font-size per breakpoint, but icon-cart's glyph is noticeably denser than icon-hearth/icon-view
+// beside it, and the WhatsApp glyph was a hand-sized SVG (previously a fixed 16x16 regardless of
+// breakpoint) rather than following that same scale at all. Bring both in line with their
+// neighbors at every tier.
+.box-icon .icon.icon-cart {
+  font-size: 12px;
+}
+.box-icon .icon.icon-whatsapp-glyph {
+  width: 0.8em;
+  height: 0.8em;
+}
+@media (min-width: 992px) {
+  .box-icon .icon.icon-cart {
+    font-size: 14px;
+  }
+}
+@media (min-width: 1200px) {
+  .box-icon .icon.icon-cart {
+    font-size: 16px;
+  }
+}
