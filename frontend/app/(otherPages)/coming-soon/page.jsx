@@ -1,5 +1,4 @@
 import Header2 from "@/components/headers/Header2";
-import Topbar1 from "@/components/headers/Topbar1";
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -12,7 +11,6 @@ export const metadata = {
 export default function page() {
   return (
     <>
-      <Topbar1 />
       <Header2 parentClass="tf-header style-2" />
       <div className="wg-coming">
         <div className="image">

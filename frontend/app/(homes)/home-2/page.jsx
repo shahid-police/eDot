@@ -1,6 +1,5 @@
 import Footer2 from "@/components/footers/Footer2";
 import Header2 from "@/components/headers/Header2";
-import Topbar2 from "@/components/headers/Topbar2";
 import Banner from "@/components/homes/home-2/Banner";
 import Blogs from "@/components/homes/home-2/Blogs";
 import Categories from "@/components/homes/home-2/Categories";
@@ -49,8 +48,7 @@ export default async function page() {
 
   return (
     <>
-      <Topbar2 />
-      <Header2 transparent />
+      <Header2 />
       <Hero />
       <Products2 products={trendyCollection} />
 

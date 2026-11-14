@@ -1,7 +1,6 @@
 import Features from "@/components/common/Features";
 import Footer1 from "@/components/footers/Footer1";
 import Header2 from "@/components/headers/Header2";
-import Topbar1 from "@/components/headers/Topbar1";
 import ApiProductDetail from "@/components/product-details/ApiProductDetail";
 import Descriptions1 from "@/components/product-details/Descriptions1";
 import Details1 from "@/components/product-details/Details1";
@@ -45,7 +44,6 @@ export default async function ProductDetailPage({ params }) {
 
   return (
     <>
-      <Topbar1 parentClass="tf-topbar bg-dark-olive" />
       <Header2 parentClass="tf-header style-2" />
       <div className="flat-spacing-16 pb-0">
         <div className="container">

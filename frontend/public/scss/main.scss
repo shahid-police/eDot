@@ -502,3 +502,103 @@ picture.jarallax-img img {
 .modal.modalCentered.show {
   background: transparent;
 }
+
+// Header2's .header-top is hidden entirely below xl (phone/tablet show no menu button, logo, or
+// icon row there - the bottom tab bar covers those instead), but the theme's own 15px/15px
+// padding on .tf-header itself is set unconditionally for every screen below xl and doesn't know
+// the row inside is empty. Zero it out to actually collapse the header down to nothing there.
+@media (max-width: 1199px) {
+  .tf-header.style-2 {
+    padding: 0;
+  }
+}
+
+// The central "E." logo replacing the toolbar's Account tab should read as the prominent,
+// eye-catching item of the bar rather than a small icon - give it the full width/height the
+// bar's own 12px top/bottom padding allows (other tabs keep their 10px side padding, which
+// would otherwise clip this wider logo) so it visually fills the bar top-to-bottom.
+.tf-toolbar-bottom .toolbar-item-logo a {
+  padding-left: 2px;
+  padding-right: 2px;
+}
+
+// icon-menu-home's glyph fills its em-square far more than the thin line glyphs (search,
+// wishlist, cart) it sits next to in the desktop header's left-hand icon group, so at the shared
+// 32px nav-icon font-size it reads much bigger than its neighbors. Shrink just this glyph there
+// to match their visual weight.
+.header-top .nav-icon .icon-menu-home {
+  font-size: 20px;
+}
+
+// icon-shop-cart (the crossed-out shopping bag replacing the search icon) is a bold glyph like
+// icon-menu-home above - same fix, same reason: shrink it to match the thin wishlist/cart line
+// icons beside it.
+.header-top .nav-icon .icon-shop-cart {
+  font-size: 20px;
+}
+
+// The icon set has no built-in "crossed out" variant of any icon, so this draws the diagonal
+// strike-through itself: a wrapper around the glyph with a rotated line overlaid via ::after,
+// colored to match the glyph (currentColor) so it follows the icon's own color/hover states.
+.icon-crossed {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 130%;
+    height: 2px;
+    background-color: currentColor;
+    transform: translate(-50%, -50%) rotate(-45deg);
+    pointer-events: none;
+  }
+}
+
+// Topbar2's announcement headline was a fixed 18px, sized for desktop, so on a narrow phone
+// screen it reads oversized relative to the viewport. Scale it down on phone/tablet.
+.topbar2-headline {
+  font-size: 12px;
+}
+@media (min-width: 768px) {
+  .topbar2-headline {
+    font-size: 14px;
+  }
+}
+@media (min-width: 1200px) {
+  .topbar2-headline {
+    font-size: 18px;
+  }
+}
+
+// Home-2 Hero's slide title ("Discover" / "Our Collection" etc., only used there) was sized with
+// a clamp whose 38px floor is still big enough, on phone and tablet, to spill the text out of the
+// dark half of these split dark/bright slide images and onto the bright product photo. Shrink it
+// there; desktop (xl+) keeps the original clamp unchanged.
+.title-sld {
+  font-size: 22px;
+  line-height: 30px;
+}
+@media (min-width: 768px) {
+  .title-sld {
+    font-size: 34px;
+    line-height: 42px;
+  }
+}
+@media (min-width: 1200px) {
+  .title-sld {
+    font-size: clamp(38px, 7vw, 76px);
+    line-height: clamp(48px, 8vw, 91px);
+  }
+}
+
+// Home-2 Hero's slide subtitle, requested in the brand's gold rather than the shared
+// .sub-title-sld/.sub-title-sld-2/.title-sld-4 rule's white - scoped to .sld-content so the
+// other two classes (used elsewhere) keep their white color.
+.sld-content .sub-title-sld {
+  color: var(--primary);
+}

@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 import Link from "next/link";
 export default function Toolbar() {
   return (
@@ -14,17 +15,24 @@ export default function Toolbar() {
       <div className="toolbar-item">
         <a href="#search" data-bs-toggle="offcanvas">
           <span className="toolbar-icon">
-            <i className="icon icon-search-2" />
+            <span className="icon-crossed">
+              <i className="icon icon-shop-cart" />
+            </span>
           </span>
           <span className="toolbar-label">Search</span>
         </a>
       </div>
-      <div className="toolbar-item">
-        <Link href={`/account-page`}>
-          <span className="toolbar-icon">
-            <i className="icon icon-user-2" />
+      <div className="toolbar-item toolbar-item-logo">
+        <Link href={`/`}>
+          <span className="logo-shine d-inline-block">
+            <Image
+              alt="E."
+              src="/images/logo/logo-transparent.png"
+              width={495}
+              height={383}
+              style={{ width: "62px", height: "auto" }}
+            />
           </span>
-          <span className="toolbar-label">Account</span>
         </Link>
       </div>
       <div className="toolbar-item">

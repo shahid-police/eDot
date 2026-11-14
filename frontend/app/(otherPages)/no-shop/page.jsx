@@ -1,6 +1,5 @@
 import Footer1 from "@/components/footers/Footer1";
 import Header2 from "@/components/headers/Header2";
-import Topbar1 from "@/components/headers/Topbar1";
 import NoShopPageClient from "@/components/no-shop/NoShopPageClient";
 import { loadFeaturedNoShopVideos, loadNoShopCategories, loadNoShopVideos } from "@/lib/api/noshop";
 
@@ -36,7 +35,6 @@ export default async function NoShopPage() {
 
   return (
     <>
-      <Topbar1 parentClass="tf-topbar bg-dark-olive" />
       <Header2 parentClass="tf-header style-2" />
       <section className="flat-spacing-6 pt-0 pb-0">
         <div className="container">

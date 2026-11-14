@@ -1,7 +1,6 @@
 import Features from "@/components/common/Features";
 import Footer1 from "@/components/footers/Footer1";
 import Header2 from "@/components/headers/Header2";
-import Topbar1 from "@/components/headers/Topbar1";
 
 import ShopSearchResults from "@/components/shop/ShopSearchResults";
 import React from "react";
@@ -27,7 +26,6 @@ export default async function page({ searchParams }) {
 
   return (
     <>
-      <Topbar1 parentClass="tf-topbar bg-dark-olive" />
       <Header2 parentClass="tf-header style-2" />
       <ShopSearchResults initialProducts={products} />
       <Features

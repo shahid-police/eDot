@@ -1,5 +1,4 @@
 import Header2 from "@/components/headers/Header2";
-import Topbar1 from "@/components/headers/Topbar1";
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -10,7 +9,6 @@ export const metadata = {
 export default function page() {
   return (
     <>
-      <Topbar1 />
       <Header2 parentClass="tf-header style-2 line-bt-2" />
       <div className="wg-404 tf-grid-layout sm-col-2 gap-0 vh-100">
         <div className="image">

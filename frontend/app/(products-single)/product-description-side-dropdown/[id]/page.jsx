@@ -1,7 +1,6 @@
 import Features from "@/components/common/Features";
 import Footer1 from "@/components/footers/Footer1";
 import Header2 from "@/components/headers/Header2";
-import Topbar1 from "@/components/headers/Topbar1";
 
 import RecentProducts from "@/components/product-details/RecentProducts";
 import RelatedProducts from "@/components/product-details/RelatedProducts";
@@ -20,7 +19,6 @@ export default async function ProductDetailPage({ params }) {
   const product = allProducts.filter((p) => p.id == id)[0] || allProducts[0];
   return (
     <>
-      <Topbar1 />
       <Header2 parentClass="tf-header style-2" />
       <div className="flat-spacing-16 pb-0">
         <div className="container">

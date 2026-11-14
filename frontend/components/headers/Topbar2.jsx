@@ -5,11 +5,10 @@ export default function Topbar2() {
     <div className="tf-topbar topbar-silver-glitter px-0">
       <div className="d-flex align-items-center justify-content-center">
         <p
-          className="font-2 mb-0"
+          className="font-2 mb-0 topbar2-headline"
           style={{
             textTransform: "none",
             color: "#b8860b",
-            fontSize: "18px",
             fontStyle: "normal",
             fontWeight: 700,
             letterSpacing: "0.04em",

@@ -43,7 +43,7 @@ export default function Hero() {
                           <span className="fst-italic">
                             {slide.titleItalic}
                           </span>
-                          <br className="d-none d-sm-block" />
+                          <br />
                           {slide.titleRest}
                         </p>
                         <p className="sub-title-sld fade-item fade-item-2">

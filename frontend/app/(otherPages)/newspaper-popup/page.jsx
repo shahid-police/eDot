@@ -1,7 +1,6 @@
 import Features from "@/components/common/Features";
 import Footer1 from "@/components/footers/Footer1";
 import Header2 from "@/components/headers/Header2";
-import Topbar1 from "@/components/headers/Topbar1";
 import Banner from "@/components/homes/home-1/Banner";
 import Collections from "@/components/homes/home-1/Collections";
 import Hero from "@/components/homes/home-1/Hero";
@@ -22,7 +21,6 @@ export default function Home() {
     <>
       <div className="bg-surface">
         <div id="wrapper">
-          <Topbar1 />
           <Header2 parentClass="tf-header style-2 line-bt-2" />
           <Hero />
           <TextBanner />
