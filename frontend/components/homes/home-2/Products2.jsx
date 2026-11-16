@@ -14,7 +14,7 @@ export default function Products2({ products }) {
   const { wishlistMap, compareMap, toggleWishlist, toggleCompare } = useSavedProducts();
   const { setNotifyItem } = useContextElement();
   return (
-    <section className="flat-spacing-6 pt-0">
+    <section className="flat-spacing-6">
       <div className="container">
         <div className="sect-top center text-center wow fadeInUp">
           <h2 className="s-title font-2">

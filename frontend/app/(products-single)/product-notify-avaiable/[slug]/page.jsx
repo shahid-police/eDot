@@ -11,12 +11,25 @@ import { notFound } from "next/navigation";
 import { allProducts } from "@/data/products";
 import TextSlider from "@/components/common/TextSlider3";
 import Details17 from "@/components/product-details/Details17";
-import { loadApiProductBySlug } from "@/lib/api/products";
+import { loadApiProductBySlug, getProducts, toTemplateCardProduct } from "@/lib/api/products";
 
 const DEFAULT_METADATA = {
   title: "Product Details || E.",
   description: "The Choice of Elegant Women, Every Day",
 };
+
+async function loadRelatedProducts(excludeSlug) {
+  try {
+    const result = await getProducts({ pageSize: 20 });
+    return result.items
+      .filter((item) => item.inStock && item.slug !== excludeSlug)
+      .map(toTemplateCardProduct)
+      .sort(() => Math.random() - 0.5);
+  } catch (error) {
+    console.error("Product API unavailable, rendering template data:", error);
+    return undefined;
+  }
+}
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
@@ -41,6 +54,8 @@ export default async function ProductDetailPage({ params }) {
   if (!apiProduct && !templateProduct) {
     notFound();
   }
+
+  const relatedProducts = await loadRelatedProducts(apiProduct?.slug ?? slug);
 
   return (
     <>
@@ -81,7 +96,7 @@ export default async function ProductDetailPage({ params }) {
       )}
       {!apiProduct && <Descriptions1 />}
       <TextSlider />
-      <RelatedProducts />
+      <RelatedProducts products={relatedProducts} />
       <RecentProducts />
       <Features
         parentClass="flat-spacing-8 bg-main"
