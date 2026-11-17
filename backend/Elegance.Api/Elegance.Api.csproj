@@ -14,6 +14,13 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <!-- SkiaSharp.NativeAssets.Linux.NoDependencies is referenced by Elegance.Infrastructure (where
+         SkiaSharp is actually used), but a RID-specific native-asset-only package reached only
+         through a ProjectReference chain does not get its runtimes/linux-x64/native/libSkiaSharp.so
+         copied into a `dotnet publish -r linux-x64` output - it has to be referenced directly by the
+         executable project for that. Without this, image uploads fail on the Linux server with
+         "That file is not a valid image". -->
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="4.153.1" />
   </ItemGroup>
 
   <ItemGroup>
