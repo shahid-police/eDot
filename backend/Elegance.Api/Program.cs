@@ -7,6 +7,7 @@ using Elegance.Infrastructure.Persistence;
 using Elegance.Infrastructure.Persistence.Seed;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 using System.Threading.RateLimiting;
@@ -147,6 +148,17 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseExceptionHandler();
+
+// nginx terminates TLS and proxies to Kestrel over plain HTTP, so without this Request.IsHttps
+// (and anything that keys off it, like the Secure cookie flag) always sees the internal HTTP
+// hop instead of what the client actually connected with.
+var forwardedHeadersOptions = new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
+};
+forwardedHeadersOptions.KnownIPNetworks.Clear();
+forwardedHeadersOptions.KnownProxies.Clear();
+app.UseForwardedHeaders(forwardedHeadersOptions);
 
 app.UseHttpsRedirection();
 
