@@ -1,6 +1,9 @@
 import { ApiError } from "@/lib/api/client";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5071";
+// Admin traffic can use its own API host (an unproxied DNS record that bypasses Cloudflare, so
+// uploads/exports aren't subject to its limits). Falls back to the storefront API host.
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_ADMIN_API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5071";
 const TOKEN_KEY = "elegance.admin.token";
 
 // The admin token lives in sessionStorage for this tab only. It expires after the access

@@ -93,5 +93,5 @@ rather than storing raw files in R2 directly.
 - No bulk/CSV image import.
 - No presigned direct-to-bucket upload path (see above).
 - No image alt text editor in the admin UI yet, though `MediaFile.AltText` exists in the schema.
-- `SkiaSharp.NativeAssets.Linux` is not yet restored in this repo's lockfile — needed before a
-  Linux container deploy; add it back to `Elegance.Infrastructure.csproj` and restore before then.
+- `SkiaSharp.NativeAssets.Linux.NoDependencies` is referenced in `Elegance.Infrastructure.csproj`. Without it, image decoding
+  fails on Linux and uploads report "That file is not a valid image."

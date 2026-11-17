@@ -22,8 +22,10 @@
     <PackageReference Include="Otp.NET" Version="1.4.0" />
     <PackageReference Include="QRCoder" Version="1.6.0" />
     <PackageReference Include="Microsoft.AspNetCore.DataProtection.Abstractions" Version="10.0.12" />
-    <!-- Needed before a Linux deploy: SkiaSharp's own native assets only cover Windows/macOS by
-         default. Re-add once this restores (it was very slow on this network): SkiaSharp.NativeAssets.Linux 4.153.1. -->
+    <!-- SkiaSharp's own native assets only cover Windows/macOS. Without this, image decoding throws
+         on the Linux server and every upload fails with "That file is not a valid image".
+         NoDependencies avoids needing fontconfig/freetype on a headless host. -->
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="4.153.1" />
   </ItemGroup>
 
   <PropertyGroup>
