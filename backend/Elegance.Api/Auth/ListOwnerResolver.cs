@@ -29,7 +29,7 @@ public static class ListOwnerResolver
         response.Cookies.Append(guestCookieName, guestToken, new CookieOptions
         {
             HttpOnly = true,
-            Secure = true,
+            Secure = request.IsHttps,
             SameSite = SameSiteMode.Lax,
             Path = "/",
             MaxAge = GuestSessionLifetime,

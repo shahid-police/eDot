@@ -78,7 +78,7 @@ public class AuthController(
         }
 
         await merge(guestToken);
-        Response.Cookies.Delete(cookieName, new CookieOptions { Path = "/", Secure = true, SameSite = SameSiteMode.Lax });
+        Response.Cookies.Delete(cookieName, new CookieOptions { Path = "/", Secure = Request.IsHttps, SameSite = SameSiteMode.Lax });
     }
 
     private void SetRefreshCookie(string refreshToken, DateTime expiresAt)
@@ -86,10 +86,13 @@ public class AuthController(
         Response.Cookies.Append(RefreshCookieName, refreshToken, RefreshCookieOptions(new DateTimeOffset(expiresAt)));
     }
 
-    private static CookieOptions RefreshCookieOptions(DateTimeOffset? expires) => new()
+    // Secure tracks the actual request scheme rather than being hardcoded: browsers silently drop
+    // Secure cookies on a plain-HTTP connection, which would break guest/session persistence
+    // entirely on an HTTP-only deployment (e.g. before DNS/TLS is live on a fresh VPS).
+    private CookieOptions RefreshCookieOptions(DateTimeOffset? expires) => new()
     {
         HttpOnly = true,
-        Secure = true,
+        Secure = Request.IsHttps,
         SameSite = SameSiteMode.Lax,
         Path = RefreshCookiePath,
         Expires = expires,
