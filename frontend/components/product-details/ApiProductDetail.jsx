@@ -9,6 +9,7 @@ import { addCompareItem, getCompare, removeCompareItem } from "@/lib/api/compare
 import { useSession } from "@/lib/auth/session";
 import { formatPrice } from "@/lib/format/price";
 import { useContextElement } from "@/context/Context";
+import { recordRecentlyViewed } from "@/lib/recentlyViewed";
 
 const GALLERY_KEY = "api";
 
@@ -48,6 +49,18 @@ export default function ApiProductDetail({ product }) {
       .then((list) => setCompareItems(list.items))
       .catch(() => setCompareItems([]));
   }, [session]);
+
+  useEffect(() => {
+    recordRecentlyViewed({
+      id: product.id,
+      slug: product.slug,
+      title: product.name,
+      price: product.salePrice ?? product.price,
+      oldPrice: product.salePrice ? product.price : null,
+      imgSrc: product.images[0]?.url,
+      hoverImgSrc: product.images[1]?.url ?? product.images[0]?.url,
+    });
+  }, [product]);
 
   const run = async (action, setItems) => {
     setSaveError("");

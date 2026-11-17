@@ -97,7 +97,7 @@ export default async function ProductDetailPage({ params }) {
       {!apiProduct && <Descriptions1 />}
       <TextSlider />
       <RelatedProducts products={relatedProducts} />
-      <RecentProducts />
+      <RecentProducts excludeId={apiProduct?.id} />
       <Features
         parentClass="flat-spacing-8 bg-main"
         iconColorClass="text-primary"

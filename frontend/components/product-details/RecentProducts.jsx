@@ -1,12 +1,23 @@
 "use client";
-import { products14 } from "@/data/products";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import Link from "next/link";
 import Image from "next/image";
 import QuickView from "../common/QuickView";
 import { Navigation, Pagination } from "swiper/modules";
-export default function RecentProducts({ containerFull = false }) {
+import { formatPrice } from "@/lib/format/price";
+import { getRecentlyViewed } from "@/lib/recentlyViewed";
+export default function RecentProducts({ containerFull = false, excludeId }) {
+  const [viewed, setViewed] = useState([]);
+
+  useEffect(() => {
+    setViewed(getRecentlyViewed(excludeId));
+  }, [excludeId]);
+
+  if (viewed.length === 0) {
+    return null;
+  }
+
   return (
     <section className="flat-spacing pt-0">
       <div className={`container${containerFull ? "-full" : ""}`}>
@@ -49,12 +60,12 @@ export default function RecentProducts({ containerFull = false }) {
             nextEl: ".snbn45",
           }}
         >
-          {products14.map((product, index) => (
-            <SwiperSlide className="swiper-slide" key={index}>
+          {viewed.map((product) => (
+            <SwiperSlide className="swiper-slide" key={product.id}>
               <div className="card_product--V01">
                 <div className="card_product-wrapper">
                   <Link
-                    href={`/product-default/${product.id}`}
+                    href={`/product-default/${product.slug ?? product.id}`}
                     className="product-img"
                   >
                     <Image
@@ -80,24 +91,18 @@ export default function RecentProducts({ containerFull = false }) {
                 </div>
                 <div className="card_product-info">
                   <Link
-                    href={`/product-default/${product.id}`}
+                    href={`/product-default/${product.slug ?? product.id}`}
                     className="name-product h5 fw-normal link text-line-clamp-2"
                   >
                     {product.title}
                   </Link>
                   <div className="price-wrap">
                     <span className="price-new h5">
-                      $
-                      {product.price.toLocaleString(undefined, {
-                        minimumFractionDigits: 2,
-                      })}
+                      {formatPrice(product.price)}
                     </span>
                     {product.oldPrice && (
                       <span className="price-old fw-normal">
-                        $
-                        {product.oldPrice.toLocaleString(undefined, {
-                          minimumFractionDigits: 2,
-                        })}
+                        {formatPrice(product.oldPrice)}
                       </span>
                     )}
                   </div>
