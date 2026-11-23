@@ -15,7 +15,7 @@ import { getProducts, toTemplateCardProduct } from "@/lib/api/products";
 import { loadTopLevelCategories } from "@/lib/api/categories";
 
 export const metadata = {
-  title: "Elegence.pk || E.",
+  title: "Empress.pk || E.",
   description: "The Choice of Elegant Women, Every Day",
 };
 

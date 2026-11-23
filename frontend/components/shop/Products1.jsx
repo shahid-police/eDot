@@ -443,7 +443,7 @@ export default function Products1({ defaultLayout = 4, products }) {
                   className="box_image-image img-style"
                 >
                   <img
-                    src="images/collections/discover-1.jpg"
+                    src="images/collections/season-1.jpg"
                     alt=""
                     className="lazyload"
                     width={714}
