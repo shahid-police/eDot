@@ -164,7 +164,16 @@ app.UseHttpsRedirection();
 
 // Serves wwwroot/uploads when Storage:Provider is "Local" (development only - see
 // Elegance.Infrastructure/Media/LocalDiskFileStorage.cs). Harmless, and unused, under "R2".
-app.UseStaticFiles();
+// Every upload gets a fresh GUID filename and a changed product/variant always re-uploads under a
+// new key rather than overwriting one in place, so a given URL's bytes never change - safe to
+// cache aggressively and immutably.
+app.UseStaticFiles(new StaticFileOptions
+{
+    OnPrepareResponse = ctx =>
+    {
+        ctx.Context.Response.Headers.CacheControl = "public, max-age=31536000, immutable";
+    },
+});
 
 app.UseCors("Frontend");
 

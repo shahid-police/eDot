@@ -29,6 +29,20 @@ public class AdminMediaService(EleganceDbContext dbContext, IFileStorage fileSto
         ["image/webp"] = "webp",
     };
 
+    // The client's declared Content-Type is just a request header - trivially spoofable, and no
+    // guarantee of what the bytes actually are. Checked against the real file signature before we
+    // ever hand the bytes to the image codec.
+    private static readonly Dictionary<string, Func<byte[], bool>> SignatureValidators = new()
+    {
+        ["image/jpeg"] = bytes => bytes.Length >= 3 && bytes[0] == 0xFF && bytes[1] == 0xD8 && bytes[2] == 0xFF,
+        ["image/png"] = bytes => bytes.Length >= 8 &&
+            bytes[0] == 0x89 && bytes[1] == 0x50 && bytes[2] == 0x4E && bytes[3] == 0x47 &&
+            bytes[4] == 0x0D && bytes[5] == 0x0A && bytes[6] == 0x1A && bytes[7] == 0x0A,
+        ["image/webp"] = bytes => bytes.Length >= 12 &&
+            bytes[0] == 'R' && bytes[1] == 'I' && bytes[2] == 'F' && bytes[3] == 'F' &&
+            bytes[8] == 'W' && bytes[9] == 'E' && bytes[10] == 'B' && bytes[11] == 'P',
+    };
+
     public async Task<AdminProductImageDto> UploadProductImageAsync(
         AdminActor actor, long productId, string imageType, Stream content, string contentType, long contentLength, CancellationToken cancellationToken = default)
     {
@@ -292,6 +306,27 @@ public class AdminMediaService(EleganceDbContext dbContext, IFileStorage fileSto
         await content.CopyToAsync(buffer, cancellationToken);
         var original = buffer.ToArray();
 
+        if (!SignatureValidators[contentType](original))
+        {
+            throw new ApplicationFailure(FailureKind.Validation, "That file is not a valid image.");
+        }
+
+        // SKCodec only parses the header, so this reports the real pixel dimensions without
+        // decoding a single pixel - checked before SKBitmap.Decode below allocates the full pixel
+        // buffer, so a small-but-highly-compressed file can't be used to force a huge allocation
+        // (a decompression-bomb DoS) before we ever get a chance to reject it.
+        using (var codec = SKCodec.Create(new SKMemoryStream(original)))
+        {
+            if (codec is null)
+            {
+                throw new ApplicationFailure(FailureKind.Validation, "That file is not a valid image.");
+            }
+            if (codec.Info.Width > MaxInputEdge || codec.Info.Height > MaxInputEdge)
+            {
+                throw new ApplicationFailure(FailureKind.Validation, $"Images must be {MaxInputEdge}×{MaxInputEdge} pixels or smaller. Resize it and try again.");
+            }
+        }
+
         // SKBitmap.Decode doesn't just return null on unparseable bytes - it can throw
         // (e.g. ArgumentNullException when it can't construct a codec), so both are "not an image".
         SKBitmap? decoded;
@@ -304,11 +339,6 @@ public class AdminMediaService(EleganceDbContext dbContext, IFileStorage fileSto
             decoded = null;
         }
         using var bitmap = decoded ?? throw new ApplicationFailure(FailureKind.Validation, "That file is not a valid image.");
-
-        if (bitmap.Width > MaxInputEdge || bitmap.Height > MaxInputEdge)
-        {
-            throw new ApplicationFailure(FailureKind.Validation, $"Images must be {MaxInputEdge}×{MaxInputEdge} pixels or smaller. Resize it and try again.");
-        }
 
         var longEdge = Math.Max(bitmap.Width, bitmap.Height);
         SKBitmap toEncode = bitmap;
