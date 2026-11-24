@@ -36,8 +36,7 @@ export default function ProductDiscountSection({ productId, productType, variant
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [productId]);
 
-  async function submit(event) {
-    event.preventDefault();
+  async function submit() {
     setError("");
     setBusy(true);
     try {
@@ -76,7 +75,9 @@ export default function ProductDiscountSection({ productId, productType, variant
       <h2 className="h6 mb-2">Discount</h2>
       {error && <div className="alert alert-danger py-2 mb-2">{error}</div>}
 
-      <form onSubmit={submit} className="row g-2 align-items-end mb-3">
+      {/* A plain div, not a <form> - this section lives inside ProductForm's own outer <form>,
+          and nested <form> elements are invalid HTML and trigger a hydration error. */}
+      <div className="row g-2 align-items-end mb-3">
         {isVariantProduct && (
           <div className="col-md-3">
             <label className="form-label small">Option</label>
@@ -124,14 +125,14 @@ export default function ProductDiscountSection({ productId, productType, variant
           />
         </div>
         <div className="col-md-auto">
-          <button type="submit" className="btn btn-outline-dark btn-sm" disabled={busy || (isVariantProduct && activeVariants.length === 0)}>
+          <button type="button" onClick={submit} className="btn btn-outline-dark btn-sm" disabled={busy || (isVariantProduct && activeVariants.length === 0)}>
             {busy ? "Saving..." : "Add discount"}
           </button>
         </div>
         {isVariantProduct && activeVariants.length === 0 && (
           <div className="col-12"><p className="small text-muted mb-0">Add and save at least one option first.</p></div>
         )}
-      </form>
+      </div>
 
       {loading && <p className="small text-muted">Loading...</p>}
 
