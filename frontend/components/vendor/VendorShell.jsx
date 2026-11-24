@@ -8,6 +8,8 @@ import { clearVendorToken, getVendorToken, vendorRequest } from "@/lib/vendor/ap
 const NAV = [
   { href: "/vendor/dashboard", label: "Dashboard" },
   { href: "/vendor/products", label: "My Products" },
+  { href: "/vendor/orders", label: "My Orders" },
+  { href: "/vendor/sales", label: "Sales Overview" },
 ];
 
 export default function VendorShell({ children }) {

@@ -982,6 +982,7 @@ public class AdminDashboardDto
     public required int CustomerCount { get; init; }
     public required int ActiveProductCount { get; init; }
     public required int LowStockCount { get; init; }
+    public required int PendingVendorSubmissionCount { get; init; }
     public required IReadOnlyList<AdminOrderSummaryDto> RecentOrders { get; init; }
 }
 

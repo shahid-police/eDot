@@ -146,8 +146,14 @@ public static class DependencyInjection
         });
         services.AddScoped<IAdminMediaService, AdminMediaService>();
 
+        services.AddOptions<Notifications.VendorNotificationOptions>()
+            .Bind(configuration.GetSection(Notifications.VendorNotificationOptions.SectionName));
+        services.AddScoped<Notifications.VendorNotificationQueuer>();
+        services.AddHostedService<Notifications.VendorNotificationWorker>();
+
         services.AddScoped<IVendorAuthService, VendorAuthService>();
         services.AddScoped<IVendorCatalogService, VendorCatalogService>();
+        services.AddScoped<IVendorOrderService, VendorOrderService>();
         services.AddScoped<IAdminVendorService, AdminVendorService>();
         services.AddScoped<IAdminVendorSubmissionService, AdminVendorSubmissionService>();
 

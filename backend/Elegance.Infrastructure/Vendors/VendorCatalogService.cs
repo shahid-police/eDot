@@ -3,12 +3,13 @@ using Elegance.Application.Vendors;
 using Elegance.Domain.Media;
 using Elegance.Domain.Vendors;
 using Elegance.Infrastructure.Media;
+using Elegance.Infrastructure.Notifications;
 using Elegance.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 namespace Elegance.Infrastructure.Vendors;
 
-public class VendorCatalogService(EleganceDbContext dbContext, IFileStorage fileStorage) : IVendorCatalogService
+public class VendorCatalogService(EleganceDbContext dbContext, IFileStorage fileStorage, VendorNotificationQueuer notificationQueuer) : IVendorCatalogService
 {
     private const int MaxImagesPerSubmission = 10;
     private static readonly VendorSubmissionStatus[] EditableStatuses =
@@ -96,6 +97,7 @@ public class VendorCatalogService(EleganceDbContext dbContext, IFileStorage file
         await dbContext.SaveChangesAsync(cancellationToken);
 
         AddHistory(submission.Id, "submission.create", null, VendorSubmissionStatus.PendingApproval, VendorSubmissionPerformedByType.Vendor, vendorId, null);
+        await notificationQueuer.QueueVendorSubmittedAsync(submission.Id, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
 
         return await LoadDtoAsync(submission.Id, cancellationToken);
@@ -143,6 +145,7 @@ public class VendorCatalogService(EleganceDbContext dbContext, IFileStorage file
         submission.Status = VendorSubmissionStatus.PendingApproval;
         submission.UpdatedAt = DateTime.UtcNow;
         AddHistory(submissionId, "submission.resubmit", previous, VendorSubmissionStatus.PendingApproval, VendorSubmissionPerformedByType.Vendor, vendorId, null);
+        await notificationQueuer.QueueVendorResubmittedAsync(submissionId, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
 
         return await LoadDtoAsync(submissionId, cancellationToken);

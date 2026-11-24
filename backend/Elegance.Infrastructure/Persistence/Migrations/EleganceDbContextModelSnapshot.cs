@@ -1546,6 +1546,78 @@ namespace Elegance.Infrastructure.Persistence.Migrations
                     b.ToTable("back_in_stock_subscriptions", (string)null);
                 });
 
+            modelBuilder.Entity("Elegance.Domain.Notifications.VendorNotification", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime?>("DeliveredAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Event")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)");
+
+                    b.Property<string>("FailureReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<string>("MessageTemplateName")
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<DateTime?>("NextAttemptAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("RetryCount")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("SentAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<long?>("SubmissionId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<long?>("VendorId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("WhatsAppMessageId")
+                        .HasMaxLength(128)
+                        .HasColumnType("varchar(128)");
+
+                    b.Property<string>("WhatsAppNumber")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NextAttemptAt");
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("SubmissionId");
+
+                    b.HasIndex("VendorId");
+
+                    b.ToTable("vendor_notifications", (string)null);
+                });
+
             modelBuilder.Entity("Elegance.Domain.Notifications.WhatsAppNotification", b =>
                 {
                     b.Property<long>("Id")
@@ -2690,6 +2762,19 @@ namespace Elegance.Infrastructure.Persistence.Migrations
                     b.Navigation("Product");
 
                     b.Navigation("ProductVariant");
+                });
+
+            modelBuilder.Entity("Elegance.Domain.Notifications.VendorNotification", b =>
+                {
+                    b.HasOne("Elegance.Domain.Vendors.VendorProductSubmission", null)
+                        .WithMany()
+                        .HasForeignKey("SubmissionId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Elegance.Domain.Vendors.Vendor", null)
+                        .WithMany()
+                        .HasForeignKey("VendorId")
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("Elegance.Domain.Notifications.WhatsAppNotification", b =>

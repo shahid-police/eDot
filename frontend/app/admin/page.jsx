@@ -26,6 +26,7 @@ export default function AdminDashboardPage() {
     ["Customers", data.customerCount],
     ["Active products", data.activeProductCount],
     ["Low stock items", data.lowStockCount],
+    ["Vendor submissions pending review", data.pendingVendorSubmissionCount],
   ];
 
   return (

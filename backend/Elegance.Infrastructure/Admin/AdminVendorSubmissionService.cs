@@ -2,6 +2,7 @@ using Elegance.Application.Admin;
 using Elegance.Application.Common;
 using Elegance.Domain.Vendors;
 using Elegance.Infrastructure.Media;
+using Elegance.Infrastructure.Notifications;
 using Elegance.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,7 +12,8 @@ public class AdminVendorSubmissionService(
     EleganceDbContext dbContext,
     IFileStorage fileStorage,
     IAdminMediaService adminMediaService,
-    IAuditLogService auditLog) : IAdminVendorSubmissionService
+    IAuditLogService auditLog,
+    VendorNotificationQueuer notificationQueuer) : IAdminVendorSubmissionService
 {
     public async Task<PagedResult<AdminVendorSubmissionDto>> ListSubmissionsAsync(AdminVendorSubmissionQuery query, CancellationToken cancellationToken = default)
     {
@@ -71,6 +73,7 @@ public class AdminVendorSubmissionService(
         submission.ReviewedAt = DateTime.UtcNow;
         submission.UpdatedAt = DateTime.UtcNow;
         AddHistory(submissionId, "submission.approve", previous, VendorSubmissionStatus.Approved, actor.Id, null);
+        await notificationQueuer.QueueSubmissionApprovedAsync(submission.VendorId, submissionId, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
 
         await auditLog.RecordAsync(actor, "vendor.submission.approve", "VendorProductSubmission", submissionId.ToString(), $"Approved submission for '{submission.ProductName}'", cancellationToken);
@@ -92,6 +95,7 @@ public class AdminVendorSubmissionService(
         submission.ReviewedAt = DateTime.UtcNow;
         submission.UpdatedAt = DateTime.UtcNow;
         AddHistory(submissionId, "submission.reject", previous, VendorSubmissionStatus.Rejected, actor.Id, request.Reason.Trim());
+        await notificationQueuer.QueueSubmissionRejectedAsync(submission.VendorId, submissionId, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
 
         await auditLog.RecordAsync(actor, "vendor.submission.reject", "VendorProductSubmission", submissionId.ToString(), $"Rejected submission for '{submission.ProductName}'", cancellationToken);
@@ -114,6 +118,7 @@ public class AdminVendorSubmissionService(
         submission.ReviewedAt = DateTime.UtcNow;
         submission.UpdatedAt = DateTime.UtcNow;
         AddHistory(submissionId, "submission.return", previous, VendorSubmissionStatus.ReturnedForCorrection, actor.Id, request.Remarks);
+        await notificationQueuer.QueueReturnedForCorrectionAsync(submission.VendorId, submissionId, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
 
         await auditLog.RecordAsync(actor, "vendor.submission.return", "VendorProductSubmission", submissionId.ToString(), $"Returned submission for '{submission.ProductName}' for correction", cancellationToken);

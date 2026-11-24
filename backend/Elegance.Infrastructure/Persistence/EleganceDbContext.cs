@@ -54,6 +54,7 @@ public class EleganceDbContext : DbContext
     public DbSet<NoShopVideo> NoShopVideos => Set<NoShopVideo>();
     public DbSet<BackInStockSubscription> BackInStockSubscriptions => Set<BackInStockSubscription>();
     public DbSet<WhatsAppNotification> WhatsAppNotifications => Set<WhatsAppNotification>();
+    public DbSet<VendorNotification> VendorNotifications => Set<VendorNotification>();
     public DbSet<Promoter> Promoters => Set<Promoter>();
     public DbSet<PromoCode> PromoCodes => Set<PromoCode>();
     public DbSet<PromoCodeProduct> PromoCodeProducts => Set<PromoCodeProduct>();

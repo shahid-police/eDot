@@ -1,6 +1,8 @@
 using Elegance.Infrastructure.Admin;
 using Elegance.Infrastructure.Auth;
+using Elegance.Infrastructure.Notifications;
 using Elegance.Infrastructure.Vendors;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Time.Testing;
 
 namespace Elegance.Tests.TestSupport;
@@ -17,8 +19,11 @@ public sealed class VendorAuthTestContext : IDisposable
     public TokenService TokenService { get; }
     public FakeFileStorage FileStorage { get; } = new();
     public AuditLogService AuditLog { get; }
+    public VendorNotificationOptions NotificationOptions { get; } = new();
+    public VendorNotificationQueuer NotificationQueuer { get; }
     public VendorAuthService AuthService { get; }
     public VendorCatalogService CatalogService { get; }
+    public VendorOrderService OrderService { get; }
     public AdminVendorService AdminVendorService { get; }
     public AdminVendorSubmissionService AdminSubmissionService { get; }
     public AdminMediaService AdminMediaService { get; }
@@ -28,11 +33,13 @@ public sealed class VendorAuthTestContext : IDisposable
         TotpService = TestServices.CreateTotpService(Clock);
         TokenService = TestServices.CreateTokenService(Clock);
         AuditLog = new AuditLogService(Db.Context);
+        NotificationQueuer = new VendorNotificationQueuer(Db.Context, Options.Create(NotificationOptions));
         AuthService = new VendorAuthService(Db.Context, TokenService, TotpService, SecretProtector);
-        CatalogService = new VendorCatalogService(Db.Context, FileStorage);
+        CatalogService = new VendorCatalogService(Db.Context, FileStorage, NotificationQueuer);
+        OrderService = new VendorOrderService(Db.Context);
         AdminVendorService = new AdminVendorService(Db.Context, AuditLog);
         AdminMediaService = new AdminMediaService(Db.Context, FileStorage, AuditLog);
-        AdminSubmissionService = new AdminVendorSubmissionService(Db.Context, FileStorage, AdminMediaService, AuditLog);
+        AdminSubmissionService = new AdminVendorSubmissionService(Db.Context, FileStorage, AdminMediaService, AuditLog, NotificationQueuer);
     }
 
     public void Dispose() => Db.Dispose();

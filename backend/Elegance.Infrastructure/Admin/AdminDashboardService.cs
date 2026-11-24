@@ -26,6 +26,8 @@ public class AdminDashboardService(
         var activeProductCount = await dbContext.Products.CountAsync(p => p.IsActive, cancellationToken);
         var lowStock = await inventoryService.GetLowStockAsync(cancellationToken);
         var recent = await orderService.ListOrdersAsync(new AdminOrderQuery { PageSize = 10 }, cancellationToken);
+        var pendingVendorSubmissions = await dbContext.VendorProductSubmissions
+            .CountAsync(s => s.Status == Domain.Vendors.VendorSubmissionStatus.PendingApproval, cancellationToken);
 
         return new AdminDashboardDto
         {
@@ -36,6 +38,7 @@ public class AdminDashboardService(
             CustomerCount = customerCount,
             ActiveProductCount = activeProductCount,
             LowStockCount = lowStock.Count,
+            PendingVendorSubmissionCount = pendingVendorSubmissions,
             RecentOrders = recent.Items,
         };
     }
