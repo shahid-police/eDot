@@ -20,6 +20,10 @@ public class Product
     public long CategoryId { get; set; }
     public Category Category { get; set; } = null!;
 
+    // Set when this product originated from an approved vendor submission (see
+    // Elegance.Domain.Vendors.VendorProductSubmission). Null for products Admin created directly.
+    public long? VendorId { get; set; }
+
     public ProductType ProductType { get; set; } = ProductType.Simple;
 
     public string? Material { get; set; }

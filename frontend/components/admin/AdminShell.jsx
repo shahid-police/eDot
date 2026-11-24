@@ -19,6 +19,8 @@ const NAV = [
   { href: "/admin/commissions", label: "Commissions" },
   { href: "/admin/promoter-payments", label: "Promoter Payments" },
   { href: "/admin/customers", label: "Customers" },
+  { href: "/admin/vendors", label: "Vendors" },
+  { href: "/admin/vendor-submissions", label: "Vendor Submissions" },
   { href: "/admin/audit", label: "Audit log" },
   { href: "/admin/security", label: "Security" },
 ];

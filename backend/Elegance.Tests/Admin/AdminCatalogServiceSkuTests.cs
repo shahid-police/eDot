@@ -1,6 +1,7 @@
 using Elegance.Application.Admin;
 using Elegance.Application.Common;
 using Elegance.Infrastructure.Admin;
+using Elegance.Infrastructure.Inventory;
 using Elegance.Tests.TestSupport;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,7 +25,7 @@ public class AdminCatalogServiceSkuTests
     public async Task PreviewNextSku_for_an_empty_category_starts_at_001()
     {
         using var db = new SqliteTestDb();
-        var service = new AdminCatalogService(db.Context, new AuditLogService(db.Context));
+        var service = new AdminCatalogService(db.Context, new AuditLogService(db.Context), new RestockDetectionService(db.Context));
         var category = await TestCategory.CreateAsync(db.Context, code: "NSET");
 
         var result = await service.PreviewNextSkuAsync(category.Id);
@@ -41,7 +42,7 @@ public class AdminCatalogServiceSkuTests
         var category = await TestCategory.CreateAsync(db.Context, code: "NSET");
         await TestProduct.CreateAsync(db.Context, category.Id, "JEW-NSET-001");
         await TestProduct.CreateAsync(db.Context, category.Id, "JEW-NSET-005");
-        var service = new AdminCatalogService(db.Context, new AuditLogService(db.Context));
+        var service = new AdminCatalogService(db.Context, new AuditLogService(db.Context), new RestockDetectionService(db.Context));
 
         var result = await service.PreviewNextSkuAsync(category.Id);
 
@@ -55,7 +56,7 @@ public class AdminCatalogServiceSkuTests
         var nset = await TestCategory.CreateAsync(db.Context, name: "Necklace Sets", slug: "necklaces-sets", code: "NSET");
         var ring = await TestCategory.CreateAsync(db.Context, name: "Rings", slug: "rings", code: "RING");
         await TestProduct.CreateAsync(db.Context, ring.Id, "JEW-RING-010");
-        var service = new AdminCatalogService(db.Context, new AuditLogService(db.Context));
+        var service = new AdminCatalogService(db.Context, new AuditLogService(db.Context), new RestockDetectionService(db.Context));
 
         var result = await service.PreviewNextSkuAsync(nset.Id);
 
@@ -68,7 +69,7 @@ public class AdminCatalogServiceSkuTests
         using var db = new SqliteTestDb();
         var category = await TestCategory.CreateAsync(db.Context, code: "NSET");
         await TestProduct.CreateAsync(db.Context, category.Id, "JEW-NSET-009");
-        var service = new AdminCatalogService(db.Context, new AuditLogService(db.Context));
+        var service = new AdminCatalogService(db.Context, new AuditLogService(db.Context), new RestockDetectionService(db.Context));
 
         Assert.Equal("JEW-NSET-010", (await service.PreviewNextSkuAsync(category.Id)).Sku);
 
@@ -81,7 +82,7 @@ public class AdminCatalogServiceSkuTests
     {
         using var db = new SqliteTestDb();
         var category = await TestCategory.CreateAsync(db.Context, name: "Gift Collections", slug: "gift-collections", code: null);
-        var service = new AdminCatalogService(db.Context, new AuditLogService(db.Context));
+        var service = new AdminCatalogService(db.Context, new AuditLogService(db.Context), new RestockDetectionService(db.Context));
 
         var ex = await Assert.ThrowsAsync<ApplicationFailure>(() => service.PreviewNextSkuAsync(category.Id));
 
@@ -93,7 +94,7 @@ public class AdminCatalogServiceSkuTests
     public async Task PreviewNextSku_for_an_unknown_category_throws_not_found()
     {
         using var db = new SqliteTestDb();
-        var service = new AdminCatalogService(db.Context, new AuditLogService(db.Context));
+        var service = new AdminCatalogService(db.Context, new AuditLogService(db.Context), new RestockDetectionService(db.Context));
 
         var ex = await Assert.ThrowsAsync<ApplicationFailure>(() => service.PreviewNextSkuAsync(999));
 
@@ -105,7 +106,7 @@ public class AdminCatalogServiceSkuTests
     {
         using var db = new SqliteTestDb();
         var category = await TestCategory.CreateAsync(db.Context, code: "NSET");
-        var service = new AdminCatalogService(db.Context, new AuditLogService(db.Context));
+        var service = new AdminCatalogService(db.Context, new AuditLogService(db.Context), new RestockDetectionService(db.Context));
         var actor = new AdminActor(1, "admin@test.local");
 
         var created = await service.CreateProductAsync(actor, MinimalProductRequest(category.Id, sku: null));
@@ -120,7 +121,7 @@ public class AdminCatalogServiceSkuTests
     {
         using var db = new SqliteTestDb();
         var category = await TestCategory.CreateAsync(db.Context, code: "NSET");
-        var service = new AdminCatalogService(db.Context, new AuditLogService(db.Context));
+        var service = new AdminCatalogService(db.Context, new AuditLogService(db.Context), new RestockDetectionService(db.Context));
         var actor = new AdminActor(1, "admin@test.local");
 
         var created = await service.CreateProductAsync(actor, MinimalProductRequest(category.Id, sku: blankSku));
@@ -133,7 +134,7 @@ public class AdminCatalogServiceSkuTests
     {
         using var db = new SqliteTestDb();
         var category = await TestCategory.CreateAsync(db.Context, code: "NSET");
-        var service = new AdminCatalogService(db.Context, new AuditLogService(db.Context));
+        var service = new AdminCatalogService(db.Context, new AuditLogService(db.Context), new RestockDetectionService(db.Context));
         var actor = new AdminActor(1, "admin@test.local");
 
         var created = await service.CreateProductAsync(actor, MinimalProductRequest(category.Id, sku: "CUSTOM-SKU-1"));
@@ -146,7 +147,7 @@ public class AdminCatalogServiceSkuTests
     {
         using var db = new SqliteTestDb();
         var category = await TestCategory.CreateAsync(db.Context, code: "NSET");
-        var service = new AdminCatalogService(db.Context, new AuditLogService(db.Context));
+        var service = new AdminCatalogService(db.Context, new AuditLogService(db.Context), new RestockDetectionService(db.Context));
         var actor = new AdminActor(1, "admin@test.local");
         await service.CreateProductAsync(actor, MinimalProductRequest(category.Id, sku: "TAKEN-1"));
 
@@ -161,7 +162,7 @@ public class AdminCatalogServiceSkuTests
     {
         using var db = new SqliteTestDb();
         var category = await TestCategory.CreateAsync(db.Context, name: "Gift Collections", slug: "gift-collections", code: null);
-        var service = new AdminCatalogService(db.Context, new AuditLogService(db.Context));
+        var service = new AdminCatalogService(db.Context, new AuditLogService(db.Context), new RestockDetectionService(db.Context));
         var actor = new AdminActor(1, "admin@test.local");
 
         var ex = await Assert.ThrowsAsync<ApplicationFailure>(() =>
@@ -176,7 +177,7 @@ public class AdminCatalogServiceSkuTests
     {
         using var db = new SqliteTestDb();
         var category = await TestCategory.CreateAsync(db.Context, code: "NSET");
-        var service = new AdminCatalogService(db.Context, new AuditLogService(db.Context));
+        var service = new AdminCatalogService(db.Context, new AuditLogService(db.Context), new RestockDetectionService(db.Context));
         var actor = new AdminActor(1, "admin@test.local");
 
         var first = await service.CreateProductAsync(actor, MinimalProductRequest(category.Id));
@@ -194,7 +195,7 @@ public class AdminCatalogServiceSkuTests
         using var db = new SqliteTestDb();
         var nset = await TestCategory.CreateAsync(db.Context, name: "Necklace Sets", slug: "necklaces-sets", code: "NSET");
         var ring = await TestCategory.CreateAsync(db.Context, name: "Rings", slug: "rings", code: "RING");
-        var service = new AdminCatalogService(db.Context, new AuditLogService(db.Context));
+        var service = new AdminCatalogService(db.Context, new AuditLogService(db.Context), new RestockDetectionService(db.Context));
         var actor = new AdminActor(1, "admin@test.local");
 
         var previewForFirstChoice = await service.PreviewNextSkuAsync(nset.Id);
@@ -215,9 +216,9 @@ public class AdminCatalogServiceSkuTests
         var category = await TestCategory.CreateAsync(db.Context, code: "NSET");
         var actor = new AdminActor(1, "admin@test.local");
 
-        var serviceA = new AdminCatalogService(db.Context, new AuditLogService(db.Context));
+        var serviceA = new AdminCatalogService(db.Context, new AuditLogService(db.Context), new RestockDetectionService(db.Context));
         var contextB = db.CreateAdditionalContext();
-        var serviceB = new AdminCatalogService(contextB, new AuditLogService(contextB));
+        var serviceB = new AdminCatalogService(contextB, new AuditLogService(contextB), new RestockDetectionService(contextB));
 
         var taskA = serviceA.CreateProductAsync(actor, MinimalProductRequest(category.Id));
         var taskB = serviceB.CreateProductAsync(actor, MinimalProductRequest(category.Id));
@@ -231,7 +232,7 @@ public class AdminCatalogServiceSkuTests
     public async Task Category_code_is_normalized_to_uppercase_and_validated_for_shape()
     {
         using var db = new SqliteTestDb();
-        var service = new AdminCatalogService(db.Context, new AuditLogService(db.Context));
+        var service = new AdminCatalogService(db.Context, new AuditLogService(db.Context), new RestockDetectionService(db.Context));
         var actor = new AdminActor(1, "admin@test.local");
 
         var created = await service.CreateCategoryAsync(actor, new AdminCategoryRequest { Name = "Hoops", Slug = "hoops-2", Code = "hoop" });
@@ -250,7 +251,7 @@ public class AdminCatalogServiceSkuTests
     public async Task Category_code_must_be_unique_across_categories()
     {
         using var db = new SqliteTestDb();
-        var service = new AdminCatalogService(db.Context, new AuditLogService(db.Context));
+        var service = new AdminCatalogService(db.Context, new AuditLogService(db.Context), new RestockDetectionService(db.Context));
         var actor = new AdminActor(1, "admin@test.local");
         await service.CreateCategoryAsync(actor, new AdminCategoryRequest { Name = "Necklace Sets", Slug = "necklaces-sets", Code = "NSET" });
 
@@ -264,7 +265,7 @@ public class AdminCatalogServiceSkuTests
     public async Task Category_without_a_code_can_still_be_created_and_updated()
     {
         using var db = new SqliteTestDb();
-        var service = new AdminCatalogService(db.Context, new AuditLogService(db.Context));
+        var service = new AdminCatalogService(db.Context, new AuditLogService(db.Context), new RestockDetectionService(db.Context));
         var actor = new AdminActor(1, "admin@test.local");
 
         var created = await service.CreateCategoryAsync(actor, new AdminCategoryRequest { Name = "Gift Collections", Slug = "gifts-2", Code = null });

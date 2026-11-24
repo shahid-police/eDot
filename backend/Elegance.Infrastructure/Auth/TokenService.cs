@@ -3,6 +3,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Elegance.Domain.Admin;
 using Elegance.Domain.Customers;
+using Elegance.Domain.Vendors;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
@@ -15,11 +16,15 @@ namespace Elegance.Infrastructure.Auth;
 public sealed class TokenService(IOptions<JwtOptions> options, TimeProvider timeProvider)
 {
     public const string CustomerRole = "Customer";
+    public const string VendorRole = "Vendor";
     public const string RoleClaim = "role";
     public const string TokenTypeClaim = "typ";
     public const string AdminTokenType = "admin";
     public const string AdminPendingTwoFactorTokenType = "admin-2fa-pending";
+    public const string VendorTokenType = "vendor";
+    public const string VendorPendingTwoFactorTokenType = "vendor-2fa-pending";
     private const int PendingTwoFactorTokenMinutes = 5;
+    private const string RequiresEnrollmentClaim = "req_enroll";
 
     private readonly JwtOptions _options = options.Value;
 
@@ -148,6 +153,110 @@ public sealed class TokenService(IOptions<JwtOptions> options, TimeProvider time
         return long.TryParse(result.ClaimsIdentity.FindFirst(JwtRegisteredClaimNames.Sub)?.Value, out var adminId)
             ? adminId
             : null;
+    }
+
+    public (string Token, DateTime ExpiresAt) CreateVendorAccessToken(Vendor vendor)
+    {
+        var now = timeProvider.GetUtcNow().UtcDateTime;
+        var expiresAt = now.AddMinutes(_options.AccessTokenMinutes);
+
+        var claims = new[]
+        {
+            new Claim(JwtRegisteredClaimNames.Sub, vendor.Id.ToString()),
+            new Claim(JwtRegisteredClaimNames.Email, vendor.Email),
+            new Claim(TokenTypeClaim, VendorTokenType),
+            new Claim(RoleClaim, VendorRole),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+        };
+
+        var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Key));
+        var descriptor = new SecurityTokenDescriptor
+        {
+            Issuer = _options.Issuer,
+            Audience = _options.Audience,
+            Subject = new ClaimsIdentity(claims),
+            NotBefore = now,
+            Expires = expiresAt,
+            SigningCredentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256),
+        };
+
+        return (new JsonWebTokenHandler().CreateToken(descriptor), expiresAt);
+    }
+
+    // Issued right after a vendor's password check succeeds. It carries typ=vendor-2fa-pending,
+    // never typ=vendor, so VendorPolicies.Portal (which requires typ==vendor) rejects it on every
+    // real portal endpoint. requiresEnrollment is carried as a claim so the (anonymous) enrollment
+    // and verify endpoints can trust it without a second database round trip, and so the frontend
+    // response can route the vendor to the right screen.
+    public (string Token, DateTime ExpiresAt) CreateVendorPendingTwoFactorToken(long vendorId, bool requiresEnrollment)
+    {
+        var now = timeProvider.GetUtcNow().UtcDateTime;
+        var expiresAt = now.AddMinutes(PendingTwoFactorTokenMinutes);
+
+        var claims = new[]
+        {
+            new Claim(JwtRegisteredClaimNames.Sub, vendorId.ToString()),
+            new Claim(TokenTypeClaim, VendorPendingTwoFactorTokenType),
+            new Claim(RequiresEnrollmentClaim, requiresEnrollment ? "1" : "0"),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+        };
+
+        var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Key));
+        var descriptor = new SecurityTokenDescriptor
+        {
+            Issuer = _options.Issuer,
+            Audience = _options.Audience,
+            Subject = new ClaimsIdentity(claims),
+            NotBefore = now,
+            Expires = expiresAt,
+            SigningCredentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256),
+        };
+
+        return (new JsonWebTokenHandler().CreateToken(descriptor), expiresAt);
+    }
+
+    // Validates a pending vendor-2FA token and returns the vendor id plus whether it was issued
+    // as a "must enroll" challenge, or null if missing/expired/tampered/not actually this token type.
+    public async Task<(long VendorId, bool RequiresEnrollment)?> ValidateVendorPendingTwoFactorTokenAsync(string token)
+    {
+        var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Key));
+        var validationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = _options.Issuer,
+            ValidateAudience = true,
+            ValidAudience = _options.Audience,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = signingKey,
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.FromSeconds(30),
+            LifetimeValidator = (notBefore, expires, _, validationParameters) =>
+            {
+                var now = timeProvider.GetUtcNow().UtcDateTime;
+                var skew = validationParameters.ClockSkew;
+                return (notBefore is null || notBefore <= now + skew) && (expires is null || expires >= now - skew);
+            },
+        };
+
+        var result = await new JsonWebTokenHandler().ValidateTokenAsync(token, validationParameters);
+        if (!result.IsValid)
+        {
+            return null;
+        }
+
+        var typ = result.ClaimsIdentity.FindFirst(TokenTypeClaim)?.Value;
+        if (typ != VendorPendingTwoFactorTokenType)
+        {
+            return null;
+        }
+
+        if (!long.TryParse(result.ClaimsIdentity.FindFirst(JwtRegisteredClaimNames.Sub)?.Value, out var vendorId))
+        {
+            return null;
+        }
+
+        var requiresEnrollment = result.ClaimsIdentity.FindFirst(RequiresEnrollmentClaim)?.Value == "1";
+        return (vendorId, requiresEnrollment);
     }
 
     public DateTime RefreshTokenExpiry() => timeProvider.GetUtcNow().UtcDateTime.AddDays(_options.RefreshTokenDays);

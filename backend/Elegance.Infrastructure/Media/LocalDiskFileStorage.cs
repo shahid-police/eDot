@@ -35,4 +35,10 @@ public class LocalDiskFileStorage(IHostEnvironment environment, IOptions<Storage
         }
         return Task.CompletedTask;
     }
+
+    public Task<Stream> GetAsync(string storageKey, CancellationToken cancellationToken = default)
+    {
+        var path = Path.Combine(RootPath, storageKey.Replace('/', Path.DirectorySeparatorChar));
+        return Task.FromResult<Stream>(File.OpenRead(path));
+    }
 }

@@ -29,6 +29,8 @@ using Elegance.Application.Wishlists;
 using Elegance.Infrastructure.Persistence;
 using Elegance.Infrastructure.Search;
 using Elegance.Application.Search;
+using Elegance.Application.Vendors;
+using Elegance.Infrastructure.Vendors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -143,6 +145,11 @@ public static class DependencyInjection
                 : new LocalDiskFileStorage(sp.GetRequiredService<IHostEnvironment>(), storageOptions);
         });
         services.AddScoped<IAdminMediaService, AdminMediaService>();
+
+        services.AddScoped<IVendorAuthService, VendorAuthService>();
+        services.AddScoped<IVendorCatalogService, VendorCatalogService>();
+        services.AddScoped<IAdminVendorService, AdminVendorService>();
+        services.AddScoped<IAdminVendorSubmissionService, AdminVendorSubmissionService>();
 
         return services;
     }

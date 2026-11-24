@@ -43,4 +43,17 @@ public class R2FileStorage(IOptions<StorageOptions> options) : IFileStorage
         using var client = CreateClient();
         await client.DeleteObjectAsync(_options.R2.Bucket, storageKey, cancellationToken);
     }
+
+    public async Task<Stream> GetAsync(string storageKey, CancellationToken cancellationToken = default)
+    {
+        using var client = CreateClient();
+        using var response = await client.GetObjectAsync(_options.R2.Bucket, storageKey, cancellationToken);
+        // Buffered into memory (not returned live) so the client/response can be disposed here
+        // rather than requiring the caller to track their disposal order - vendor images are
+        // already capped at a few MB by the upload validation, so this is cheap.
+        var buffer = new MemoryStream();
+        await response.ResponseStream.CopyToAsync(buffer, cancellationToken);
+        buffer.Position = 0;
+        return buffer;
+    }
 }

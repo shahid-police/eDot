@@ -8,7 +8,7 @@ import ProductDiscountSection from "./ProductDiscountSection";
 
 const EMPTY_VARIANT = { id: null, sku: "", variantName: "", price: "", salePrice: "", stockQuantity: 0, size: "", color: "", isActive: true, imageUrl: null };
 
-const EMPTY_PRODUCT = {
+export const EMPTY_PRODUCT = {
   sku: "",
   name: "",
   slug: "",
@@ -18,6 +18,7 @@ const EMPTY_PRODUCT = {
   productType: "Simple",
   price: "",
   salePrice: "",
+  costPrice: "",
   stockQuantity: 0,
   lowStockThreshold: "",
   material: "",
@@ -118,6 +119,7 @@ export function fromApi(product) {
     productType: product.productType,
     price: String(product.price),
     salePrice: product.salePrice == null ? "" : String(product.salePrice),
+    costPrice: product.costPrice == null ? "" : String(product.costPrice),
     stockQuantity: product.stockQuantity,
     lowStockThreshold: product.lowStockThreshold == null ? "" : String(product.lowStockThreshold),
     material: product.material ?? "",
@@ -159,6 +161,7 @@ function toPayload(form) {
     description: form.description || null,
     price: Number(form.price),
     salePrice: toNumberOrNull(form.salePrice),
+    costPrice: toNumberOrNull(form.costPrice),
     currency: "PKR",
     categoryId: Number(form.categoryId),
     productType: form.productType,
@@ -190,7 +193,7 @@ function toPayload(form) {
   };
 }
 
-export default function ProductForm({ productId = null, initial = null }) {
+export default function ProductForm({ productId = null, initial = null, onCreated = null }) {
   const router = useRouter();
   const isNew = productId === null;
   const [form, setForm] = useState(initial ?? EMPTY_PRODUCT);
@@ -338,6 +341,9 @@ export default function ProductForm({ productId = null, initial = null }) {
       const payload = toPayload(form);
       if (isNew) {
         const created = await adminRequest("/products", { method: "POST", body: payload });
+        if (onCreated) {
+          await onCreated(created);
+        }
         router.replace(`/admin/products/${created.id}`);
         return;
       }
@@ -490,6 +496,10 @@ export default function ProductForm({ productId = null, initial = null }) {
         <div className="col-md-3">
           <label className="form-label">Sale price (PKR)</label>
           <input type="number" min="0" step="0.01" className="form-control" value={form.salePrice} onChange={(e) => update("salePrice", e.target.value)} />
+        </div>
+        <div className="col-md-3">
+          <label className="form-label">Wholesale / cost price (PKR)</label>
+          <input type="number" min="0" step="0.01" className="form-control" value={form.costPrice} onChange={(e) => update("costPrice", e.target.value)} />
         </div>
         {!isVariant && (
           <div className="col-md-3">

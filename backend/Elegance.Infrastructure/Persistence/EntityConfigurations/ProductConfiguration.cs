@@ -47,7 +47,13 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             .HasForeignKey(p => p.CategoryId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        builder.HasOne<Elegance.Domain.Vendors.Vendor>()
+            .WithMany()
+            .HasForeignKey(p => p.VendorId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         builder.HasIndex(p => p.CategoryId);
+        builder.HasIndex(p => p.VendorId);
         builder.HasIndex(p => p.IsActive);
         builder.HasIndex(p => p.IsFeatured);
         builder.HasIndex(p => p.IsNew);

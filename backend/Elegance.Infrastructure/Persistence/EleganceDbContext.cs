@@ -11,6 +11,7 @@ using Elegance.Domain.Marketing;
 using Elegance.Domain.Media;
 using Elegance.Domain.Notifications;
 using Elegance.Domain.Orders;
+using Elegance.Domain.Vendors;
 using Elegance.Domain.Wishlists;
 using Microsoft.EntityFrameworkCore;
 
@@ -61,6 +62,12 @@ public class EleganceDbContext : DbContext
     public DbSet<PromoterCommission> PromoterCommissions => Set<PromoterCommission>();
     public DbSet<PromoterPayment> PromoterPayments => Set<PromoterPayment>();
     public DbSet<PromoterPaymentAllocation> PromoterPaymentAllocations => Set<PromoterPaymentAllocation>();
+    public DbSet<Vendor> Vendors => Set<Vendor>();
+    public DbSet<VendorTwoFactorCredential> VendorTwoFactorCredentials => Set<VendorTwoFactorCredential>();
+    public DbSet<VendorRefreshToken> VendorRefreshTokens => Set<VendorRefreshToken>();
+    public DbSet<VendorProductSubmission> VendorProductSubmissions => Set<VendorProductSubmission>();
+    public DbSet<VendorProductImage> VendorProductImages => Set<VendorProductImage>();
+    public DbSet<VendorProductSubmissionHistory> VendorProductSubmissionHistory => Set<VendorProductSubmissionHistory>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

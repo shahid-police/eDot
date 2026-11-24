@@ -15,4 +15,9 @@ public static class ClaimsPrincipalExtensions
         long.TryParse(principal.FindFirst("sub")?.Value, out var id)
             ? new AdminActor(id, principal.FindFirst("email")?.Value ?? string.Empty)
             : throw new ApplicationFailure(FailureKind.Unauthorized, "Your session has expired. Please sign in again.");
+
+    public static long GetVendorId(this ClaimsPrincipal principal) =>
+        long.TryParse(principal.FindFirst("sub")?.Value, out var id)
+            ? id
+            : throw new ApplicationFailure(FailureKind.Unauthorized, "Your session has expired. Please sign in again.");
 }

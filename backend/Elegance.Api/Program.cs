@@ -68,7 +68,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             RoleClaimType = "role",
         };
     });
-builder.Services.AddAuthorization(options => options.AddAdminPolicies());
+builder.Services.AddAuthorization(options =>
+{
+    options.AddAdminPolicies();
+    options.AddVendorPolicies();
+});
 
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<ApplicationFailureExceptionHandler>();
