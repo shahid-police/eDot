@@ -125,29 +125,9 @@ public class AdminVendorSubmissionService(
         return await LoadDtoAsync(submissionId, cancellationToken);
     }
 
-    public async Task<AdminVendorSubmissionDto> LinkProductAsync(AdminActor actor, long submissionId, AdminLinkSubmissionToProductRequest request, CancellationToken cancellationToken = default)
-    {
-        var submission = await RequireSubmissionAsync(submissionId, cancellationToken);
-        if (submission.Status != VendorSubmissionStatus.Approved)
-        {
-            throw new ApplicationFailure(FailureKind.Conflict, "Only an approved submission can be linked to a product.");
-        }
-        if (submission.ProductId is not null)
-        {
-            throw new ApplicationFailure(FailureKind.Conflict, "This submission is already linked to a product.");
-        }
-
-        var product = await dbContext.Products.FirstOrDefaultAsync(p => p.Id == request.ProductId, cancellationToken)
-            ?? throw new ApplicationFailure(FailureKind.Validation, "Choose a valid product.");
-
-        submission.ProductId = product.Id;
-        submission.UpdatedAt = DateTime.UtcNow;
-        product.VendorId = submission.VendorId;
-        await dbContext.SaveChangesAsync(cancellationToken);
-
-        await auditLog.RecordAsync(actor, "vendor.submission.link-product", "VendorProductSubmission", submissionId.ToString(), $"Linked submission to product {product.Sku}", cancellationToken);
-        return await LoadDtoAsync(submissionId, cancellationToken);
-    }
+    // A submission's Product is created automatically (inactive) the moment the vendor submits -
+    // see VendorCatalogService.CreateSubmissionAsync - so there is no separate "link to a product"
+    // admin action anymore.
 
     public async Task<(Stream Content, string ContentType, string FileName)> DownloadSubmissionImageAsync(long submissionId, long imageId, CancellationToken cancellationToken = default)
     {
@@ -166,7 +146,7 @@ public class AdminVendorSubmissionService(
         var submission = await RequireSubmissionAsync(submissionId, cancellationToken);
         if (submission.ProductId is not { } productId)
         {
-            throw new ApplicationFailure(FailureKind.Validation, "Create or link this submission's product before publishing images.");
+            throw new ApplicationFailure(FailureKind.Validation, "This submission has no product to publish images onto.");
         }
 
         var image = await dbContext.VendorProductImages.AsNoTracking()

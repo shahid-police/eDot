@@ -137,12 +137,6 @@ public class AdminReturnSubmissionForCorrectionRequest
     public string? Remarks { get; init; }
 }
 
-public class AdminLinkSubmissionToProductRequest
-{
-    [Required]
-    public long ProductId { get; init; }
-}
-
 public interface IAdminVendorSubmissionService
 {
     Task<PagedResult<AdminVendorSubmissionDto>> ListSubmissionsAsync(AdminVendorSubmissionQuery query, CancellationToken cancellationToken = default);
@@ -150,7 +144,6 @@ public interface IAdminVendorSubmissionService
     Task<AdminVendorSubmissionDto> ApproveAsync(AdminActor actor, long submissionId, CancellationToken cancellationToken = default);
     Task<AdminVendorSubmissionDto> RejectAsync(AdminActor actor, long submissionId, AdminRejectSubmissionRequest request, CancellationToken cancellationToken = default);
     Task<AdminVendorSubmissionDto> ReturnForCorrectionAsync(AdminActor actor, long submissionId, AdminReturnSubmissionForCorrectionRequest request, CancellationToken cancellationToken = default);
-    Task<AdminVendorSubmissionDto> LinkProductAsync(AdminActor actor, long submissionId, AdminLinkSubmissionToProductRequest request, CancellationToken cancellationToken = default);
 
     // Streams a vendor's original image bytes back for the admin to inspect/download.
     Task<(Stream Content, string ContentType, string FileName)> DownloadSubmissionImageAsync(long submissionId, long imageId, CancellationToken cancellationToken = default);

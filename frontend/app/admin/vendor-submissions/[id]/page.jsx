@@ -152,17 +152,12 @@ export default function AdminVendorSubmissionDetailPage() {
         </div>
       )}
 
-      {submission.status === "Approved" && !submission.productId && (
-        <div className="alert alert-info">
-          <Link href={`/admin/products/new?fromSubmission=${id}`} className="btn btn-dark btn-sm">
-            Create product from this submission
-          </Link>
-        </div>
-      )}
       {submission.productId && (
         <div className="alert alert-info">
-          Linked to product <Link href={`/admin/products/${submission.productId}`}>{submission.productSku}</Link>.
-          Use &quot;Publish&quot; below on any image you want to make public.
+          A draft product was created automatically for this submission:{" "}
+          <Link href={`/admin/products/${submission.productId}`}>{submission.productSku}</Link> (currently hidden).
+          Open it to set pricing, description, and other attributes, use &quot;Publish&quot; below on any image you
+          want to make public, then activate the product when it's ready to go live.
         </div>
       )}
 

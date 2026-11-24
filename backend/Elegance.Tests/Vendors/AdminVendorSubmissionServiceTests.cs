@@ -13,7 +13,30 @@ public class AdminVendorSubmissionServiceTests
     private static readonly AdminActor Actor = new(1, "admin@test.local");
 
     [Fact]
-    public async Task Approve_then_link_then_publish_makes_the_image_public_without_any_new_sku_or_publish_logic()
+    public async Task Submitting_auto_creates_a_hidden_product_with_an_auto_generated_sku_via_the_existing_mechanism()
+    {
+        using var ctx = new VendorAuthTestContext();
+        var category = await TestCategory.CreateAsync(ctx.Db.Context, code: "RING");
+        var vendor = await TestVendor.CreateAsync(ctx.Db.Context);
+
+        var submission = await ctx.CatalogService.CreateSubmissionAsync(vendor.Id, new VendorSubmissionRequest
+        {
+            ProductName = "Gold Ring", CategoryId = category.Id, WholesalePrice = 1500, VendorProductCode = "GR-1",
+        });
+
+        Assert.NotNull(submission.ProductId);
+        var product = await ctx.Db.Context.Products.AsNoTracking().SingleAsync(p => p.Id == submission.ProductId);
+
+        // SKU came from AdminCatalogService's existing ComputeNextSkuAsync - nothing in the
+        // vendor module computes or guesses a SKU itself.
+        Assert.StartsWith("JEW-RING-", product.Sku);
+        Assert.Equal(vendor.Id, product.VendorId);
+        Assert.Equal(1500, product.CostPrice);
+        Assert.False(product.IsActive, "a freshly submitted product must never be publicly visible");
+    }
+
+    [Fact]
+    public async Task Approve_then_publish_makes_the_image_public_on_the_auto_created_product()
     {
         using var ctx = new VendorAuthTestContext();
         var category = await TestCategory.CreateAsync(ctx.Db.Context);
@@ -28,33 +51,11 @@ public class AdminVendorSubmissionServiceTests
 
         await ctx.AdminSubmissionService.ApproveAsync(Actor, submission.Id);
 
-        // Admin creates the real product through the EXISTING, unmodified product-creation path -
-        // nothing in the vendor module computes a SKU.
-        var product = new Product
-        {
-            Sku = "JEW-TEST-001",
-            Name = "Gold Ring",
-            Slug = "gold-ring",
-            CategoryId = category.Id,
-            CostPrice = 1500,
-            Price = 4500,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow,
-        };
-        ctx.Db.Context.Products.Add(product);
-        await ctx.Db.Context.SaveChangesAsync();
-
-        var linked = await ctx.AdminSubmissionService.LinkProductAsync(Actor, submission.Id, new AdminLinkSubmissionToProductRequest { ProductId = product.Id });
-        Assert.Equal(product.Id, linked.ProductId);
-
-        var storedVendorRow = await ctx.Db.Context.Products.AsNoTracking().FirstAsync(p => p.Id == product.Id);
-        Assert.Equal(vendor.Id, storedVendorRow.VendorId);
-
         var published = await ctx.AdminSubmissionService.PublishSubmissionImageAsync(Actor, submission.Id, vendorImage.Id, "Primary");
 
         var productImage = await ctx.Db.Context.ProductImages.AsNoTracking().Include(i => i.MediaFile)
             .SingleAsync(i => i.Id == published.Id);
-        Assert.Equal(product.Id, productImage.ProductId);
+        Assert.Equal(submission.ProductId, productImage.ProductId);
         Assert.Equal(ProductImageType.Primary, productImage.ImageType);
 
         // The public ProductImage's MediaFile must be a distinct row/storage object from the
@@ -69,8 +70,11 @@ public class AdminVendorSubmissionServiceTests
     }
 
     [Fact]
-    public async Task Publishing_an_image_before_a_product_is_linked_is_rejected()
+    public async Task An_image_can_be_published_even_before_the_submission_is_approved()
     {
+        // The draft product exists from the moment of submission, so an admin reviewing a
+        // still-Pending submission can already pick a primary image for it - approval is purely
+        // about the vendor-facing status, not a gate on editing/publishing the product.
         using var ctx = new VendorAuthTestContext();
         var category = await TestCategory.CreateAsync(ctx.Db.Context);
         var vendor = await TestVendor.CreateAsync(ctx.Db.Context);
@@ -81,9 +85,10 @@ public class AdminVendorSubmissionServiceTests
         var bytes = TestImage.ValidPngBytes();
         var vendorImage = await ctx.CatalogService.UploadSubmissionImageAsync(vendor.Id, submission.Id, new MemoryStream(bytes), "image/png", bytes.Length);
 
-        var ex = await Assert.ThrowsAsync<ApplicationFailure>(() =>
-            ctx.AdminSubmissionService.PublishSubmissionImageAsync(Actor, submission.Id, vendorImage.Id, "Primary"));
-        Assert.Equal(FailureKind.Validation, ex.Kind);
+        var published = await ctx.AdminSubmissionService.PublishSubmissionImageAsync(Actor, submission.Id, vendorImage.Id, "Primary");
+
+        var productImage = await ctx.Db.Context.ProductImages.AsNoTracking().SingleAsync(i => i.Id == published.Id);
+        Assert.Equal(submission.ProductId, productImage.ProductId);
     }
 
     [Fact]

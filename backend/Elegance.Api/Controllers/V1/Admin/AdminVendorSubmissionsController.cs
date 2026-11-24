@@ -51,13 +51,6 @@ public class AdminVendorSubmissionsController(IAdminVendorSubmissionService subm
         return Ok(dto);
     }
 
-    [HttpPost("{submissionId:long}/link-product")]
-    public async Task<ActionResult<AdminVendorSubmissionDto>> LinkProduct(long submissionId, [FromBody] AdminLinkSubmissionToProductRequest request, CancellationToken cancellationToken)
-    {
-        var dto = await submissionService.LinkProductAsync(User.GetAdminActor(), submissionId, request, cancellationToken);
-        return Ok(dto);
-    }
-
     // Lets an admin inspect/download a vendor's original image. Only reachable via this
     // Admin.Vendors-gated controller - there is no public or vendor-facing route to any other
     // vendor's image.

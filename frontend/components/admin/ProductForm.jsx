@@ -8,7 +8,7 @@ import ProductDiscountSection from "./ProductDiscountSection";
 
 const EMPTY_VARIANT = { id: null, sku: "", variantName: "", price: "", salePrice: "", stockQuantity: 0, size: "", color: "", isActive: true, imageUrl: null };
 
-export const EMPTY_PRODUCT = {
+const EMPTY_PRODUCT = {
   sku: "",
   name: "",
   slug: "",
@@ -193,7 +193,7 @@ function toPayload(form) {
   };
 }
 
-export default function ProductForm({ productId = null, initial = null, onCreated = null }) {
+export default function ProductForm({ productId = null, initial = null }) {
   const router = useRouter();
   const isNew = productId === null;
   const [form, setForm] = useState(initial ?? EMPTY_PRODUCT);
@@ -341,9 +341,6 @@ export default function ProductForm({ productId = null, initial = null, onCreate
       const payload = toPayload(form);
       if (isNew) {
         const created = await adminRequest("/products", { method: "POST", body: payload });
-        if (onCreated) {
-          await onCreated(created);
-        }
         router.replace(`/admin/products/${created.id}`);
         return;
       }

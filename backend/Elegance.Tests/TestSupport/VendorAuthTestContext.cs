@@ -1,5 +1,6 @@
 using Elegance.Infrastructure.Admin;
 using Elegance.Infrastructure.Auth;
+using Elegance.Infrastructure.Inventory;
 using Elegance.Infrastructure.Notifications;
 using Elegance.Infrastructure.Vendors;
 using Microsoft.Extensions.Options;
@@ -22,6 +23,7 @@ public sealed class VendorAuthTestContext : IDisposable
     public VendorNotificationOptions NotificationOptions { get; } = new();
     public VendorNotificationQueuer NotificationQueuer { get; }
     public VendorAuthService AuthService { get; }
+    public AdminCatalogService AdminCatalogService { get; }
     public VendorCatalogService CatalogService { get; }
     public VendorOrderService OrderService { get; }
     public AdminVendorService AdminVendorService { get; }
@@ -35,7 +37,8 @@ public sealed class VendorAuthTestContext : IDisposable
         AuditLog = new AuditLogService(Db.Context);
         NotificationQueuer = new VendorNotificationQueuer(Db.Context, Options.Create(NotificationOptions));
         AuthService = new VendorAuthService(Db.Context, TokenService, TotpService, SecretProtector);
-        CatalogService = new VendorCatalogService(Db.Context, FileStorage, NotificationQueuer);
+        AdminCatalogService = new AdminCatalogService(Db.Context, AuditLog, new RestockDetectionService(Db.Context));
+        CatalogService = new VendorCatalogService(Db.Context, FileStorage, NotificationQueuer, AdminCatalogService);
         OrderService = new VendorOrderService(Db.Context);
         AdminVendorService = new AdminVendorService(Db.Context, AuditLog);
         AdminMediaService = new AdminMediaService(Db.Context, FileStorage, AuditLog);
