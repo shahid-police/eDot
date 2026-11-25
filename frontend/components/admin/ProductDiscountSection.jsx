@@ -38,6 +38,24 @@ export default function ProductDiscountSection({ productId, productType, variant
 
   async function submit() {
     setError("");
+
+    // These fields are deliberately not HTML-`required`: this section lives inside the main
+    // product <form>, and a `required` attribute there would block saving the whole product
+    // whenever a discount isn't being added, not just this one action. Validated here instead,
+    // only when the admin actually clicks "Add discount".
+    if (isVariantProduct && !form.productVariantId) {
+      setError("Choose which option this discount applies to.");
+      return;
+    }
+    if (!form.discountPercentage || Number(form.discountPercentage) <= 0) {
+      setError("Enter a discount percentage.");
+      return;
+    }
+    if (!form.startDate || !form.endDate) {
+      setError("Choose a start and end date.");
+      return;
+    }
+
     setBusy(true);
     try {
       await adminRequest(`/products/${productId}/discounts`, {
@@ -85,7 +103,6 @@ export default function ProductDiscountSection({ productId, productType, variant
               className="form-select form-select-sm"
               value={form.productVariantId}
               onChange={(e) => setForm((f) => ({ ...f, productVariantId: e.target.value }))}
-              required
             >
               <option value="">Choose an option...</option>
               {activeVariants.map((v) => (
@@ -101,7 +118,6 @@ export default function ProductDiscountSection({ productId, productType, variant
             className="form-control form-control-sm"
             value={form.discountPercentage}
             onChange={(e) => setForm((f) => ({ ...f, discountPercentage: e.target.value }))}
-            required
           />
         </div>
         <div className="col-md-3">
@@ -111,7 +127,6 @@ export default function ProductDiscountSection({ productId, productType, variant
             className="form-control form-control-sm"
             value={form.startDate}
             onChange={(e) => setForm((f) => ({ ...f, startDate: e.target.value }))}
-            required
           />
         </div>
         <div className="col-md-3">
@@ -121,7 +136,6 @@ export default function ProductDiscountSection({ productId, productType, variant
             className="form-control form-control-sm"
             value={form.endDate}
             onChange={(e) => setForm((f) => ({ ...f, endDate: e.target.value }))}
-            required
           />
         </div>
         <div className="col-md-auto">
