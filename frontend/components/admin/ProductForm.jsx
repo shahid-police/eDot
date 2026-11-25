@@ -198,7 +198,11 @@ export default function ProductForm({ productId = null, initial = null }) {
   const isNew = productId === null;
   const [form, setForm] = useState(initial ?? EMPTY_PRODUCT);
   const [categories, setCategories] = useState([]);
-  const [slugTouched, setSlugTouched] = useState(!isNew);
+  // Unlike SKU (tied to category, and far more operationally sensitive once set), the slug keeps
+  // following the name - on a brand-new product and when editing an existing one alike - until the
+  // admin types into the slug field themselves. Edits still happen deliberately: the autosave on
+  // the form only fires on save/submit, so the public URL doesn't change until the edit is saved.
+  const [slugTouched, setSlugTouched] = useState(false);
   // Mirrors slugTouched: once the admin edits the SKU themselves, picking a different category
   // stops overwriting it. Editing an existing product always starts "touched" (its real SKU).
   const [skuTouched, setSkuTouched] = useState(!isNew);
@@ -399,6 +403,17 @@ export default function ProductForm({ productId = null, initial = null }) {
             required
             maxLength={320}
           />
+          {form.slug && (
+            <div className="form-text">
+              Public link: <code>/product-default/{form.slug}</code>
+              {!isNew && (
+                <>
+                  {" "}
+                  <a href={`/product-default/${form.slug}`} target="_blank" rel="noreferrer">View on site</a>
+                </>
+              )}
+            </div>
+          )}
         </div>
         <div className="col-md-4">
           <label className="form-label">Category</label>
