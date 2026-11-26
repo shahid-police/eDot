@@ -108,6 +108,12 @@ public class AdminProductQuery
     public bool? IsActive { get; init; }
     public long? CategoryId { get; init; }
     public string? ProductType { get; init; }
+
+    // One of: sku, name, category, type, price, stock, active. Unrecognized or omitted falls back
+    // to the original default (newest first).
+    public string? SortBy { get; init; }
+    public bool SortDescending { get; init; }
+
     public int Page { get; init; } = 1;
     public int PageSize { get; init; } = 25;
 }

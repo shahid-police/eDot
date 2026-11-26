@@ -17,6 +17,8 @@ export default function AdminProductsPage() {
   const [result, setResult] = useState(null);
   const [categories, setCategories] = useState([]);
   const [error, setError] = useState("");
+  const [sortBy, setSortBy] = useState("");
+  const [sortDescending, setSortDescending] = useState(false);
 
   useEffect(() => {
     adminRequest("/categories").then(setCategories).catch(() => {});
@@ -25,12 +27,33 @@ export default function AdminProductsPage() {
   useEffect(() => {
     let active = true;
     adminRequest("/products", {
-      query: { search: query, categoryId, productType, isActive, page, pageSize: PAGE_SIZE },
+      query: { search: query, categoryId, productType, isActive, sortBy, sortDescending, page, pageSize: PAGE_SIZE },
     })
       .then((data) => active && setResult(data))
       .catch((err) => active && setError(err.message));
     return () => { active = false; };
-  }, [query, categoryId, productType, isActive, page]);
+  }, [query, categoryId, productType, isActive, sortBy, sortDescending, page]);
+
+  // Clicking the active column flips direction; clicking a different column starts ascending.
+  function toggleSort(column) {
+    setPage(1);
+    if (sortBy === column) {
+      setSortDescending((d) => !d);
+    } else {
+      setSortBy(column);
+      setSortDescending(false);
+    }
+  }
+
+  function SortableHeader({ column, children, className = "" }) {
+    const active = sortBy === column;
+    const arrow = active ? (sortDescending ? " ↓" : " ↑") : "";
+    return (
+      <th className={className} role="button" onClick={() => toggleSort(column)} style={{ cursor: "pointer", userSelect: "none" }}>
+        {children}{arrow}
+      </th>
+    );
+  }
 
   function applySearch(event) {
     event.preventDefault();
@@ -93,12 +116,13 @@ export default function AdminProductsPage() {
           <option value="false">Inactive only</option>
         </select>
 
-        {(categoryId || productType || isActive || query) && (
+        {(categoryId || productType || isActive || query || sortBy) && (
           <button
             type="button"
             className="btn btn-outline-secondary btn-sm"
             onClick={() => {
-              setSearch(""); setQuery(""); setCategoryId(""); setProductType(""); setIsActive(""); setPage(1);
+              setSearch(""); setQuery(""); setCategoryId(""); setProductType(""); setIsActive("");
+              setSortBy(""); setSortDescending(false); setPage(1);
             }}
           >
             Clear filters
@@ -115,13 +139,13 @@ export default function AdminProductsPage() {
             <table className="table table-sm align-middle">
               <thead>
                 <tr>
-                  <th>SKU</th>
-                  <th>Name</th>
-                  <th>Category</th>
-                  <th>Type</th>
-                  <th className="text-end">Price</th>
-                  <th className="text-end">Stock</th>
-                  <th>Active</th>
+                  <SortableHeader column="sku">SKU</SortableHeader>
+                  <SortableHeader column="name">Name</SortableHeader>
+                  <SortableHeader column="category">Category</SortableHeader>
+                  <SortableHeader column="type">Type</SortableHeader>
+                  <SortableHeader column="price" className="text-end">Price</SortableHeader>
+                  <SortableHeader column="stock" className="text-end">Stock</SortableHeader>
+                  <SortableHeader column="active">Active</SortableHeader>
                 </tr>
               </thead>
               <tbody>

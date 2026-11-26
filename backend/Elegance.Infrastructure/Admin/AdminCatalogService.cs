@@ -41,8 +41,8 @@ public class AdminCatalogService(EleganceDbContext dbContext, IAuditLogService a
         }
 
         var total = await products.CountAsync(cancellationToken);
+        products = ApplySort(products, query.SortBy, query.SortDescending);
         var rows = await products
-            .OrderByDescending(p => p.Id)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .Select(p => new
@@ -486,6 +486,33 @@ public class AdminCatalogService(EleganceDbContext dbContext, IAuditLogService a
             SortOrder = i.SortOrder,
         }).ToList(),
     };
+
+    // Always ends with a stable ThenBy(Id) tiebreaker, so paging stays deterministic even when
+    // many rows share the same sorted value (e.g. several products at the same price).
+    private static IQueryable<Product> ApplySort(IQueryable<Product> products, string? sortBy, bool descending)
+    {
+        var key = sortBy?.Trim().ToLowerInvariant();
+        if (key is null or "")
+        {
+            return products.OrderByDescending(p => p.Id);
+        }
+
+        IOrderedQueryable<Product> ordered = key switch
+        {
+            "sku" => descending ? products.OrderByDescending(p => p.Sku) : products.OrderBy(p => p.Sku),
+            "name" => descending ? products.OrderByDescending(p => p.Name) : products.OrderBy(p => p.Name),
+            "category" => descending ? products.OrderByDescending(p => p.Category.Name) : products.OrderBy(p => p.Category.Name),
+            "type" => descending ? products.OrderByDescending(p => p.ProductType) : products.OrderBy(p => p.ProductType),
+            "price" => descending
+                ? products.OrderByDescending(p => p.SalePrice ?? p.Price)
+                : products.OrderBy(p => p.SalePrice ?? p.Price),
+            "stock" => descending ? products.OrderByDescending(p => p.StockQuantity) : products.OrderBy(p => p.StockQuantity),
+            "active" => descending ? products.OrderByDescending(p => p.IsActive) : products.OrderBy(p => p.IsActive),
+            _ => products.OrderByDescending(p => p.Id),
+        };
+
+        return ordered.ThenBy(p => p.Id);
+    }
 
     private static ProductType ParseProductType(string value) =>
         Enum.TryParse<ProductType>(value, ignoreCase: true, out var type) && Enum.IsDefined(type)
