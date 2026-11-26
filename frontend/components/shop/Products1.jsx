@@ -4,16 +4,24 @@ import React from "react";
 import DiscountMarquee from "../common/DiscountMarquee";
 import ProductQuickActions from "../common/ProductQuickActions";
 import { initialState, reducer } from "@/reducer/filterReducer";
-import { useEffect, useReducer, useState } from "react";
+import { useEffect, useRef, useReducer, useState } from "react";
 import FilterSidebar from "./FilterSidebar";
 import LayoutHandler from "./LayoutHandler";
 import Link from "next/link";
-import Pagination from "../common/Pagination";
 import { formatPrice } from "@/lib/format/price";
 import useSavedProducts from "@/hooks/useSavedProducts";
 import { useContextElement } from "@/context/Context";
+
+// How many products are visible before any scrolling (matches the original two "pages" of 4 + 9
+// shown around the two promo tiles) and how many more to reveal each time the sentinel at the
+// bottom of the grid comes into view.
+const INITIAL_VISIBLE = 13;
+const LOAD_MORE_BATCH = 12;
+
 export default function Products1({ defaultLayout = 4, products }) {
   const source = products ?? products15;
+  const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE);
+  const sentinelRef = useRef(null);
   const { wishlistMap, compareMap, toggleWishlist, toggleCompare } = useSavedProducts();
   const { setNotifyItem } = useContextElement();
   const [activeLayout, setActiveLayout] = useState(defaultLayout);
@@ -178,7 +186,30 @@ export default function Products1({ defaultLayout = 4, products }) {
       dispatch({ type: "SET_SORTED", payload: filtered });
     }
     dispatch({ type: "SET_CURRENT_PAGE", payload: 1 });
+    setVisibleCount(INITIAL_VISIBLE);
   }, [filtered, sortingOption]);
+
+  // Lazy-load more products as the user scrolls near the bottom of the grid, instead of a
+  // "1 2 3" pager - reveals the next batch of already-fetched/filtered results, and stops
+  // observing once everything currently matching the filters is shown.
+  useEffect(() => {
+    const node = sentinelRef.current;
+    if (!node || visibleCount >= (sorted?.length ?? 0)) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          setVisibleCount((count) => Math.min(count + LOAD_MORE_BATCH, sorted?.length ?? count));
+        }
+      },
+      { rootMargin: "400px" }
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [visibleCount, sorted]);
+
   return (
     <>
       <div className="flat-spacing pt-0">
@@ -468,7 +499,7 @@ export default function Products1({ defaultLayout = 4, products }) {
                   </Link>
                 </div>
               </div>
-              {sorted?.slice(4, 13).map((product) => (
+              {sorted?.slice(4, Math.min(13, visibleCount)).map((product) => (
                 <div
                   key={product.id}
                   className={`loadItem card_product--V01 grid ${
@@ -616,10 +647,123 @@ export default function Products1({ defaultLayout = 4, products }) {
                   </Link>
                 </div>
               </div>
-              {/* Pagination */}
-              <div className="wd-full tempo">
-                <Pagination />
-              </div>
+              {sorted?.slice(13, visibleCount).map((product) => (
+                <div
+                  key={product.id}
+                  className={`loadItem card_product--V01 grid ${
+                    product.outOfStock ? "out-of-stock" : ""
+                  }`}
+                  data-availability={product.availability}
+                  data-category={product.category}
+                  data-material={product.material}
+                  data-size={product.size}
+                >
+                  <div className="card_product-wrapper">
+                    <Link
+                      href={`/${
+                        product.outOfStock
+                          ? "product-notify-avaiable"
+                          : "product-default"
+                      }/${product.slug ?? product.id}`}
+                      className="product-img"
+                    >
+                      <img
+                        src={product.imgSrc}
+                        alt={product.title}
+                        className="lazyload img-product"
+                        width={714}
+                        height={900}
+                      />
+                      <img
+                        src={product.hoverImgSrc}
+                        alt={product.title}
+                        className="lazyload img-hover"
+                        width={714}
+                        height={900}
+                      />
+                    </Link>
+
+                    {!product.outOfStock && (
+                      <ul className="list-product-btn" style={{ display: "flex" }}>
+                        <ProductQuickActions
+                          product={product}
+                          alwaysVisible
+                          isSaved={wishlistMap.has(product.id)}
+                          isCompared={compareMap.has(product.id)}
+                          onToggleWishlist={toggleWishlist}
+                          onToggleCompare={toggleCompare}
+                        />
+                      </ul>
+                    )}
+
+                    {product.badge && (
+                      <div className="badge-box">
+                        <span className={`badge-item ${product.badgeType}`}>
+                          {product.badge}
+                        </span>
+                      </div>
+                    )}
+
+                    {product.variantText && (
+                      <div
+                        className={`variant-box ${
+                          product.variantType === "marquee" ? "bg-primary" : ""
+                        }`}
+                      >
+                        {product.variantType === "notify" ? (
+                          <a
+                            href="#unavailable"
+                            data-bs-toggle="modal"
+                            className={`variant-box stock bg-main link ${product.textColor}`}
+                            onClick={() => setNotifyItem({ id: product.id, variantId: null })}
+                          >
+                            <p className="text-center d-none d-md-block">
+                              {product.variantText}
+                            </p>
+                            <p className="text-center d-md-none">Notify Me</p>
+                          </a>
+                        ) : product.variantType === "text" ? (
+                          <div className="size-box bg-light-gray text-center">
+                            <p className="text-caption">
+                              {product.variantText}
+                            </p>
+                          </div>
+                        ) : product.variantType === "marquee" ? (
+                          <DiscountMarquee parentClass="marquee-sale  infiniteSlide infiniteSlider" />
+                        ) : null}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="card_product-info">
+                    <Link
+                      href={`/${
+                        product.outOfStock
+                          ? "product-notify-avaiable"
+                          : "product-default"
+                      }/${product.slug ?? product.id}`}
+                      className="name-product h5 fw-normal link text-line-clamp-2"
+                    >
+                      {product.title}
+                    </Link>
+                    <div className="price-wrap">
+                      <span className="price-new h5">
+                        {formatPrice(product.price)}
+                      </span>
+                      {product.oldPrice && (
+                        <span className="price-old fw-normal">
+                          {formatPrice(product.oldPrice)}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {/* Lazy-load sentinel: becomes visible as the user nears the bottom of the grid,
+                  which reveals the next batch - replaces the old non-functional "1 2 3" pager. */}
+              {visibleCount < (sorted?.length ?? 0) && (
+                <div ref={sentinelRef} className="wd-full tempo" aria-hidden="true" />
+              )}
             </div>
           </div>
         </div>
