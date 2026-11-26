@@ -33,6 +33,12 @@ public class AdminCatalogService(EleganceDbContext dbContext, IAuditLogService a
         {
             products = products.Where(p => p.CategoryId == categoryId);
         }
+        if (!string.IsNullOrWhiteSpace(query.ProductType)
+            && Enum.TryParse<ProductType>(query.ProductType, ignoreCase: true, out var productType)
+            && Enum.IsDefined(productType))
+        {
+            products = products.Where(p => p.ProductType == productType);
+        }
 
         var total = await products.CountAsync(cancellationToken);
         var rows = await products

@@ -107,6 +107,7 @@ public class AdminProductQuery
     public string? Search { get; init; }
     public bool? IsActive { get; init; }
     public long? CategoryId { get; init; }
+    public string? ProductType { get; init; }
     public int Page { get; init; } = 1;
     public int PageSize { get; init; } = 25;
 }
