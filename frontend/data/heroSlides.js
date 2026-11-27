@@ -1,20 +1,20 @@
 export const sliderData = [
   {
-    image: "/images/slider/slider-1.jpg",
+    image: "/images/slider/slider-1.webp",
     titleItalic: "DISCOVER",
     titleRest: "OUR COLLECTION",
     subtitle:
       "Make a statement with colors and cuts that stand out. Be bold, be beautiful.",
   },
   {
-    image: "/images/slider/slider-2.jpg",
+    image: "/images/slider/slider-2.webp",
     titleItalic: "CRAFTED",
     titleRest: "TO DAZZLE",
     subtitle:
       "Make a statement with colors and cuts that stand out. Be bold, be beautiful.",
   },
   {
-    image: "/images/slider/slider-3.jpg",
+    image: "/images/slider/slider-3.webp",
     titleItalic: "TIMELESS",
     titleRest: "SPARKLE",
     subtitle:
