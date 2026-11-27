@@ -7,6 +7,7 @@ import Collections from "@/components/homes/home-2/Collections";
 import Cta from "@/components/homes/home-2/Cta";
 import Features from "@/components/homes/home-2/Features";
 import Hero from "@/components/homes/home-2/Hero";
+import ShoppingPreferenceChips from "@/components/common/ShoppingPreferenceChips";
 import Products1 from "@/components/homes/home-2/Products1";
 import Products2 from "@/components/homes/home-2/Products2";
 import Testimonials from "@/components/homes/home-2/Testimonials";
@@ -49,8 +50,18 @@ export default async function page() {
   return (
     <>
       <Header2 />
-      <Hero />
-      <Products2 products={trendyCollection} />
+      <div className="position-relative">
+        <Hero />
+        <div
+          className="container"
+          style={{ position: "absolute", left: 0, right: 0, bottom: 0, transform: "translateY(50%)", zIndex: 5 }}
+        >
+          <ShoppingPreferenceChips elevated />
+        </div>
+      </div>
+      <div style={{ marginTop: 56 }}>
+        <Products2 products={trendyCollection} />
+      </div>
 
       <Products1 products={bestSellers} />
       <Collections />

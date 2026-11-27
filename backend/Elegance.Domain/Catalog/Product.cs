@@ -32,6 +32,11 @@ public class Product
     public ProductGender? Gender { get; set; }
     public decimal? WeightGrams { get; set; }
 
+    // Admin-assigned classification powering the Budget/Premium/Luxury storefront chips. Null
+    // (Unassigned) for legacy products and anything the admin hasn't classified yet - never
+    // derived from price.
+    public ShoppingPreference? ShoppingPreference { get; set; }
+
     // Denormalized read-optimization for simple (non-variant) products.
     // Authoritative inventory ledger arrives in a later phase.
     public int StockQuantity { get; set; }

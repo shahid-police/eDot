@@ -10,9 +10,9 @@ export const metadata = {
   description: "The Choice of Elegant Women, Every Day",
 };
 
-async function loadProducts(category) {
+async function loadProducts(category, shoppingPreference) {
   try {
-    const result = await getProducts({ pageSize: 100, category });
+    const result = await getProducts({ pageSize: 100, category, shoppingPreference });
     return result.items.map(toTemplateCardProduct);
   } catch (error) {
     console.error("Product API unavailable, rendering template data:", error);
@@ -21,13 +21,13 @@ async function loadProducts(category) {
 }
 
 export default async function page({ searchParams }) {
-  const { category } = await searchParams;
-  const products = await loadProducts(category);
+  const { category, preference } = await searchParams;
+  const products = await loadProducts(category, preference);
 
   return (
     <>
       <Header2 parentClass="tf-header style-2" />
-      <ShopSearchResults initialProducts={products} />
+      <ShopSearchResults initialProducts={products} activePreference={preference ?? ""} />
       <Features
         parentClass="flat-spacing-8 bg-main"
         iconColorClass="text-primary"

@@ -389,6 +389,10 @@ namespace Elegance.Infrastructure.Persistence.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("varchar(200)");
 
+                    b.Property<string>("ShoppingPreference")
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
                     b.Property<string>("ShortDescription")
                         .HasMaxLength(500)
                         .HasColumnType("varchar(500)");
@@ -433,6 +437,8 @@ namespace Elegance.Infrastructure.Persistence.Migrations
                     b.HasIndex("IsFeatured");
 
                     b.HasIndex("IsNew");
+
+                    b.HasIndex("ShoppingPreference");
 
                     b.HasIndex("Sku")
                         .IsUnique();

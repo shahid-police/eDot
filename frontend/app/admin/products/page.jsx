@@ -7,12 +7,31 @@ import { formatPrice } from "@/lib/format/price";
 
 const PAGE_SIZE = 25;
 
+const PREFERENCE_BADGE_STYLES = {
+  Budget: { background: "#e6f4ea", color: "#1e7e34" },
+  Premium: { background: "#e3eefc", color: "#1a5fb4" },
+  Luxury: { background: "#f8ecd4", color: "#8a6d1d" },
+};
+
+function ShoppingPreferenceBadge({ value }) {
+  const style = value ? PREFERENCE_BADGE_STYLES[value] : { background: "#f1f1f1", color: "#777" };
+  return (
+    <span
+      className="badge rounded-pill"
+      style={{ ...style, fontWeight: 500 }}
+    >
+      {value || "Unassigned"}
+    </span>
+  );
+}
+
 export default function AdminProductsPage() {
   const [search, setSearch] = useState("");
   const [query, setQuery] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [productType, setProductType] = useState("");
   const [isActive, setIsActive] = useState("");
+  const [shoppingPreference, setShoppingPreference] = useState("");
   const [page, setPage] = useState(1);
   const [result, setResult] = useState(null);
   const [categories, setCategories] = useState([]);
@@ -27,12 +46,12 @@ export default function AdminProductsPage() {
   useEffect(() => {
     let active = true;
     adminRequest("/products", {
-      query: { search: query, categoryId, productType, isActive, sortBy, sortDescending, page, pageSize: PAGE_SIZE },
+      query: { search: query, categoryId, productType, isActive, shoppingPreference, sortBy, sortDescending, page, pageSize: PAGE_SIZE },
     })
       .then((data) => active && setResult(data))
       .catch((err) => active && setError(err.message));
     return () => { active = false; };
-  }, [query, categoryId, productType, isActive, sortBy, sortDescending, page]);
+  }, [query, categoryId, productType, isActive, shoppingPreference, sortBy, sortDescending, page]);
 
   // Clicking the active column flips direction; clicking a different column starts ascending.
   function toggleSort(column) {
@@ -116,13 +135,25 @@ export default function AdminProductsPage() {
           <option value="false">Inactive only</option>
         </select>
 
-        {(categoryId || productType || isActive || query || sortBy) && (
+        <select
+          className="form-select form-select-sm w-auto"
+          value={shoppingPreference}
+          onChange={(e) => resetFilterPage(setShoppingPreference)(e.target.value)}
+        >
+          <option value="">All preferences</option>
+          <option value="Budget">Budget</option>
+          <option value="Premium">Premium</option>
+          <option value="Luxury">Luxury</option>
+          <option value="Unassigned">Unassigned</option>
+        </select>
+
+        {(categoryId || productType || isActive || shoppingPreference || query || sortBy) && (
           <button
             type="button"
             className="btn btn-outline-secondary btn-sm"
             onClick={() => {
               setSearch(""); setQuery(""); setCategoryId(""); setProductType(""); setIsActive("");
-              setSortBy(""); setSortDescending(false); setPage(1);
+              setShoppingPreference(""); setSortBy(""); setSortDescending(false); setPage(1);
             }}
           >
             Clear filters
@@ -146,6 +177,7 @@ export default function AdminProductsPage() {
                   <SortableHeader column="price" className="text-end">Price</SortableHeader>
                   <SortableHeader column="stock" className="text-end">Stock</SortableHeader>
                   <SortableHeader column="active">Active</SortableHeader>
+                  <th>Preference</th>
                 </tr>
               </thead>
               <tbody>
@@ -158,10 +190,11 @@ export default function AdminProductsPage() {
                     <td className="text-end">{formatPrice(p.salePrice ?? p.price)}</td>
                     <td className="text-end">{p.productType === "Variant" ? "per option" : p.stockQuantity}</td>
                     <td>{p.isActive ? "Yes" : "No"}</td>
+                    <td><ShoppingPreferenceBadge value={p.shoppingPreference} /></td>
                   </tr>
                 ))}
                 {result.items.length === 0 && (
-                  <tr><td colSpan={7} className="text-muted">No products found.</td></tr>
+                  <tr><td colSpan={8} className="text-muted">No products found.</td></tr>
                 )}
               </tbody>
             </table>

@@ -84,6 +84,14 @@ public class ProductService(EleganceDbContext dbContext) : IProductService
             products = products.Where(p => p.Gender == gender);
         }
 
+        // "Any Item" (no value) returns everything, Unassigned products included. Any specific
+        // value excludes Unassigned products entirely - they only ever show under "Any Item".
+        if (!string.IsNullOrWhiteSpace(query.ShoppingPreference)
+            && Enum.TryParse<ShoppingPreference>(query.ShoppingPreference, true, out var shoppingPreference))
+        {
+            products = products.Where(p => p.ShoppingPreference == shoppingPreference);
+        }
+
         if (query.IsFeatured.HasValue)
         {
             products = products.Where(p => p.IsFeatured == query.IsFeatured.Value);

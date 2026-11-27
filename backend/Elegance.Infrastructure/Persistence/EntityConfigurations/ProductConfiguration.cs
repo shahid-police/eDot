@@ -30,6 +30,7 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
 
         builder.Property(p => p.ProductType).HasConversion<string>().HasMaxLength(20);
         builder.Property(p => p.Gender).HasConversion<string>().HasMaxLength(20);
+        builder.Property(p => p.ShoppingPreference).HasConversion<string>().HasMaxLength(20);
 
         builder.Property(p => p.Material).HasMaxLength(100);
         builder.Property(p => p.Color).HasMaxLength(50);
@@ -54,6 +55,7 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
 
         builder.HasIndex(p => p.CategoryId);
         builder.HasIndex(p => p.VendorId);
+        builder.HasIndex(p => p.ShoppingPreference);
         builder.HasIndex(p => p.IsActive);
         builder.HasIndex(p => p.IsFeatured);
         builder.HasIndex(p => p.IsNew);

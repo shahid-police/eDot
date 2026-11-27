@@ -24,6 +24,7 @@ const EMPTY_PRODUCT = {
   material: "",
   color: "",
   occasion: "",
+  shoppingPreference: "",
   weightGrams: "",
   videoUrl: "",
   isActive: true,
@@ -37,6 +38,14 @@ const EMPTY_PRODUCT = {
 // Accepted by the admin media upload endpoints (Elegance.Infrastructure/Admin/AdminMediaService.cs).
 const IMAGE_ACCEPT = "image/jpeg,image/png,image/webp";
 const MAX_GALLERY_IMAGES = 8;
+
+// Powers the customer-facing Budget/Premium/Luxury storefront chips. Manually assigned only -
+// never derived from price. Blank/unselected leaves the product Unassigned.
+const SHOPPING_PREFERENCES = [
+  { value: "Budget", label: "Budget", hint: "Everyday, accessible pieces" },
+  { value: "Premium", label: "Premium", hint: "Elevated, statement pieces" },
+  { value: "Luxury", label: "Luxury", hint: "Exclusive, top-tier pieces" },
+];
 
 function slugify(value) {
   return value.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
@@ -125,6 +134,7 @@ export function fromApi(product) {
     material: product.material ?? "",
     color: product.color ?? "",
     occasion: product.occasion ?? "",
+    shoppingPreference: product.shoppingPreference ?? "",
     weightGrams: product.weightGrams == null ? "" : String(product.weightGrams),
     videoUrl: product.videoUrl ?? "",
     isActive: product.isActive,
@@ -168,6 +178,7 @@ function toPayload(form) {
     material: form.material || null,
     color: form.color || null,
     occasion: form.occasion || null,
+    shoppingPreference: form.shoppingPreference || null,
     weightGrams: toNumberOrNull(form.weightGrams),
     videoUrl: form.videoUrl.trim() || null,
     stockQuantity: isVariant ? 0 : Number(form.stockQuantity) || 0,
@@ -534,6 +545,49 @@ export default function ProductForm({ productId = null, initial = null }) {
         <div className="col-md-3">
           <label className="form-label">Occasion</label>
           <input className="form-control" value={form.occasion} onChange={(e) => update("occasion", e.target.value)} maxLength={100} />
+        </div>
+        <div className="col-12">
+          <label className="form-label d-block">Shopping preference</label>
+          <div className="d-flex flex-wrap gap-2">
+            {SHOPPING_PREFERENCES.map((pref) => {
+              const selected = form.shoppingPreference === pref.value;
+              return (
+                <button
+                  key={pref.value}
+                  type="button"
+                  className="text-start"
+                  onClick={() => update("shoppingPreference", selected ? "" : pref.value)}
+                  style={{
+                    minWidth: 160,
+                    padding: "10px 14px",
+                    borderRadius: 8,
+                    border: selected ? "2px solid var(--primary)" : "1px solid #d9d9d9",
+                    background: selected ? "rgba(174, 135, 62, 0.08)" : "#fff",
+                    cursor: "pointer",
+                  }}
+                >
+                  <div style={{ fontWeight: 600, color: selected ? "var(--primary)" : "var(--main)" }}>{pref.label}</div>
+                  <div style={{ fontSize: 12, color: "#777" }}>{pref.hint}</div>
+                </button>
+              );
+            })}
+            <button
+              type="button"
+              className="text-start"
+              onClick={() => update("shoppingPreference", "")}
+              style={{
+                minWidth: 120,
+                padding: "10px 14px",
+                borderRadius: 8,
+                border: !form.shoppingPreference ? "2px solid var(--primary)" : "1px solid #d9d9d9",
+                background: !form.shoppingPreference ? "rgba(174, 135, 62, 0.08)" : "#fff",
+                cursor: "pointer",
+              }}
+            >
+              <div style={{ fontWeight: 600, color: !form.shoppingPreference ? "var(--primary)" : "var(--main)" }}>Unassigned</div>
+              <div style={{ fontSize: 12, color: "#777" }}>Not shown under Budget/Premium/Luxury</div>
+            </button>
+          </div>
         </div>
         <div className="col-12 d-flex flex-wrap gap-3">
           {[["isActive", "Active"], ["isFeatured", "Featured"], ["isNew", "New"], ["isBestSeller", "Best seller"]].map(([field, label]) => (

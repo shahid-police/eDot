@@ -109,6 +109,9 @@ public class AdminProductQuery
     public long? CategoryId { get; init; }
     public string? ProductType { get; init; }
 
+    // One of: budget, premium, luxury, unassigned. Unrecognized or omitted applies no filter.
+    public string? ShoppingPreference { get; init; }
+
     // One of: sku, name, category, type, price, stock, active. Unrecognized or omitted falls back
     // to the original default (newest first).
     public string? SortBy { get; init; }
@@ -130,6 +133,7 @@ public class AdminProductSummaryDto
     public decimal? SalePrice { get; init; }
     public required int StockQuantity { get; init; }
     public required bool IsActive { get; init; }
+    public string? ShoppingPreference { get; init; }
 }
 
 public class AdminVariantDto
@@ -173,6 +177,7 @@ public class AdminProductDto
     public string? Color { get; init; }
     public string? Occasion { get; init; }
     public decimal? WeightGrams { get; init; }
+    public string? ShoppingPreference { get; init; }
     public required int StockQuantity { get; init; }
     public int? LowStockThreshold { get; init; }
     public required bool IsFeatured { get; init; }
@@ -264,6 +269,11 @@ public class AdminProductRequest
     public string? Occasion { get; init; }
 
     public decimal? WeightGrams { get; init; }
+
+    // One of: Budget, Premium, Luxury. Leave blank/null to leave the product Unassigned - never
+    // forced, never derived from price.
+    [StringLength(20)]
+    public string? ShoppingPreference { get; init; }
 
     [Range(0, 1000000)]
     public int StockQuantity { get; init; }

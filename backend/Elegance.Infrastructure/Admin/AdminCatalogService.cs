@@ -39,6 +39,18 @@ public class AdminCatalogService(EleganceDbContext dbContext, IAuditLogService a
         {
             products = products.Where(p => p.ProductType == productType);
         }
+        if (!string.IsNullOrWhiteSpace(query.ShoppingPreference))
+        {
+            if (string.Equals(query.ShoppingPreference, "Unassigned", StringComparison.OrdinalIgnoreCase))
+            {
+                products = products.Where(p => p.ShoppingPreference == null);
+            }
+            else if (Enum.TryParse<ShoppingPreference>(query.ShoppingPreference, ignoreCase: true, out var shoppingPreference)
+                && Enum.IsDefined(shoppingPreference))
+            {
+                products = products.Where(p => p.ShoppingPreference == shoppingPreference);
+            }
+        }
 
         var total = await products.CountAsync(cancellationToken);
         products = ApplySort(products, query.SortBy, query.SortDescending);
@@ -57,6 +69,7 @@ public class AdminCatalogService(EleganceDbContext dbContext, IAuditLogService a
                 p.SalePrice,
                 p.StockQuantity,
                 p.IsActive,
+                p.ShoppingPreference,
             })
             .ToListAsync(cancellationToken);
 
@@ -74,6 +87,7 @@ public class AdminCatalogService(EleganceDbContext dbContext, IAuditLogService a
                 SalePrice = p.SalePrice,
                 StockQuantity = p.StockQuantity,
                 IsActive = p.IsActive,
+                ShoppingPreference = p.ShoppingPreference.HasValue ? p.ShoppingPreference.Value.ToString() : null,
             }).ToList(),
             Page = page,
             PageSize = pageSize,
@@ -425,6 +439,7 @@ public class AdminCatalogService(EleganceDbContext dbContext, IAuditLogService a
         product.Color = request.Color;
         product.Occasion = request.Occasion;
         product.WeightGrams = request.WeightGrams;
+        product.ShoppingPreference = ParseShoppingPreference(request.ShoppingPreference);
         product.LowStockThreshold = request.LowStockThreshold;
         product.IsFeatured = request.IsFeatured;
         product.IsNew = request.IsNew;
@@ -454,6 +469,7 @@ public class AdminCatalogService(EleganceDbContext dbContext, IAuditLogService a
         Color = product.Color,
         Occasion = product.Occasion,
         WeightGrams = product.WeightGrams,
+        ShoppingPreference = product.ShoppingPreference?.ToString(),
         StockQuantity = product.StockQuantity,
         LowStockThreshold = product.LowStockThreshold,
         IsFeatured = product.IsFeatured,
@@ -512,6 +528,20 @@ public class AdminCatalogService(EleganceDbContext dbContext, IAuditLogService a
         };
 
         return ordered.ThenBy(p => p.Id);
+    }
+
+    // Blank/null leaves the product Unassigned - a legitimate, ongoing state the admin can choose,
+    // not just a legacy artifact. Only a non-empty, unrecognized value is rejected.
+    private static ShoppingPreference? ParseShoppingPreference(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return null;
+        }
+
+        return Enum.TryParse<ShoppingPreference>(value, ignoreCase: true, out var preference) && Enum.IsDefined(preference)
+            ? preference
+            : throw new ApplicationFailure(FailureKind.Validation, "Choose Budget, Premium, or Luxury as the shopping preference.");
     }
 
     private static ProductType ParseProductType(string value) =>
