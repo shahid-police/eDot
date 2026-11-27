@@ -41,13 +41,35 @@ const CHIPS = [
 export default function ShoppingPreferenceChips({ active = "", basePath = "/shop-default", className = "", elevated = false }) {
   return (
     <div
-      className={`d-flex flex-wrap justify-content-center gap-2 gap-sm-3 ${className}`}
+      className={`preference-chip-row d-flex flex-nowrap justify-content-center justify-content-sm-center gap-2 gap-sm-3 ${className}`}
       role="navigation"
       aria-label="Shop by preference"
     >
       <style jsx>{`
+        .preference-chip-row {
+          overflow-x: auto;
+          scrollbar-width: none;
+          -webkit-overflow-scrolling: touch;
+        }
+        .preference-chip-row::-webkit-scrollbar {
+          display: none;
+        }
         .preference-chip:hover {
           transform: translateY(-2px);
+        }
+        @media (max-width: 480px) {
+          .preference-chip-row {
+            justify-content: flex-start;
+          }
+          .preference-chip {
+            padding: 8px 12px !important;
+            font-size: 11.5px !important;
+            gap: 4px !important;
+          }
+          .preference-chip :global(svg) {
+            width: 12px;
+            height: 12px;
+          }
         }
       `}</style>
       {CHIPS.map((chip) => {
@@ -57,7 +79,7 @@ export default function ShoppingPreferenceChips({ active = "", basePath = "/shop
           <Link
             key={chip.label}
             href={href}
-            className="d-inline-flex align-items-center gap-2 preference-chip"
+            className="d-inline-flex align-items-center gap-2 preference-chip flex-shrink-0"
             style={{
               padding: "11px 22px",
               borderRadius: 999,
